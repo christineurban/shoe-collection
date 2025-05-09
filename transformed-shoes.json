@@ -1,0 +1,552 @@
+[
+  {
+    "Image": "",
+    "Brand": "Amazon",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Ballet Flat",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Either",
+    "Notes": "\"foldable flats"
+  },
+  {
+    "Image": "",
+    "Brand": "Ugg",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Boot",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Marc Fisher",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": "Marc Fisher Women's Alva Ankle Boot"
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Front Closet",
+    "Color": "Beige",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Soda",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Vepose",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Columbia",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Kelsi Dagger",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Franco Sarto",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Dolce Vita",
+    "Location": "Bedroom Closet",
+    "Color": "Brown",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Nine West",
+    "Location": "Bedroom Closet",
+    "Color": "Brown",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Sam Edelman",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Tommy Hilfiger",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Joie",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Joie",
+    "Location": "Garage",
+    "Color": "Black",
+    "Type": "Boot",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Reebok",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Gym",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Altra",
+    "Location": "Garage",
+    "Color": "White",
+    "Type": "Gym",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Nike",
+    "Location": "Garage",
+    "Color": "Purple",
+    "Type": "Gym",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Columbia",
+    "Location": "Bedroom Closet",
+    "Color": "Gray",
+    "Type": "Hiking",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Columbia",
+    "Location": "Bedroom Closet",
+    "Color": "Gray",
+    "Type": "Hiking",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Amazon Essentials",
+    "Location": "Front Closet",
+    "Color": "Beige",
+    "Type": "Loafer",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Amazon",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Mule",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Clarks",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Mule",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Dolce Vita",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Mule",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Ivanka Trump",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Pump",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Pump",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Pump",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Old Navy",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Old Navy",
+    "Location": "Front Closet",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Yellow Box",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Rainbow",
+    "Location": "Bedroom Closet",
+    "Color": "Brown",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Olukai",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Reef",
+    "Location": "Bedroom Closet",
+    "Color": "Brown",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Target",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Either",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Bedroom Closet",
+    "Color": "Black",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Kelly & Katie",
+    "Location": "Bedroom Closet",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Garage",
+    "Color": "Silver",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Unknown",
+    "Location": "Garage",
+    "Color": "Silver",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Jessica Simpson",
+    "Location": "Garage",
+    "Color": "Black",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Jessica Simpson",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Dressy",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Calvin Klein",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Sandal",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Target",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Sorel",
+    "Location": "Front Closet",
+    "Color": "Black",
+    "Type": "Sneaker",
+    "Heel or Flat": "Heel",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Hoka",
+    "Location": "Front Closet",
+    "Color": "White",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Skechers",
+    "Location": "Bedroom Closet",
+    "Color": "Pink",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Nike",
+    "Location": "Bedroom Closet",
+    "Color": "White",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Altra",
+    "Location": "Bedroom Closet",
+    "Color": "Blue",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Brooks",
+    "Location": "Bedroom Closet",
+    "Color": "Gray",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Cole Haan",
+    "Location": "Bedroom Closet",
+    "Color": "Gray",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Ecco",
+    "Location": "Bedroom Closet",
+    "Color": "White",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "New Balance",
+    "Location": "Garage",
+    "Color": "Black",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  },
+  {
+    "Image": "",
+    "Brand": "Target",
+    "Location": "Garage",
+    "Color": "Beige",
+    "Type": "Sneaker",
+    "Heel or Flat": "Flat",
+    "DressStyle": "Casual",
+    "Notes": ""
+  }
+]

@@ -1,4 +1,7 @@
 import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 interface SheetRow {
   Image: string;
@@ -11,7 +14,10 @@ interface SheetRow {
   Notes: string;
 }
 
-const SPREADSHEET_ID = '1kvLvggx5kp4GI6IFHAhTA2DsKux_-aCRqel7h_e1VUU';
+const SPREADSHEET_ID = '1ca-HNVSJ-wN_GqXofcMzftFPTaMfKQ-zPJRFkAbQjRU';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
   try {
@@ -56,10 +62,15 @@ async function main() {
       return obj as SheetRow;
     });
 
-    // Output the result
-    console.log(JSON.stringify(data, null, 2));
+    // Write the data to a JSON file
+    const outputPath = path.join(__dirname, '..', 'transformed-shoes.json');
+    fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
+
+    console.log(`Successfully processed ${data.length} records`);
+    console.log(`Output written to: ${outputPath}`);
   } catch (err) {
     console.error('Error:', err);
+    process.exit(1);
   }
 }
 
