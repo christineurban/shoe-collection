@@ -1,0 +1,82 @@
+name: Database and Image Backup
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly at midnight on Sunday
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for better versioning
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Clean install dependencies
+        run: |
+          rm -rf node_modules
+          rm -f package-lock.json
+          npm install
+
+      - name: Create backup directories
+        run: |
+          mkdir -p backups
+          mkdir -p image-backups
+
+      - name: Run database backup
+        run: npm run backup
+
+      - name: Run image backup
+        run: npm run backup:images
+
+      - name: Debug directory contents
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "\nAll files in current directory:"
+          ls -la
+          echo "\nBackups directory contents:"
+          ls -la backups/ || echo "Backups directory not found"
+          echo "\nImage backups directory contents:"
+          ls -la image-backups/ || echo "Image backups directory not found"
+
+      - name: Upload database backup as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup-${{ github.run_number }}
+          path: ${{ github.workspace }}/backups/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload image backup as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-backup-${{ github.run_number }}
+          path: ${{ github.workspace }}/image-backups/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: List backup contents
+        run: |
+          echo "Database backup contents:"
+          ls -la ${{ github.workspace }}/backups/ || echo "Backups directory not found"
+          echo "\nLatest database backup directory:"
+          ls -la ${{ github.workspace }}/backups/$(ls -t ${{ github.workspace }}/backups/ | head -n1) || echo "No database backup found"
+          echo "\nImage backup contents:"
+          ls -la ${{ github.workspace }}/image-backups/ || echo "Image backups directory not found"
+          echo "\nLatest image backup directory:"
+          ls -la ${{ github.workspace }}/image-backups/$(ls -t ${{ github.workspace }}/image-backups/ | head -n1) || echo "No image backup found"

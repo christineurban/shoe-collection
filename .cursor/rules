@@ -1,0 +1,189 @@
+{
+  "rules": {
+    "components": {
+      "structure": {
+        "pattern": "src/app/components/${componentName}/${fileName}",
+        "rules": [
+          {
+            "fileName": "index.tsx",
+            "required": true,
+            "description": "Main component file"
+          },
+          {
+            "fileName": "index.styled.ts",
+            "required": true,
+            "description": "Styled components file"
+          },
+          {
+            "fileName": "index.test.tsx",
+            "required": true,
+            "description": "Test file"
+          }
+        ]
+      },
+      "naming": {
+        "components": "PascalCase",
+        "styledComponents": "^Styled[A-Z]\\w+$",
+        "files": {
+          "components": "PascalCase",
+          "pages": "kebab-case",
+          "other": "camelCase"
+        }
+      }
+    },
+    "imports": {
+      "rules": [
+        {
+          "pattern": "^styled-components$",
+          "message": "Use styled-components for all styling"
+        },
+        {
+          "pattern": "style=",
+          "forbidden": true,
+          "message": "Inline styles are not allowed. Use styled-components instead."
+        },
+        {
+          "pattern": "unused-import",
+          "forbidden": true,
+          "message": "Remove unused imports"
+        },
+        {
+          "pattern": "import\\s*{[^}]+}\\s*from",
+          "message": "Group and organize imports properly"
+        }
+      ],
+      "order": [
+        "^react",
+        "^next",
+        "^@/",
+        "^[./]"
+      ]
+    },
+    "styling": {
+      "rules": [
+        {
+          "pattern": "className=",
+          "forbidden": true,
+          "message": "Regular CSS classes are not allowed. Use styled-components instead."
+        },
+        {
+          "pattern": "var\\(--[^)]+\\)",
+          "forbidden": true,
+          "message": "CSS variables are not allowed. Use styled-components theme instead."
+        },
+        {
+          "pattern": "style=",
+          "forbidden": true,
+          "message": "Style attributes are not allowed. Use styled-components instead."
+        },
+        {
+          "pattern": "styled\\.[a-zA-Z]+`\\s*`",
+          "forbidden": true,
+          "message": "Empty styled components are not allowed"
+        }
+      ]
+    },
+    "exports": {
+      "rules": [
+        {
+          "pattern": "export default",
+          "allowed": ["src/app/pages/**/*.tsx"],
+          "message": "Default exports are only allowed in page components"
+        }
+      ]
+    },
+    "accessibility": {
+      "rules": [
+        {
+          "element": "a",
+          "required": ["tabIndex", "aria-label", "onClick", "onKeyDown"],
+          "message": "Anchor tags must include accessibility attributes"
+        }
+      ]
+    },
+    "eventHandling": {
+      "naming": {
+        "pattern": "^handle[A-Z]\\w+$",
+        "message": "Event handler functions must start with 'handle'"
+      }
+    },
+    "codeStyle": {
+      "rules": [
+        {
+          "pattern": "function\\s+[a-zA-Z]+",
+          "message": "Use const arrow functions instead of function declarations"
+        },
+        {
+          "pattern": "return\\s+.*\\s+{",
+          "message": "Consider using early returns for better readability"
+        },
+        {
+          "pattern": "const\\s+[a-z]+\\s*=\\s*\\(.*\\)\\s*=>\\s*[^:]+$",
+          "message": "Arrow functions should have type annotations"
+        },
+        {
+          "pattern": "TODO|FIXME|XXX",
+          "forbidden": true,
+          "message": "No TODOs or placeholders allowed - implement full functionality"
+        },
+        {
+          "pattern": "[a-z]{1,2}\\s*=",
+          "forbidden": true,
+          "message": "Use descriptive variable names (minimum 3 characters)"
+        },
+        {
+          "pattern": "(\\w+).*\\1",
+          "message": "Check for potential code duplication (DRY principle)"
+        }
+      ]
+    },
+    "typescript": {
+      "rules": [
+        {
+          "pattern": "\\.ts$",
+          "forbidden": true,
+          "message": "Use .tsx instead of .ts for React components"
+        },
+        {
+          "pattern": ":\\s*any",
+          "forbidden": true,
+          "message": "Avoid using 'any' type - specify proper types"
+        }
+      ]
+    },
+    "fileStructure": {
+      "components": {
+        "location": "src/app/components",
+        "structure": {
+          "pattern": "${componentName}/index.tsx",
+          "required": true
+        },
+        "tests": {
+          "pattern": "${componentName}/index.test.tsx",
+          "required": true,
+          "forbidden": ["${componentName}/index.spec.tsx"]
+        },
+        "styling": {
+          "pattern": "${componentName}/index.styled.ts",
+          "required": true
+        }
+      },
+      "database": {
+        "fileNaming": {
+          "pattern": "^[a-z_]+$",
+          "message": "Database file names must match DB naming conventions"
+        }
+      }
+    },
+    "dataModification": {
+      "forbidden": [
+        "DROP DATABASE",
+        "prisma migrate reset",
+        "prisma db reset",
+        "TRUNCATE",
+        "DELETE FROM"
+      ],
+      "message": "Data loss commands require explicit user confirmation"
+    }
+  }
+}
