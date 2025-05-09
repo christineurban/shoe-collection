@@ -4,63 +4,170 @@ import styled from 'styled-components';
 import Link from 'next/link';
 
 export const StyledNav = styled.nav`
-  background-color: ${({ theme }) => theme.colors.background.primary};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-  padding: 1rem 2rem;
+  background: ${({ theme }) => theme.colors.background.gradient};
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: ${({ theme }) => theme.shadows.md};
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid ${({ theme }) => `${theme.colors.primary[400]}30`};
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 0;
+  }
 `;
 
-export const StyledNavList = styled.ul`
+export const StyledContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
+  gap: 1rem;
 
-export const StyledNavItem = styled.li`
-  display: flex;
-  align-items: center;
-`;
+  @media (max-width: 1024px) {
+    padding: 0 1.5rem;
+    justify-content: space-between;
+  }
 
-export const StyledNavLink = styled(Link)<{ $isActive: boolean }>`
-  color: ${({ theme, $isActive }) =>
-    $isActive ? theme.colors.text.primary : theme.colors.text.secondary};
-  text-decoration: none;
-  font-weight: ${({ $isActive }) => $isActive ? '600' : '400'};
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text.primary};
+  @media (max-width: 480px) {
+    padding: 0 1rem;
+    gap: 0.5rem;
   }
 `;
 
 export const StyledLogo = styled(Link)`
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.inverse};
   text-decoration: none;
-  margin-right: 2rem;
+  font-weight: ${({ theme }) => theme.typography.fontWeights.bold};
+  font-size: ${({ theme }) => theme.typography.fontSize.xl};
+  margin-right: auto;
+  padding: 0.5rem 0;
+  position: relative;
+  cursor: pointer;
+
+  &::after {
+    display: none;
+  }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.text.primary};
+    color: ${({ theme }) => theme.colors.text.inverse};
+  }
+
+  @media (max-width: 1024px) {
+    font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  }
+
+  @media (max-width: 480px) {
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    padding: 0.25rem 0;
   }
 `;
 
-export const StyledAuthButton = styled.button`
+export const StyledLink = styled(Link)<{ $isActive: boolean }>`
+  color: ${({ theme, $isActive }) =>
+    $isActive ? theme.colors.text.inverse : `${theme.colors.text.inverse}80`};
+  text-decoration: none;
+  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
+  padding: 0.5rem 1rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  background: ${({ theme, $isActive }) =>
+    $isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+  transition: all ${({ theme }) => theme.transitions.base};
+  backdrop-filter: ${({ $isActive }) => ($isActive ? 'blur(4px)' : 'none')};
+
+  @media (max-width: 480px) {
+    padding: 0.375rem 0.75rem;
+  }
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.text.inverse};
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    text-shadow: 0 0 20px ${({ theme }) => `${theme.colors.primary[400]}50`};
+  }
+`;
+
+export const StyledLinks = styled.div<{ $isOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  @media (max-width: 1112px) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: ${({ theme }) => theme.colors.background.gradient};
+    padding: 1rem;
+    gap: 0.5rem;
+    transform: translateY(${({ $isOpen }) => ($isOpen ? '0' : '-100%')});
+    opacity: ${({ $isOpen }) => ($isOpen ? '1' : '0')};
+    visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
+    transition: all 0.3s ease;
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    backdrop-filter: blur(8px);
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+  }
+`;
+
+export const StyledHamburger = styled.button<{ $isOpen: boolean }>`
+  display: none;
   background: none;
   border: none;
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.text.inverse};
   cursor: pointer;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  transition: color 0.2s ease;
+  padding: 0.5rem;
+  transition: all ${({ theme }) => theme.transitions.base};
+  position: relative;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    transition: transform 0.3s ease;
+    transform: ${({ $isOpen }) => ($isOpen ? 'rotate(90deg)' : 'rotate(0)')};
+  }
+
+  @media (max-width: 1112px) {
+    display: flex;
+  }
+
+  @media (max-width: 480px) {
+    width: 40px;
+    height: 40px;
+    padding: 0.375rem;
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.text.primary};
+    transform: scale(1.1);
   }
-`;
 
-export const StyledAuthButtonText = styled.span`
-  font-weight: 500;
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
 `;

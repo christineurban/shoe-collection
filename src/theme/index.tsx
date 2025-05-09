@@ -73,7 +73,7 @@ export const theme: Theme = {
       primary: '#ffffff',
       secondary: '#f9fafb',
       muted: '#f3f4f6',
-      gradient: 'linear-gradient(135deg, #0ea5e9 0%, #a21caf 100%)',
+      gradient: 'linear-gradient(135deg, #166B5D 0%, #207DA9 100%)',
     },
     border: {
       default: '#e5e7eb',
