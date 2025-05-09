@@ -18,8 +18,8 @@ const onest = Onest({
 });
 
 export const metadata: Metadata = {
-  title: "Nail Polish Collection",
-  description: "Track and manage your nail polish collection",
+  title: "Shoe Collection",
+  description: "Track and manage your shoe collection",
 };
 
 export default function RootLayout({

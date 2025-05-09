@@ -2,12 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../Button';
 import { SingleSelect } from '../fields/SingleSelect';
-import { MultiSelect } from '../fields/MultiSelect';
 import { Input } from '../fields/Input';
-import { Rating, RATING_OPTIONS } from '@/types/rating';
 import { SuccessMessage } from '@/components/SuccessMessage';
 import {
   StyledForm,
@@ -24,25 +21,24 @@ interface AddEditFormData {
   id?: string;
   imageUrl?: string;
   brand: string;
-  name: string;
-  colors: string[];
-  finishes: string[];
+  color: string;
+  dressStyle: string;
+  shoeType: string;
+  heelType: string;
+  location: string;
   link?: string;
-  coats?: number;
-  rating?: Rating;
   notes?: string;
-  isOld: boolean | null;
-  lastUsed?: Date;
-  totalBottles?: number;
-  emptyBottles?: number;
 }
 
 interface AddEditFormProps {
   initialData?: AddEditFormData;
   isEditing?: boolean;
   brands?: string[];
-  availableColors?: string[];
-  availableFinishes?: string[];
+  colors?: string[];
+  dressStyles?: string[];
+  shoeTypes?: string[];
+  heelTypes?: string[];
+  locations?: string[];
 }
 
 export const AddEditForm = (props: AddEditFormProps) => {
@@ -57,8 +53,11 @@ function AddEditFormContent({
   initialData,
   isEditing = false,
   brands = [],
-  availableColors = [],
-  availableFinishes = []
+  colors = [],
+  dressStyles = [],
+  shoeTypes = [],
+  heelTypes = [],
+  locations = []
 }: AddEditFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,10 +65,11 @@ function AddEditFormContent({
   const [formData, setFormData] = useState<AddEditFormData>(
     initialData || {
       brand: '',
-      name: '',
-      colors: [],
-      finishes: [],
-      isOld: isEditing ? null : false,
+      color: '',
+      dressStyle: '',
+      shoeType: '',
+      heelType: '',
+      location: '',
     }
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +82,7 @@ function AddEditFormContent({
     setIsLoading(true);
 
     try {
-      const endpoint = isEditing ? `/api/polish/${formData.id}` : '/api/polish';
+      const endpoint = isEditing ? `/api/shoe/${formData.id}` : '/api/shoe';
       const response = await fetch(endpoint, {
         method: isEditing ? 'PUT' : 'POST',
         headers: {
@@ -92,23 +92,23 @@ function AddEditFormContent({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save nail polish');
+        throw new Error('Failed to save shoe');
       }
 
-      const savedPolish = await response.json();
-      setSuccessMessage(isEditing ? 'Polish updated successfully!' : 'Polish added successfully!');
+      const savedShoe = await response.json();
+      setSuccessMessage(isEditing ? 'Shoe updated successfully!' : 'Shoe added successfully!');
       setIsSuccess(true);
       setTimeout(() => {
         if (isEditing) {
-          router.push(returnTo || `/polish/${formData.id}`);
+          router.push(returnTo || `/shoe/${formData.id}`);
         } else {
-          router.push(`/polish/${savedPolish.id}`);
+          router.push(`/shoe/${savedShoe.id}`);
         }
         router.refresh();
       }, 1500);
     } catch (error) {
-      console.error('Error saving nail polish:', error);
-      alert('Failed to save nail polish. Please try again.');
+      console.error('Error saving shoe:', error);
+      alert('Failed to save shoe. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +118,7 @@ function AddEditFormContent({
     if (!formData.id) return;
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${formData.brand} - ${formData.name}"? This action cannot be undone.`
+      `Are you sure you want to delete this shoe? This action cannot be undone.`
     );
 
     if (!confirmed) return;
@@ -126,23 +126,23 @@ function AddEditFormContent({
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/polish/${formData.id}`, {
+      const response = await fetch(`/api/shoe/${formData.id}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete nail polish');
+        throw new Error('Failed to delete shoe');
       }
 
-      setSuccessMessage('Polish deleted successfully!');
+      setSuccessMessage('Shoe deleted successfully!');
       setIsSuccess(true);
       setTimeout(() => {
         router.push('/');
         router.refresh();
       }, 1500);
     } catch (error) {
-      console.error('Error deleting nail polish:', error);
-      alert('Failed to delete nail polish. Please try again.');
+      console.error('Error deleting shoe:', error);
+      alert('Failed to delete shoe. Please try again.');
     } finally {
       setIsDeleting(false);
     }
@@ -164,36 +164,12 @@ function AddEditFormContent({
               />
             </StyledFormGroup>
             <StyledFormGroup>
-              <label>Name *</label>
-              <Input
-                type="text"
-                value={formData.name}
-                onChange={(value) => setFormData((prev) => ({ ...prev, name: value }))}
-                required
-              />
-            </StyledFormGroup>
-          </StyledFormRow>
-        </StyledFormSection>
-
-        <StyledFormSection>
-          <h3>Appearance</h3>
-          <StyledFormRow>
-            <StyledFormGroup>
-              <label>Colors *</label>
-              <MultiSelect
-                values={formData.colors}
-                options={availableColors}
-                placeholder="Select colors"
-                onChange={(values) => setFormData((prev) => ({ ...prev, colors: values }))}
-              />
-            </StyledFormGroup>
-            <StyledFormGroup>
-              <label>Finishes *</label>
-              <MultiSelect
-                values={formData.finishes}
-                options={availableFinishes}
-                placeholder="Select finishes"
-                onChange={(values) => setFormData((prev) => ({ ...prev, finishes: values }))}
+              <label>Color *</label>
+              <SingleSelect
+                value={formData.color}
+                options={colors}
+                placeholder="Select color"
+                onChange={(value) => setFormData((prev) => ({ ...prev, color: value }))}
               />
             </StyledFormGroup>
           </StyledFormRow>
@@ -203,71 +179,42 @@ function AddEditFormContent({
           <h3>Details</h3>
           <StyledFormRow>
             <StyledFormGroup>
-              <label>Rating</label>
+              <label>Dress Style *</label>
               <SingleSelect
-                value={formData.rating || ''}
-                options={RATING_OPTIONS}
-                placeholder="Select rating"
-                onChange={(value) => setFormData((prev) => ({ ...prev, rating: value as Rating || undefined }))}
+                value={formData.dressStyle}
+                options={dressStyles}
+                placeholder="Select dress style"
+                onChange={(value) => setFormData((prev) => ({ ...prev, dressStyle: value }))}
               />
             </StyledFormGroup>
             <StyledFormGroup>
-              <label>Coats Needed</label>
-              <Input
-                type="number"
-                value={formData.coats || ''}
-                onChange={(value) => setFormData((prev) => ({ ...prev, coats: parseInt(value) || undefined }))}
-                min="1"
-                max="5"
+              <label>Shoe Type *</label>
+              <SingleSelect
+                value={formData.shoeType}
+                options={shoeTypes}
+                placeholder="Select shoe type"
+                onChange={(value) => setFormData((prev) => ({ ...prev, shoeType: value }))}
               />
             </StyledFormGroup>
           </StyledFormRow>
 
           <StyledFormRow>
             <StyledFormGroup>
-              <label>Total Bottles</label>
-              <Input
-                type="number"
-                value={formData.totalBottles || ''}
-                onChange={(value) => setFormData((prev) => ({ ...prev, totalBottles: parseInt(value) || undefined }))}
-                min="0"
-              />
-            </StyledFormGroup>
-            <StyledFormGroup>
-              <label>Empty Bottles</label>
-              <Input
-                type="number"
-                value={formData.emptyBottles || ''}
-                onChange={(value) => setFormData((prev) => ({ ...prev, emptyBottles: parseInt(value) || undefined }))}
-                min="0"
-              />
-            </StyledFormGroup>
-          </StyledFormRow>
-
-          <StyledFormRow>
-            <StyledFormGroup>
-              <label>Last Used</label>
-              <Input
-                type="date"
-                value={formData.lastUsed ? new Date(formData.lastUsed).toISOString().split('T')[0] : ''}
-                onChange={(value) => setFormData((prev) => ({ ...prev, lastUsed: value ? new Date(value) : undefined }))}
-                required={false}
-              />
-            </StyledFormGroup>
-            <StyledFormGroup>
-              <label>Is older polish?</label>
+              <label>Heel Type *</label>
               <SingleSelect
-                value={formData.isOld === null ? '' : formData.isOld ? 'Yes' : 'No'}
-                options={['Yes', 'No']}
-                placeholder="Select answer"
-                onChange={(value) => {
-                  if (value === '') {
-                    setFormData((prev) => ({ ...prev, isOld: null }));
-                  } else {
-                    setFormData((prev) => ({ ...prev, isOld: value === 'Yes' }));
-                  }
-                }}
-                disableSearch={true}
+                value={formData.heelType}
+                options={heelTypes}
+                placeholder="Select heel type"
+                onChange={(value) => setFormData((prev) => ({ ...prev, heelType: value }))}
+              />
+            </StyledFormGroup>
+            <StyledFormGroup>
+              <label>Location *</label>
+              <SingleSelect
+                value={formData.location}
+                options={locations}
+                placeholder="Select location"
+                onChange={(value) => setFormData((prev) => ({ ...prev, location: value }))}
               />
             </StyledFormGroup>
           </StyledFormRow>
@@ -281,7 +228,7 @@ function AddEditFormContent({
               type="url"
               value={formData.link || ''}
               onChange={(value) => setFormData((prev) => ({ ...prev, link: value }))}
-              placeholder="https://example.com/polish"
+              placeholder="https://example.com/shoe"
             />
           </StyledFormGroup>
           <StyledFormGroup>
@@ -299,14 +246,14 @@ function AddEditFormContent({
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Saving...' : isEditing ? 'Update Polish' : 'Add Polish'}
+            {isLoading ? 'Saving...' : isEditing ? 'Update Shoe' : 'Add Shoe'}
           </Button>
         </StyledButtonGroup>
 
         {isEditing && (
           <StyledDangerZone>
             <h3>Danger Zone</h3>
-            <p>Once you delete a polish, there is no going back. Please be certain.</p>
+            <p>Once you delete a shoe, there is no going back. Please be certain.</p>
             <Button
               onClick={handleDelete}
               type="button"
@@ -314,7 +261,7 @@ function AddEditFormContent({
               disabled={isDeleting}
               $fullWidth
             >
-              {isDeleting ? 'Deleting...' : 'Delete Polish'}
+              {isDeleting ? 'Deleting...' : 'Delete Shoe'}
             </Button>
           </StyledDangerZone>
         )}

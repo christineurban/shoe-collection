@@ -9,13 +9,23 @@ export interface StatCount {
   count: number;
 }
 
-export interface CollectionStats {
-  totalPolishes: number;
+interface CommonStat {
+  name: string;
+  count: number;
+}
+
+export interface Stats {
+  totalShoes: number;
   totalBrands: number;
   totalColors: number;
-  totalFinishes: number;
-  averageRating: number;
-  mostCommonBrand: StatCount;
-  mostCommonColor: StatCount;
-  mostCommonFinish: StatCount;
+  totalDressStyles: number;
+  totalShoeTypes: number;
+  totalHeelTypes: number;
+  totalLocations: number;
+  mostCommonBrand: CommonStat;
+  mostCommonColor: CommonStat;
+  mostCommonDressStyle: CommonStat;
+  mostCommonShoeType: CommonStat;
+  mostCommonHeelType: CommonStat;
+  mostCommonLocation: CommonStat;
 }

@@ -6,15 +6,14 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   try {
     // Update all records where image_url contains 'googleusercontent'
-    const result = await prisma.nail_polish.updateMany({
+    const result = await prisma.shoes.updateMany({
       where: {
         image_url: {
-          contains: 'googleusercontent'
+          not: null
         }
       },
       data: {
-        image_url: null,
-        updated_at: new Date()
+        image_url: null
       }
     });
 

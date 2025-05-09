@@ -1,28 +1,49 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const brands = await prisma.brands.findMany({
+    const { searchParams } = new URL(request.url);
+    const brand = searchParams.get('brand');
+
+    if (!brand) {
+      return NextResponse.json(
+        { error: 'Brand parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    const shoes = await prisma.shoes.findMany({
+      where: {
+        brand: {
+          name: brand
+        }
+      },
       include: {
-        nail_polish: {
-          select: {
-            id: true,
-            name: true,
-            is_old: true,
-          },
-        },
-      },
-      orderBy: {
-        name: 'asc',
-      },
+        brand: true,
+        color: true,
+        dress_style: true,
+        shoe_type: true,
+        heel_type: true,
+        location: true
+      }
     });
 
-    return NextResponse.json(brands);
+    return NextResponse.json(shoes.map(shoe => ({
+      id: shoe.id,
+      imageUrl: shoe.image_url,
+      brand: shoe.brand.name,
+      color: shoe.color.name,
+      dressStyle: shoe.dress_style.name,
+      shoeType: shoe.shoe_type.name,
+      heelType: shoe.heel_type.name,
+      location: shoe.location.name,
+      notes: shoe.notes
+    })));
   } catch (error) {
-    console.error('Error fetching brands with polishes:', error);
+    console.error('Error fetching shoes by brand:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch brands with polishes' },
+      { error: 'Failed to fetch shoes by brand' },
       { status: 500 }
     );
   }

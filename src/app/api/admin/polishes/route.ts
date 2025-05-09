@@ -3,30 +3,24 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const polishes = await prisma.nail_polish.findMany({
-      select: {
-        id: true,
-        name: true,
-        brands: {
-          select: {
-            name: true
-          }
-        }
-      },
-      orderBy: {
-        brands: {
-          name: 'asc'
-        }
+    const shoes = await prisma.shoes.findMany({
+      include: {
+        brand: true,
+        color: true,
+        location: true,
+        shoe_type: true,
+        heel_type: true,
+        dress_style: true
       }
     });
 
     return NextResponse.json({
-      polishes
+      shoes
     });
   } catch (error) {
-    console.error('Error fetching polishes:', error);
+    console.error('Error fetching shoes:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch polishes' },
+      { error: 'Failed to fetch shoes' },
       { status: 500 }
     );
   }

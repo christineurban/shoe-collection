@@ -1,7 +1,6 @@
 'use client';
 
 import styled from 'styled-components';
-import { theme } from '@/lib/theme';
 import { fieldStyles } from '../index.styled';
 
 export const StyledInput = styled.input`

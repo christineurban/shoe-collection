@@ -29,7 +29,7 @@ async function deleteImageFromSupabase(imageUrl: string) {
 
     // Delete the file from storage
     const { error } = await supabaseAdmin.storage
-      .from('nail-polish-images')
+      .from('shoe-images')
       .remove([fileName]);
 
     if (error) {
@@ -54,48 +54,49 @@ export async function POST(request: Request) {
         {
           success: false,
           error: 'Missing required field: id',
-          details: 'The id field is required to identify the nail polish to update.'
+          details: 'The id field is required to identify the shoe to update.'
         },
         { status: 400 }
       );
     }
 
-    // Get current polish data to check for existing image
-    const currentPolish = await prisma.nail_polish.findUnique({
+    // Get current shoe data to check for existing image
+    const currentShoe = await prisma.shoes.findUnique({
       where: { id },
-      include: { brands: true }
+      include: {
+        brand: true
+      }
     });
 
-    if (!currentPolish) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Polish not found',
-          details: 'The specified nail polish id does not exist.'
-        },
-        { status: 404 }
-      );
+    if (!currentShoe) {
+      return NextResponse.json({
+        error: 'Shoe not found',
+        details: 'The specified shoe id does not exist.'
+      }, { status: 404 });
     }
 
     // If marking as no image available (imageUrl === 'n/a')
     if (imageUrl === 'n/a') {
       // If there was an existing image, delete it from storage
-      if (currentPolish.image_url && currentPolish.image_url !== 'n/a') {
-        await deleteImageFromSupabase(currentPolish.image_url);
+      if (currentShoe.image_url && currentShoe.image_url !== 'n/a') {
+        await deleteImageFromSupabase(currentShoe.image_url);
       }
 
       // Update database to mark as no image available
-      const updatedPolish = await prisma.nail_polish.update({
+      const updatedShoe = await prisma.shoes.update({
         where: { id },
         data: {
           image_url: 'n/a',
           updated_at: new Date()
+        },
+        include: {
+          brand: true
         }
       });
 
       return NextResponse.json({
         success: true,
-        data: updatedPolish,
+        data: updatedShoe,
         message: 'Marked as no image available'
       });
     }
@@ -106,7 +107,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error: 'Missing required field: imageUrl',
-          details: 'The imageUrl field is required to update the nail polish image.'
+          details: 'The imageUrl field is required to update the shoe image.'
         },
         { status: 400 }
       );
@@ -123,45 +124,47 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('Uploading image to Supabase for polish:', {
-      id: currentPolish.id,
-      name: currentPolish.name,
-      brand: currentPolish.brands.name,
-      imageUrl: imageUrl.trim()
+    console.log('Uploading image to Supabase for shoe:', {
+      id: currentShoe.id,
+      name: currentShoe.brand.name,
+      brand: currentShoe.brand.name,
     });
 
     try {
       // Upload new image to Supabase storage
-      const supabaseUrl = await uploadImageToSupabase(imageUrl.trim(), currentPolish);
+      const supabaseUrl = await uploadImageToSupabase(imageUrl.trim(), {
+        brand: currentShoe.brand.name,
+        name: currentShoe.brand.name // Using brand name as the name since there's no name field in the shoes table
+      });
       console.log('Supabase upload successful, URL:', supabaseUrl);
 
-      // Only delete the old image if it exists and has a different filename
-      if (currentPolish.image_url &&
-          currentPolish.image_url !== 'n/a' &&
-          currentPolish.image_url !== supabaseUrl) {
-        const oldFileName = getFilenameFromUrl(currentPolish.image_url);
-        const newFileName = getFilenameFromUrl(supabaseUrl);
-
-        if (oldFileName && newFileName && oldFileName !== newFileName) {
-          console.log('Deleting old image with different filename:', oldFileName);
-          await deleteImageFromSupabase(currentPolish.image_url);
+      // Delete old image if it exists and is different from new one
+      if (currentShoe.image_url &&
+        currentShoe.image_url !== 'n/a' &&
+        currentShoe.image_url !== supabaseUrl) {
+        const oldFileName = getFilenameFromUrl(currentShoe.image_url);
+        if (oldFileName) {
+          await deleteImageFromSupabase(currentShoe.image_url);
         }
       }
 
       // Update database with new Supabase URL
-      const updatedPolish = await prisma.nail_polish.update({
+      const updatedShoe = await prisma.shoes.update({
         where: { id },
         data: {
           image_url: supabaseUrl,
           updated_at: new Date()
+        },
+        include: {
+          brand: true
         }
       });
 
-      console.log('Database updated with new URL:', JSON.stringify(updatedPolish, null, 2));
+      console.log('Database updated with new URL:', JSON.stringify(updatedShoe, null, 2));
 
       return NextResponse.json({
         success: true,
-        data: updatedPolish,
+        data: updatedShoe,
         message: 'Image updated successfully'
       });
     } catch (error) {
@@ -179,7 +182,7 @@ export async function POST(request: Request) {
           {
             success: false,
             error: 'Record not found',
-            details: 'The specified nail polish id does not exist.'
+            details: 'The specified shoe id does not exist.'
           },
           { status: 404 }
         );

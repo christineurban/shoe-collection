@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST() {
   const cookieStore = cookies();
-  cookieStore.delete('nail-polish-auth');
+  cookieStore.delete('shoe-collection-auth');
 
   return NextResponse.json({ success: true });
 }

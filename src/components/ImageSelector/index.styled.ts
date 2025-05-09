@@ -3,19 +3,28 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export const StyledContainer = styled.div`
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: ${({ theme }) => theme.colors.background.secondary};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
-export const StyledPolishCard = styled(motion.div)`
-  border: 1px solid #ccc;
-  margin: 20px 0;
-  padding: 20px;
-  border-radius: 8px;
-  position: relative;
+export const StyledShoeCard = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: ${({ theme }) => theme.colors.background.secondary};
+  box-shadow: ${({ theme }) => theme.shadows.base};
+  transition: all 0.2s ease-in-out;
 
-  @media (max-width: 768px) {
-    padding: 15px;
-    margin: 15px 0;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows.lg};
   }
 `;
 
@@ -34,28 +43,22 @@ export const StyledImagesGrid = styled.div`
 
 export const StyledImageContainer = styled.div`
   position: relative;
+  width: 100%;
+  height: 300px;
+  background: ${({ theme }) => theme.colors.background.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const StyledImage = styled.img<{ $isSelected?: boolean }>`
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #eee;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  ${props => props.$isSelected && `
-    border: 5px solid #4CAF50;
-  `}
-
-  &:hover {
-    transform: scale(1.02);
-  }
-
-  @media (max-width: 768px) {
-    ${props => props.$isSelected && `
-      border: 3px solid #4CAF50;
-    `}
-  }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: ${({ $isSelected }) => ($isSelected ? 0.7 : 1)};
+  transition: opacity ${({ theme }) => theme.transitions.base};
 `;
 
 export const StyledSaveButton = styled.button`
@@ -83,32 +86,30 @@ export const StyledSaveButton = styled.button`
   }
 `;
 
-export const StyledRemoveButton = styled.button<{ $hasSelectedImage?: boolean }>`
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 4px;
+export const StyledRemoveButton = styled.button`
   position: absolute;
-  top: 20px;
-  right: ${props => props.$hasSelectedImage ? '150px' : '20px'};
-  z-index: 5;
-
-  @media (max-width: 768px) {
-    position: static;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.background.primary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all ${({ theme }) => theme.transitions.base};
 
   &:hover {
-    background: #c82333;
+    background: ${({ theme }) => theme.colors.background.secondary};
   }
+`;
+
+export const StyledRemoveIcon = styled.span`
+  font-size: 1.5rem;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  line-height: 1;
 `;
 
 export const StyledMetadata = styled.div`
@@ -134,30 +135,81 @@ export const StyledLoadingOverlay = styled(motion.div)`
   z-index: 10;
 `;
 
-export const StyledSpinner = styled(motion.div)`
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #2196F3;
+export const StyledLoadingSpinner = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid ${({ theme }) => theme.colors.border};
+  border-top-color: ${({ theme }) => theme.colors.primary[500]};
   border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
 `;
 
-export const StyledContent = styled(motion.div)`
-  overflow: hidden;
+export const StyledLoadingText = styled.p`
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-export const StyledCollapseText = styled.div`
-  color: ${({ theme }) => theme.colors.primary[600]};
+export const StyledContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const StyledName = styled.h3`
+  margin: 0;
+  font-size: ${({ theme }) => theme.typography.fontSize.xl};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+export const StyledBrand = styled.p`
+  margin: 0;
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+export const StyledImageInput = styled.input`
+  display: none;
+`;
+
+export const StyledImageInputLabel = styled.label`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s ease;
+  transition: background-color ${({ theme }) => theme.transitions.base};
 
   &:hover {
-    color: ${({ theme }) => theme.colors.primary[700]};
-    text-decoration: underline;
+    background-color: ${({ theme }) => theme.colors.background.secondary};
   }
+`;
+
+export const StyledImageInputText = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  margin-top: 0.5rem;
+`;
+
+export const StyledImageInputIcon = styled.span`
+  font-size: 2rem;
+  color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 export const StyledImageCount = styled.div`
@@ -170,23 +222,12 @@ export const StyledImageCount = styled.div`
   white-space: nowrap;
 `;
 
-export const StyledPolishLink = styled(Link)`
+export const StyledShoeLink = styled(Link)`
   text-decoration: none;
-  color: ${({ theme }) => theme.colors.primary[700]};
-  transition: color 0.2s ease;
+  color: inherit;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.primary[900]};
-    text-decoration: underline;
-  }
-
-  h3 {
-    margin: 0;
-    display: inline-block;
-    margin-bottom: 0.5rem;
-    @media (max-width: 768px) {
-      margin-bottom: 1rem;
-    }
+    text-decoration: none;
   }
 `;
 

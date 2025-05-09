@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -15,19 +15,16 @@ export async function PUT(
       );
     }
 
-    const updatedPolish = await prisma.nail_polish.update({
+    const updatedShoe = await prisma.shoes.update({
       where: { id: params.id },
-      data: {
-        link,
-        updated_at: new Date(),
-      },
+      data: { link },
     });
 
-    return NextResponse.json(updatedPolish);
+    return NextResponse.json(updatedShoe);
   } catch (error) {
-    console.error('Error updating polish link:', error);
+    console.error('Error updating shoe link:', error);
     return NextResponse.json(
-      { error: 'Failed to update polish link' },
+      { error: 'Failed to update shoe link' },
       { status: 500 }
     );
   }

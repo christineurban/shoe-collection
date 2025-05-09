@@ -39,26 +39,9 @@ export const StyledScrollIndicator = styled.div`
 
 export const StyledStatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-top: 2rem;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  }
-
-  > div {
-    transition: transform 0.2s ease-in-out;
-
-    &:active {
-      transform: scale(0.98);
-    }
-  }
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: ${({ theme }) => theme.spacing[4]};
+  margin-bottom: ${({ theme }) => theme.spacing[8]};
 `;
 
 export const StyledAttributeList = styled.div`
@@ -261,4 +244,17 @@ export const StyledNote = styled.p`
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   margin-top: 1rem;
   font-style: italic;
+`;
+
+export const StyledDashboard = styled.div`
+  padding: ${({ theme }) => theme.spacing[4]};
+`;
+
+export const StyledAttributeSection = styled.div`
+  margin-top: ${({ theme }) => theme.spacing[8]};
+
+  h2 {
+    margin-bottom: ${({ theme }) => theme.spacing[4]};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
 `;

@@ -17,48 +17,49 @@ export async function POST(request: Request) {
     }
 
     const results = await Promise.all(
-      updates.map(async ({ polishId, imageUrl }) => {
+      updates.map(async ({ shoeId, imageUrl }) => {
         try {
-          // Get polish details
-          const polish = await prisma.nail_polish.findUnique({
-            where: { id: polishId },
-            include: { brands: true }
+          // Get shoe details
+          const shoe = await prisma.shoes.findUnique({
+            where: { id: shoeId },
+            include: {
+              brand: true
+            }
           });
 
-          if (!polish) {
+          if (!shoe) {
             return {
-              id: polishId,
+              id: shoeId,
               success: false,
-              error: 'Polish not found'
+              error: 'Shoe not found'
             };
           }
 
-          let finalImageUrl: string;
+          let finalImageUrl = imageUrl;
 
-          if (imageUrl === 'n/a') {
-            finalImageUrl = 'n/a';
-          } else {
-            // Upload to Supabase and get URL
-            finalImageUrl = await uploadImageToSupabase(imageUrl, polish);
+          // If the image is a data URL, upload it to Supabase
+          if (imageUrl.startsWith('data:')) {
+            finalImageUrl = await uploadImageToSupabase(imageUrl, {
+              brand: shoe.brand.name,
+              name: shoe.brand.name // Using brand name as the name since there's no name field in the shoes table
+            });
           }
 
-          // Update the database
-          const updatedPolish = await prisma.nail_polish.update({
-            where: { id: polishId },
+          const updatedShoe = await prisma.shoes.update({
+            where: { id: shoeId },
             data: {
-              image_url: finalImageUrl,
-              updated_at: new Date()
+              image_url: finalImageUrl
             }
           });
 
           return {
-            id: polishId,
+            id: shoeId,
             success: true,
-            data: updatedPolish
+            data: updatedShoe
           };
         } catch (error) {
           return {
-            id: polishId,
+            id: shoeId,
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error'
           };

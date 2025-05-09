@@ -7,24 +7,26 @@ export async function POST(request: Request) {
     const { id } = await request.json();
 
     if (!id) {
-      return NextResponse.json({ error: 'Polish ID is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Shoe ID is required' }, { status: 400 });
     }
 
     // First, get the current image URL
-    const polish = await prisma.nail_polish.findUnique({
+    const shoe = await prisma.shoes.findUnique({
       where: { id },
-      select: { image_url: true }
+      include: {
+        brand: true
+      }
     });
 
-    if (!polish) {
-      return NextResponse.json({ error: 'Polish not found' }, { status: 404 });
+    if (!shoe) {
+      return NextResponse.json({ error: 'Shoe not found' }, { status: 404 });
     }
 
     // Delete the image from storage if it exists
-    if (polish.image_url) {
+    if (shoe.image_url) {
       const { error: storageError } = await supabaseAdmin.storage
-        .from('nail-polish-images')
-        .remove([polish.image_url.split('/').pop()!]);
+        .from('shoe-images')
+        .remove([shoe.image_url.split('/').pop()!]);
 
       if (storageError) {
         console.error('Error deleting image from storage:', storageError);
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     // Update the database to remove the image URL
-    await prisma.nail_polish.update({
+    await prisma.shoes.update({
       where: { id },
       data: {
         image_url: null,

@@ -1,134 +1,59 @@
-import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
-import { CollectionStats } from '@/types/stats';
-
-const formatRating = (rating: string): string => {
-  return rating.replace('_PLUS', '+').replace('_MINUS', '-');
-};
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // Get total polishes
-    const totalPolishes = await prisma.nail_polish.count();
+    const totalShoes = await prisma.shoes.count();
 
-    // Get total brands
-    const totalBrands = await prisma.brands.count();
-
-    // Get total colors
-    const totalColors = await prisma.colors.count();
-
-    // Get total finishes
-    const totalFinishes = await prisma.finishes.count();
-
-    // Get most popular brand among new polishes
-    const brandsWithNewPolishes = await prisma.brands.findMany({
-      select: {
-        name: true,
-        nail_polish: {
-          where: {
-            OR: [
-              { is_old: false },
-              { is_old: null }
-            ]
-          }
-        }
+    const shoes = await prisma.shoes.findMany({
+      include: {
+        brand: true,
+        color: true,
+        dress_style: true,
+        shoe_type: true,
+        heel_type: true,
+        location: true
       }
-    });
-
-    const brandCounts = brandsWithNewPolishes.map(brand => ({
-      name: brand.name,
-      count: brand.nail_polish.length
-    })).sort((a, b) => b.count - a.count);
-
-    const mostPopularNewBrand = brandCounts.length > 0
-      ? brandCounts[0]
-      : { name: 'N/A', count: 0 };
-
-    // Get all ratings
-    const polishesWithRatings = await prisma.nail_polish.findMany({
-      select: {
-        rating: true
-      }
-    });
-
-    // Calculate most common rating
-    const ratedPolishes = polishesWithRatings.filter(polish => polish.rating !== null);
-    const ratedPolishesCount = ratedPolishes.length;
-
-    const ratingsCount = ratedPolishes.reduce((acc, polish) => {
-      const rating = polish.rating as string;
-      acc[rating] = (acc[rating] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const mostCommonRating = Object.entries(ratingsCount)
-      .sort(([, a], [, b]) => b - a)[0]?.[0] || null;
-
-    // Get brand stats with highest count
-    const mostCommonBrand = await prisma.brands.findMany({
-      include: {
-        _count: {
-          select: { nail_polish: true }
-        }
-      },
-      orderBy: {
-        nail_polish: {
-          _count: 'desc'
-        }
-      },
-      take: 1
-    });
-
-    // Get color stats with highest count
-    const mostCommonColor = await prisma.colors.findMany({
-      include: {
-        _count: {
-          select: { nail_polish: true }
-        }
-      },
-      orderBy: {
-        nail_polish: {
-          _count: 'desc'
-        }
-      },
-      take: 1
-    });
-
-    // Get finish stats with highest count
-    const mostCommonFinish = await prisma.finishes.findMany({
-      include: {
-        _count: {
-          select: { nail_polish: true }
-        }
-      },
-      orderBy: {
-        nail_polish: {
-          _count: 'desc'
-        }
-      },
-      take: 1
     });
 
     const stats = {
-      totalPolishes,
-      totalBrands,
-      totalColors,
-      totalFinishes,
-      averageRating: mostCommonRating ? formatRating(mostCommonRating) : null,
-      ratedPolishesCount,
-      mostPopularNewBrand,
-      mostCommonBrand: {
-        name: mostCommonBrand[0]?.name || 'N/A',
-        count: mostCommonBrand[0]?._count.nail_polish || 0
-      },
-      mostCommonColor: {
-        name: mostCommonColor[0]?.name || 'N/A',
-        count: mostCommonColor[0]?._count.nail_polish || 0
-      },
-      mostCommonFinish: {
-        name: mostCommonFinish[0]?.name || 'N/A',
-        count: mostCommonFinish[0]?._count.nail_polish || 0
-      }
+      totalShoes,
+      brands: Object.entries(
+        shoes.reduce((acc, shoe) => {
+          acc[shoe.brand.name] = (acc[shoe.brand.name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, count]) => ({ name, count })),
+      colors: Object.entries(
+        shoes.reduce((acc, shoe) => {
+          acc[shoe.color.name] = (acc[shoe.color.name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, count]) => ({ name, count })),
+      dressStyles: Object.entries(
+        shoes.reduce((acc, shoe) => {
+          acc[shoe.dress_style.name] = (acc[shoe.dress_style.name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, count]) => ({ name, count })),
+      shoeTypes: Object.entries(
+        shoes.reduce((acc, shoe) => {
+          acc[shoe.shoe_type.name] = (acc[shoe.shoe_type.name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, count]) => ({ name, count })),
+      heelTypes: Object.entries(
+        shoes.reduce((acc, shoe) => {
+          acc[shoe.heel_type.name] = (acc[shoe.heel_type.name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, count]) => ({ name, count })),
+      locations: Object.entries(
+        shoes.reduce((acc, shoe) => {
+          acc[shoe.location.name] = (acc[shoe.location.name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, count]) => ({ name, count }))
     };
 
     return NextResponse.json(stats);

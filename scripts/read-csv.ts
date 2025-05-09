@@ -11,7 +11,6 @@ interface SheetRow {
   DressStyle: string;
   ShoeType: string;
   Link: string;
-  Rating: string;
   Notes: string;
 }
 

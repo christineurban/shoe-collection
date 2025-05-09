@@ -8,7 +8,6 @@ interface SheetRow {
   DressStyle: string;
   ShoeType: string;
   Link: string;
-  Rating: string;
   Notes: string;
 }
 
@@ -49,7 +48,6 @@ async function main() {
           'Dress Style': 'DressStyle',
           'Shoe Type': 'ShoeType',
           'Link': 'Link',
-          'Rating': 'Rating',
           'Notes': 'Notes',
         }[header] || header;
 

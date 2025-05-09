@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
     if (password === process.env.PASSWORD) {
       // Set the authentication cookie with a more specific name
-      cookies().set('nail-polish-auth', 'true', {
+      cookies().set('shoe-collection-auth', 'true', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',

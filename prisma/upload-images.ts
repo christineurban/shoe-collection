@@ -29,8 +29,8 @@ async function getImagesFromUrl(url: string): Promise<string[]> {
       const width = $(element).attr('width');
       const height = $(element).attr('height');
 
-      // Skip if it's likely not a nail polish image
-      const isNotNailPolish =
+      // Skip if it's likely not a shoe image
+      const isNotShoe =
         src?.includes('avatar') ||
         src?.includes('logo') ||
         src?.includes('icon') ||
@@ -67,10 +67,10 @@ async function getImagesFromUrl(url: string): Promise<string[]> {
         (width && parseInt(width) < 200) ||
         (height && parseInt(height) < 200);
 
-      if (src && !isNotNailPolish) {
+      if (src && !isNotShoe) {
         images.push(src);
       }
-      if (dataSrc && !isNotNailPolish) {
+      if (dataSrc && !isNotShoe) {
         images.push(dataSrc);
       }
       if (srcset) {
@@ -86,7 +86,7 @@ async function getImagesFromUrl(url: string): Promise<string[]> {
           .sort((a: string[], b: string[]) => parseInt(b[1]) - parseInt(a[1]))
           .map((parts: string[]) => parts[0])
           .filter((url: string) => {
-            const isNotNailPolish = url.includes('avatar') ||
+            const isNotShoe = url.includes('avatar') ||
               url.includes('logo') ||
               url.includes('icon') ||
               url.includes('social') ||
@@ -97,7 +97,7 @@ async function getImagesFromUrl(url: string): Promise<string[]> {
               url.includes('thumb') ||
               url.includes('small') ||
               url.includes('tiny');
-            return !isNotNailPolish;
+            return !isNotShoe;
           });
 
         if (srcsetUrls.length > 0) {
@@ -128,7 +128,7 @@ async function getImagesFromUrl(url: string): Promise<string[]> {
   }
 }
 
-async function generateHtmlReport(polishesWithImages: Array<{
+async function generateHtmlReport(shoesWithImages: Array<{
   id: string;
   name: string;
   brand: { name: string };
@@ -139,10 +139,10 @@ async function generateHtmlReport(polishesWithImages: Array<{
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Nail Polish Images Selection</title>
+      <title>Shoe Images Selection</title>
       <style>
         body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .polish { border: 1px solid #ccc; margin: 20px 0; padding: 20px; border-radius: 8px; }
+        .shoe { border: 1px solid #ccc; margin: 20px 0; padding: 20px; border-radius: 8px; }
         .images { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
         .image-container { position: relative; }
         img { max-width: 100%; height: auto; border: 1px solid #eee; }
@@ -172,24 +172,24 @@ async function generateHtmlReport(polishesWithImages: Array<{
       </style>
     </head>
     <body>
-      <h1>Nail Polish Images Selection</h1>
+      <h1>Shoe Images Selection</h1>
       <p>Click on an image to select it, then click "Save" to update the database.</p>
-      ${polishesWithImages.map(polish => `
-        <div class="polish" id="polish-${polish.id}">
+      ${shoesWithImages.map(shoe => `
+        <div class="shoe" id="shoe-${shoe.id}">
           <div class="metadata">
-            <h2>${polish.brand.name} - ${polish.name}</h2>
-            <p>ID: ${polish.id}</p>
-            <p>Link: <a href="${polish.link}" target="_blank">${polish.link}</a></p>
+            <h2>${shoe.brand.name} - ${shoe.name}</h2>
+            <p>ID: ${shoe.id}</p>
+            <p>Link: <a href="${shoe.link}" target="_blank">${shoe.link}</a></p>
           </div>
-          ${polish.images.length ? `
+          ${shoe.images.length ? `
             <div class="images">
-              ${polish.images.map(img => `
+              ${shoe.images.map(img => `
                 <div class="image-container">
-                  <img src="${img}" onerror="this.style.display='none'" onclick="selectImage('${polish.id}', '${img}')" />
+                  <img src="${img}" onerror="this.style.display='none'" onclick="selectImage('${shoe.id}', '${img}')" />
                 </div>
               `).join('')}
             </div>
-            <button class="save-btn" onclick="saveImage('${polish.id}')">Save Selected Image</button>
+            <button class="save-btn" onclick="saveImage('${shoe.id}')">Save Selected Image</button>
           ` : `
             <p class="no-images">No images found on the linked page</p>
           `}
@@ -198,9 +198,9 @@ async function generateHtmlReport(polishesWithImages: Array<{
       <script>
         const selectedImages = {};
 
-        function selectImage(polishId, imageUrl) {
-          // Remove selected class from all images in this polish
-          document.querySelectorAll(\`#polish-\${polishId} img\`).forEach(img => {
+        function selectImage(shoeId, imageUrl) {
+          // Remove selected class from all images in this shoe
+          document.querySelectorAll(\`#shoe-\${shoeId} img\`).forEach(img => {
             img.classList.remove('selected');
           });
 
@@ -208,11 +208,11 @@ async function generateHtmlReport(polishesWithImages: Array<{
           event.target.classList.add('selected');
 
           // Store the selected image
-          selectedImages[polishId] = imageUrl;
+          selectedImages[shoeId] = imageUrl;
         }
 
-        async function saveImage(polishId) {
-          const imageUrl = selectedImages[polishId];
+        async function saveImage(shoeId) {
+          const imageUrl = selectedImages[shoeId];
           if (!imageUrl) {
             alert('Please select an image first');
             return;
@@ -225,7 +225,7 @@ async function generateHtmlReport(polishesWithImages: Array<{
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                id: polishId,
+                id: shoeId,
                 imageUrl: imageUrl
               }),
             });

@@ -2,86 +2,69 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const isAuthenticated = request.cookies.get('nail-polish-auth')?.value === 'true';
-  const isLoginPage = request.nextUrl.pathname === '/login';
+  const isAuthenticated = request.cookies.get('shoe-auth')?.value === 'true';
+  const { pathname } = request.nextUrl;
 
-  // If trying to access login page while authenticated, redirect to home
-  if (isLoginPage && isAuthenticated) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // Public routes that don't require authentication
+  const publicRoutes = [
+    '/',
+    '/api/shoes',
+    '/api/brands',
+    '/api/colors',
+    '/api/dress-styles',
+    '/api/shoe-types',
+    '/api/heel-types',
+    '/api/locations'
+  ];
 
-  // If not authenticated and trying to access protected routes, redirect to login
-  if (!isAuthenticated && isProtectedRoute(request.nextUrl.pathname, request.method)) {
-    const loginUrl = new URL('/login', request.url);
-    // Preserve the original URL as a query parameter
-    loginUrl.searchParams.set('from', request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Allow access to login page if not authenticated
-  if (isLoginPage && !isAuthenticated) {
+  // Check if the current path is a public route
+  if (publicRoutes.some(route => pathname === route)) {
     return NextResponse.next();
+  }
+
+  // Protected routes that require authentication
+  const protectedRoutes = [
+    '/shoe/add',
+    '/shoe/[id]', // This will match any shoe detail page
+    '/shoe/[id]/select-image',
+    '/shoe/[id]/edit',
+    '/image-selection'
+  ];
+
+  // Check if the current path is a protected route
+  if (protectedRoutes.some(route => {
+    if (route.includes('[id]')) {
+      return pathname.match(/^\/shoe\/\d+(\/select-image|\/edit)?$/);
+    }
+    return pathname === route;
+  })) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // API routes that require authentication
+  if (pathname.startsWith('/api/shoe')) {
+    if (!isAuthenticated) {
+      return new NextResponse(null, { status: 401 });
+    }
+    if (pathname === '/api/shoe') return true; // POST /api/shoe
+    if (pathname.match(/^\/api\/shoe\/\d+$/)) return true; // PUT/DELETE /api/shoe/[id]
   }
 
   return NextResponse.next();
 }
 
-// Add routes that need protection here
-const isProtectedRoute = (pathname: string, method: string) => {
-  // Protected frontend routes
-  const protectedPages = [
-    '/dashboard',
-    '/polish/add',
-    '/image-selection',
-    '/polish/[id]', // This will match any polish detail page
-  ];
-
-  // Check if the current path matches any protected page
-  if (protectedPages.some(page => {
-    if (page.includes('[')) {
-      // Handle dynamic routes by checking the pattern
-      const pattern = new RegExp('^' + page.replace(/\[.*?\]/, '[^/]+') + '$');
-      return pattern.test(pathname);
-    }
-    return pathname === page;
-  })) {
-    return true;
-  }
-
-  // API routes protection
-  if (pathname.startsWith('/api/')) {
-    // Allow all GET requests
-    if (method === 'GET') return false;
-
-    // Polish management routes
-    if (pathname.startsWith('/api/polish')) {
-      if (pathname === '/api/polish') return true; // POST /api/polish
-      if (pathname.match(/^\/api\/polish\/\d+$/)) return true; // PUT/DELETE /api/polish/[id]
-      return false;
-    }
-
-    // Image management routes
-    if (
-      pathname === '/api/update-image' ||
-      pathname === '/api/update-bulk-images' ||
-      pathname === '/api/delete-bulk-images' ||
-      pathname.startsWith('/api/remove-image/')
-    ) {
-      return true;
-    }
-
-    // Attributes management routes
-    if (pathname === '/api/attributes') {
-      return true;
-    }
-  }
-
-  return false;
-};
-
 export const config = {
   matcher: [
-    '/api/:path*',
-    '/((?!_next/static|_next/image|favicon.ico).*)'
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],
 };

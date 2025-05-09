@@ -1,7 +1,6 @@
 'use client';
 
 import styled, { css } from 'styled-components';
-import { theme } from '@/lib/theme';
 import { formStyles } from '@/theme/form';
 
 // Base field container styles
@@ -18,22 +17,22 @@ export const StyledContainer = styled.div`
 
 // Base label styles
 export const StyledLabel = styled.label`
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text};
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
+  color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 // Base field wrapper styles (for label + field combination)
 export const StyledFieldWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing.xs};
+  gap: ${({ theme }) => theme.spacing[1]};
   width: 100%;
 
   .error {
-    color: ${theme.colors.error};
-    font-size: ${theme.typography.fontSize.sm};
-    margin-top: ${theme.spacing.xs};
+    color: ${({ theme }) => theme.colors.error};
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    margin-top: ${({ theme }) => theme.spacing[1]};
   }
 `;
 
@@ -56,8 +55,8 @@ export const fieldStyles = css`
 
   &:focus {
     outline: none;
-    border-color: ${({ theme }) => theme.colors.border.medium};
-    box-shadow: 0 0 0 1px rgba(203, 213, 225, 0.3);
+    border-color: ${({ theme }) => theme.colors.border.default};
+    box-shadow: ${({ theme }) => theme.shadows.focus};
   }
 
   &:disabled {
@@ -84,8 +83,8 @@ export const chevronIconStyles = css<{ $isOpen: boolean }>`
 export const StyledDropdown = styled.div<{ $isOpen: boolean }>`
     position: absolute;
     background: ${({ theme }) => theme.colors.background.primary};
-    border: 2px solid ${({ theme }) => theme.colors.border.medium};
-    border-radius: ${({ theme }) => theme.borderRadius.lg};
+    border: 2px solid ${({ theme }) => theme.colors.border.default};
+    border-radius: ${({ theme }) => theme.borderRadius['2xl']};
     box-shadow: ${({ theme }) => theme.shadows.lg};
     max-height: ${({ $isOpen }) => ($isOpen ? '200px' : '0')};
     visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};

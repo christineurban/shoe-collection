@@ -1,84 +1,73 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth/AuthContext';
 import { ImageSelector } from '@/components/ImageSelector';
-import { PageHeader } from '@/components/PageHeader';
-import { Button } from '@/components/Button';
-import {
-  StyledPagination,
-  StyledPaginationButton,
-  StyledPaginationInfo
-} from './page.styled';
+import { EmptyState } from '@/components/EmptyState';
+import { Pagination } from '@/components/Pagination';
+import { Shoe } from '@/types/shoe';
 
-interface Polish {
-  id: string;
-  name: string;
-  link: string | null;
-  imageUrl: string | null;
-  brand: string;
+interface PageProps {
+  searchParams: {
+    page?: string;
+  };
 }
 
-interface PaginatedResponse {
-  polishes: Polish[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
-
-interface SelectedImage {
-  polishId: string;
-  imageUrl: string;
-}
-
-export default function ImageSelectionPage() {
+export default function ImageSelectionPage({ searchParams }: PageProps) {
   const router = useRouter();
-  const [polishes, setPolishes] = useState<Polish[]>([]);
+  const { isAuthenticated } = useAuth();
+  const [shoes, setShoes] = useState<Shoe[]>([]);
+  const [selectedImages, setSelectedImages] = useState<Record<string, string | null>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.page || '1'));
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedImages, setSelectedImages] = useState<Record<string, string>>({});
-  const [isSavingBulk, setIsSavingBulk] = useState(false);
-
-  const fetchPolishes = async () => {
-    try {
-      const response = await fetch(`/api/polishes?hasImage=false&page=${currentPage}&limit=25`);
-      if (!response.ok) throw new Error('Failed to fetch polish details');
-      const data: PaginatedResponse = await response.json();
-      setPolishes(data.polishes);
-      setTotalPages(data.totalPages);
-      setTotalItems(data.total);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    fetchPolishes();
-  }, [currentPage]);
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
 
-  const handleImageSelected = (polishId: string, imageUrl: string | null) => {
-    setSelectedImages(prev => {
-      if (imageUrl === null) {
-        const newState = { ...prev };
-        delete newState[polishId];
-        return newState;
+    const fetchShoes = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/shoes?hasImage=false&page=${currentPage}&limit=25`);
+        if (!response.ok) throw new Error('Failed to fetch shoe details');
+        const data = await response.json();
+        setShoes(data.shoes);
+        setTotalItems(data.total);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
       }
-      return { ...prev, [polishId]: imageUrl };
+    };
+
+    fetchShoes();
+  }, [currentPage, isAuthenticated, router]);
+
+  const handleImageSelected = (shoeId: string, imageUrl: string | null) => {
+    setSelectedImages(prev => {
+      const newState = { ...prev };
+      if (imageUrl === null) {
+        delete newState[shoeId];
+      } else {
+        newState[shoeId] = imageUrl;
+      }
+      return newState;
     });
   };
 
-  const handleBulkSave = async () => {
+  const handleSave = async () => {
     if (Object.keys(selectedImages).length === 0) return;
 
     try {
-      setIsSavingBulk(true);
-      const updates = Object.entries(selectedImages).map(([polishId, imageUrl]) => ({
-        polishId,
+      setIsSaving(true);
+      const updates = Object.entries(selectedImages).map(([shoeId, imageUrl]) => ({
+        shoeId,
         imageUrl
       }));
 
@@ -90,108 +79,93 @@ export default function ImageSelectionPage() {
         body: JSON.stringify({ updates }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save images');
-      }
+      if (!response.ok) throw new Error('Failed to save images');
 
-      const data = await response.json();
+      const { successfulIds } = await response.json() as { successfulIds: string[] };
 
-      // Remove successful updates from the list
-      const successfulIds = data.results
-        .filter((result: { success: boolean }) => result.success)
-        .map((result: { id: string }) => result.id);
+      // Remove successful shoes from the page
+      setShoes(prev => prev.filter(s => !successfulIds.includes(s.id)));
 
-      // Remove successful polishes from the page
-      setPolishes(prev => prev.filter(p => !successfulIds.includes(p.id)));
+      // Clear selected images for successful updates
+      setSelectedImages(prev => {
+        const newState = { ...prev };
+        successfulIds.forEach(id => delete newState[id]);
+        return newState;
+      });
 
-      // Clear selected images
-      setSelectedImages({});
-
-      // If this was the last polish on the page and not the first page, go to previous page
-      if (polishes.length === successfulIds.length && currentPage > 1) {
+      // If this was the last shoe on the page and not the first page, go to previous page
+      if (shoes.length === successfulIds.length && currentPage > 1) {
         setCurrentPage(prev => prev - 1);
       } else {
-        // Refetch the data to get the updated list
-        await fetchPolishes();
+        // Refresh the current page
+        const response = await fetch(`/api/shoes?hasImage=false&page=${currentPage}&limit=25`);
+        if (!response.ok) throw new Error('Failed to fetch shoe details');
+        const data = await response.json();
+        setShoes(data.shoes);
+        setTotalItems(data.total);
       }
-    } catch (error) {
-      console.error('Error saving images:', error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setIsSavingBulk(false);
+      setIsSaving(false);
     }
   };
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-  };
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   if (isLoading) {
-    return (
-      <PageHeader title="Loading..." />
-    );
+    return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (shoes.length === 0) {
     return (
-      <PageHeader
-        title="Error"
-        description={error}
-      />
-    );
-  }
-
-  if (polishes.length === 0) {
-    return (
-      <PageHeader
-        title="No Polishes Need Images"
-        description="All polishes in your collection have images."
+      <EmptyState
+        title="No Shoes Need Images"
+        description="All shoes in your collection have images."
       />
     );
   }
 
   return (
-    <>
-      <PageHeader
-        title="Select Images"
-        description='Select images for multiple polishes and save them all at once.'
-      />
-      {Object.keys(selectedImages).length > 0 && (
-        <Button
-          onClick={handleBulkSave}
-          disabled={isSavingBulk}
-          style={{ margin: '20px 0' }}
+    <div>
+      <div>
+        <h1>Image Selection</h1>
+        <p>Select images for multiple shoes and save them all at once.</p>
+      </div>
+
+      <div>
+        {shoes.map(shoe => (
+          <ImageSelector
+            key={shoe.id}
+            shoe={shoe}
+            onImageSelected={handleImageSelected}
+            selectedImage={selectedImages[shoe.id]}
+          />
+        ))}
+      </div>
+
+      <div>
+        <button
+          onClick={handleSave}
+          disabled={Object.keys(selectedImages).length === 0 || isSaving}
         >
-          {isSavingBulk ? 'Saving...' : `Save ${Object.keys(selectedImages).length} Selected Images`}
-        </Button>
-      )}
-      {polishes.map(polish => (
-        <ImageSelector
-          key={polish.id}
-          polish={polish}
-          bulkMode={true}
-          onImageSelected={handleImageSelected}
-          selectedImage={selectedImages[polish.id]}
+          {isSaving ? 'Saving...' : 'Save Selected Images'}
+        </button>
+      </div>
+
+      <div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={totalItems}
+          itemsPerPage={25}
+          onPageChange={setCurrentPage}
         />
-      ))}
-      <StyledPagination>
-        <StyledPaginationInfo>
-          Showing {((currentPage - 1) * 25) + 1} to {Math.min(currentPage * 25, totalItems)} of {totalItems} polishes
-        </StyledPaginationInfo>
-        <div>
-          <StyledPaginationButton
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </StyledPaginationButton>
-          <StyledPaginationButton
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </StyledPaginationButton>
-        </div>
-      </StyledPagination>
-    </>
+        <p>
+          Showing {((currentPage - 1) * 25) + 1} to {Math.min(currentPage * 25, totalItems)} of {totalItems} shoes
+        </p>
+      </div>
+    </div>
   );
 }

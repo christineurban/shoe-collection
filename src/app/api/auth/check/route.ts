@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const cookieStore = cookies();
-  const isAuthenticated = cookieStore.get('nail-polish-auth')?.value === 'true';
+  const isAuthenticated = cookieStore.get('shoe-collection-auth')?.value === 'true';
 
   return NextResponse.json({ isAuthenticated });
 }

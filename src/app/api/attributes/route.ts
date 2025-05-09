@@ -5,49 +5,99 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // Get total polish count first
-    const totalPolishes = await prisma.nail_polish.count();
+    const totalShoes = await prisma.shoes.count();
 
-    const [brands, colors, finishes] = await Promise.all([
-      prisma.brands.findMany({
-        include: {
-          nail_polish: true
-        },
-        orderBy: { name: 'asc' }
-      }),
-      prisma.colors.findMany({
-        include: {
-          nail_polish: true
-        },
-        orderBy: { name: 'asc' }
-      }),
-      prisma.finishes.findMany({
-        include: {
-          nail_polish: true
-        },
-        orderBy: { name: 'asc' }
-      })
-    ]);
+    // Get all brands with their shoe counts
+    const brands = await prisma.brands.findMany({
+      include: {
+        shoes: true
+      }
+    });
+
+    // Get all colors with their shoe counts
+    const colors = await prisma.colors.findMany({
+      include: {
+        shoes: true
+      }
+    });
+
+    // Get all dress styles with their shoe counts
+    const dressStyles = await prisma.dress_styles.findMany({
+      include: {
+        shoes: true
+      }
+    });
+
+    // Get all shoe types with their shoe counts
+    const shoeTypes = await prisma.shoe_types.findMany({
+      include: {
+        shoes: true
+      }
+    });
+
+    // Get all heel types with their shoe counts
+    const heelTypes = await prisma.heel_types.findMany({
+      include: {
+        shoes: true
+      }
+    });
+
+    // Get all locations with their shoe counts
+    const locations = await prisma.locations.findMany({
+      include: {
+        shoes: true
+      }
+    });
+
+    const brandsData = brands.map(brand => ({
+      id: brand.id,
+      name: brand.name,
+      count: brand.shoes.length,
+      percentage: Number(((brand.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const colorsData = colors.map(color => ({
+      id: color.id,
+      name: color.name,
+      count: color.shoes.length,
+      percentage: Number(((color.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const dressStylesData = dressStyles.map(style => ({
+      id: style.id,
+      name: style.name,
+      count: style.shoes.length,
+      percentage: Number(((style.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const shoeTypesData = shoeTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      count: type.shoes.length,
+      percentage: Number(((type.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const heelTypesData = heelTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      count: type.shoes.length,
+      percentage: Number(((type.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const locationsData = locations.map(location => ({
+      id: location.id,
+      name: location.name,
+      count: location.shoes.length,
+      percentage: Number(((location.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
 
     return NextResponse.json({
-      brands: brands.map(brand => ({
-        id: brand.id,
-        name: brand.name,
-        count: brand.nail_polish.length,
-        percentage: Number(((brand.nail_polish.length / totalPolishes) * 100).toFixed(1))
-      })),
-      colors: colors.map(color => ({
-        id: color.id,
-        name: color.name,
-        count: color.nail_polish.length,
-        percentage: Number(((color.nail_polish.length / totalPolishes) * 100).toFixed(1))
-      })),
-      finishes: finishes.map(finish => ({
-        id: finish.id,
-        name: finish.name,
-        count: finish.nail_polish.length,
-        percentage: Number(((finish.nail_polish.length / totalPolishes) * 100).toFixed(1))
-      }))
+      brands: brandsData,
+      colors: colorsData,
+      dressStyles: dressStylesData,
+      shoeTypes: shoeTypesData,
+      heelTypes: heelTypesData,
+      locations: locationsData
     });
   } catch (error) {
     console.error('Error fetching attributes:', error);
@@ -62,9 +112,9 @@ export async function POST(request: Request) {
   try {
     const { type, name } = await request.json();
 
-    if (!type || !name || !['brand', 'color', 'finish'].includes(type)) {
+    if (!type || !name || !['brand', 'color', 'dressStyle', 'shoeType', 'heelType', 'location'].includes(type)) {
       return NextResponse.json(
-        { error: 'Invalid request body' },
+        { error: 'Invalid type or name' },
         { status: 400 }
       );
     }
@@ -87,8 +137,32 @@ export async function POST(request: Request) {
           }
         });
         break;
-      case 'finish':
-        result = await prisma.finishes.create({
+      case 'dressStyle':
+        result = await prisma.dress_styles.create({
+          data: {
+            name,
+            updated_at: new Date()
+          }
+        });
+        break;
+      case 'shoeType':
+        result = await prisma.shoe_types.create({
+          data: {
+            name,
+            updated_at: new Date()
+          }
+        });
+        break;
+      case 'heelType':
+        result = await prisma.heel_types.create({
+          data: {
+            name,
+            updated_at: new Date()
+          }
+        });
+        break;
+      case 'location':
+        result = await prisma.locations.create({
           data: {
             name,
             updated_at: new Date()
@@ -98,13 +172,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(result);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: 'Name already exists' },
-        { status: 400 }
-      );
-    }
+  } catch (error) {
+    console.error('Error creating attribute:', error);
     return NextResponse.json(
       { error: 'Failed to create attribute' },
       { status: 500 }
@@ -114,11 +183,13 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const { type, id } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get('type');
+    const id = searchParams.get('id');
 
-    if (!type || !id || !['brand', 'color', 'finish'].includes(type)) {
+    if (!type || !id || !['brand', 'color', 'dressStyle', 'shoeType', 'heelType', 'location'].includes(type)) {
       return NextResponse.json(
-        { error: 'Invalid request body' },
+        { error: 'Invalid type or id' },
         { status: 400 }
       );
     }
@@ -127,13 +198,22 @@ export async function DELETE(request: Request) {
     let inUse = false;
     switch (type) {
       case 'brand':
-        inUse = (await prisma.nail_polish.count({ where: { brand_id: id } })) > 0;
+        inUse = (await prisma.shoes.count({ where: { brand_id: id } })) > 0;
         break;
       case 'color':
-        inUse = (await prisma.nail_polish_color.count({ where: { color_id: id } })) > 0;
+        inUse = (await prisma.shoes.count({ where: { color_id: id } })) > 0;
         break;
-      case 'finish':
-        inUse = (await prisma.nail_polish_finish.count({ where: { finish_id: id } })) > 0;
+      case 'dressStyle':
+        inUse = (await prisma.shoes.count({ where: { dress_style_id: id } })) > 0;
+        break;
+      case 'shoeType':
+        inUse = (await prisma.shoes.count({ where: { shoe_type_id: id } })) > 0;
+        break;
+      case 'heelType':
+        inUse = (await prisma.shoes.count({ where: { heel_type_id: id } })) > 0;
+        break;
+      case 'location':
+        inUse = (await prisma.shoes.count({ where: { location_id: id } })) > 0;
         break;
     }
 
@@ -144,7 +224,6 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // Delete the attribute
     let result;
     switch (type) {
       case 'brand':
@@ -153,13 +232,23 @@ export async function DELETE(request: Request) {
       case 'color':
         result = await prisma.colors.delete({ where: { id } });
         break;
-      case 'finish':
-        result = await prisma.finishes.delete({ where: { id } });
+      case 'dressStyle':
+        result = await prisma.dress_styles.delete({ where: { id } });
+        break;
+      case 'shoeType':
+        result = await prisma.shoe_types.delete({ where: { id } });
+        break;
+      case 'heelType':
+        result = await prisma.heel_types.delete({ where: { id } });
+        break;
+      case 'location':
+        result = await prisma.locations.delete({ where: { id } });
         break;
     }
 
     return NextResponse.json(result);
   } catch (error) {
+    console.error('Error deleting attribute:', error);
     return NextResponse.json(
       { error: 'Failed to delete attribute' },
       { status: 500 }

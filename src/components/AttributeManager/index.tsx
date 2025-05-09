@@ -12,18 +12,19 @@ import {
   StyledAddForm,
   StyledErrorMessage,
   StyledActionsCell,
-  StyledPolishCount
+  StyledShoeCount
 } from './index.styled';
 
 interface Attribute {
   id: string;
   name: string;
-  polishCount: number;
+  shoeCount: number;
+  isDeletable: boolean;
 }
 
 interface AttributeManagerProps {
   title: string;
-  type: 'brand' | 'color' | 'finish';
+  type: 'brand' | 'color';
 }
 
 export const AttributeManager = ({ title, type }: AttributeManagerProps) => {
@@ -39,7 +40,7 @@ export const AttributeManager = ({ title, type }: AttributeManagerProps) => {
         throw new Error('Failed to fetch attributes');
       }
       const data = await response.json();
-      const key = type === 'finish' ? 'finishes' : `${type}s`;
+      const key = `${type}s`;
       if (!data[key]) {
         throw new Error('Invalid response format');
       }
@@ -137,12 +138,12 @@ export const AttributeManager = ({ title, type }: AttributeManagerProps) => {
               <StyledTableRow key={attr.id}>
                 <StyledTableCell>{attr.name}</StyledTableCell>
                 <StyledTableCell>
-                  <StyledPolishCount>
-                    {attr.polishCount} {attr.polishCount === 1 ? 'polish' : 'polishes'}
-                  </StyledPolishCount>
+                  <StyledShoeCount>
+                    {attr.shoeCount} {attr.shoeCount === 1 ? 'shoe' : 'shoes'}
+                  </StyledShoeCount>
                 </StyledTableCell>
                 <StyledActionsCell>
-                  {attr.polishCount === 0 && (
+                  {attr.shoeCount === 0 && (
                     <Button
                       onClick={() => handleDelete(attr.id)}
                       aria-label={`Delete ${attr.name}`}

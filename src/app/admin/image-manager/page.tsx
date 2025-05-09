@@ -14,24 +14,26 @@ import {
   StyledErrorMessage,
 } from './page.styled';
 
-interface Polish {
+interface Shoe {
   id: string;
-  name: string;
-  brands: {
+  image_url: string | null;
+  brand: {
     name: string;
   };
 }
 
-interface ImageItem {
-  url: string;
+interface Image {
   name: string;
-  selectedPolishId?: string;
+  url: string;
+  size: number;
+  lastModified: string;
+  selectedShoeId?: string;
   markedForDeletion?: boolean;
 }
 
 export default function ImageManager() {
-  const [images, setImages] = useState<ImageItem[]>([]);
-  const [polishes, setPolishes] = useState<Polish[]>([]);
+  const [images, setImages] = useState<Image[]>([]);
+  const [shoes, setShoes] = useState<Shoe[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,10 +60,10 @@ export default function ImageManager() {
       setTotalImages(imagesData.totalImages);
       setMatchedImages(imagesData.matchedImages);
 
-      // Fetch polish details
-      const polishesResponse = await fetch('/api/admin/polishes');
-      const polishesData = await polishesResponse.json();
-      setPolishes(polishesData.polishes);
+      // Fetch shoe details
+      const shoesResponse = await fetch('/api/admin/shoes');
+      const shoesData = await shoesResponse.json();
+      setShoes(shoesData.shoes);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -69,14 +71,14 @@ export default function ImageManager() {
     }
   };
 
-  const handlePolishSelect = (imageIndex: number, polishId: string) => {
-    setImages(prev => prev.map((img, idx) =>
-      idx === imageIndex ? { ...img, selectedPolishId: polishId } : img
+  const handleShoeSelect = (imageIndex: number, shoeId: string) => {
+    setImages(images.map((img, idx) =>
+      idx === imageIndex ? { ...img, selectedShoeId: shoeId } : img
     ));
   };
 
-  const toggleDeletion = (imageIndex: number) => {
-    setImages(prev => prev.map((img, idx) =>
+  const handleMarkForDeletion = (imageIndex: number) => {
+    setImages(images.map((img, idx) =>
       idx === imageIndex ? { ...img, markedForDeletion: !img.markedForDeletion } : img
     ));
   };
@@ -84,63 +86,54 @@ export default function ImageManager() {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      // Handle deletions
+      setError(null);
+
+      // Get images that need to be updated
+      const imagesToUpdate = images.filter(img => img.selectedShoeId && !img.markedForDeletion);
       const imagesToDelete = images.filter(img => img.markedForDeletion);
-      const imagesToUpdate = images.filter(img => img.selectedPolishId && !img.markedForDeletion);
+
+      // Update shoe image URLs
+      for (const img of imagesToUpdate) {
+        const response = await fetch('/api/update-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: img.selectedShoeId,
+            imageUrl: img.url,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update shoe images');
+        }
+      }
 
       // Delete marked images
       if (imagesToDelete.length > 0) {
-        console.log('Deleting images:', imagesToDelete.map(img => img.name));
-        const deleteResponse = await fetch('/api/delete-bulk-images', {
+        const response = await fetch('/api/delete-bulk-images', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ images: imagesToDelete.map(img => img.name) })
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            images: imagesToDelete.map(img => img.name),
+          }),
         });
 
-        if (!deleteResponse.ok) {
-          const errorData = await deleteResponse.json();
+        if (!response.ok) {
+          const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to delete images');
         }
-
-        const deleteResult = await deleteResponse.json();
-        console.log('Delete response:', deleteResult);
       }
 
-      // Update polish image URLs
-      if (imagesToUpdate.length > 0) {
-        const updateResponse = await fetch('/api/update-bulk-images', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            updates: imagesToUpdate.map(img => ({
-              polishId: img.selectedPolishId,
-              imageUrl: img.url
-            }))
-          })
-        });
-
-        if (!updateResponse.ok) {
-          const errorData = await updateResponse.json();
-          throw new Error(errorData.error || 'Failed to update polish images');
-        }
-      }
-
-      // Clear browser's memory cache
-      if ('caches' in window) {
-        try {
-          const cacheNames = await caches.keys();
-          await Promise.all(
-            cacheNames.map(cacheName => caches.delete(cacheName))
-          );
-        } catch (e) {
-          console.error('Error clearing cache:', e);
-        }
-      }
-
-      // Force a hard refresh of the page
-      window.location.href = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
+      // Refresh data
+      await fetchData();
     } catch (error) {
-      alert('Error saving changes. Please try again.');
+      console.error('Error saving changes:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save changes');
     } finally {
       setIsSaving(false);
     }
@@ -183,7 +176,7 @@ export default function ImageManager() {
           title="Image Manager"
           description="No Images Found"
         />
-        <p>There are no images in storage. Upload images to begin matching them with polishes.</p>
+        <p>There are no images in storage. Upload images to begin matching them with shoes.</p>
       </StyledContainer>
     );
   }
@@ -193,18 +186,18 @@ export default function ImageManager() {
       <StyledContainer>
         <PageHeader
           title="Image Manager"
-          description="Match unmatched images to nail polishes"
+          description="Match unmatched images to shoes"
         />
-        <p>All {totalImages} images in storage have been matched to polishes.</p>
+        <p>All {totalImages} images in storage have been matched to shoes.</p>
       </StyledContainer>
     );
   }
 
-  const hasChanges = images.some(img => img.selectedPolishId || img.markedForDeletion);
+  const hasChanges = images.some(img => img.selectedShoeId || img.markedForDeletion);
 
-  const polishOptions = polishes.map(polish => ({
-    value: polish.id,
-    label: `${polish.brands.name} - ${polish.name}`
+  const shoeOptions = shoes.map(shoe => ({
+    value: shoe.id,
+    label: `${shoe.brand.name}`
   }));
 
   return (
@@ -212,7 +205,7 @@ export default function ImageManager() {
       <StyledHeaderContainer>
         <PageHeader
           title="Image Manager"
-          description="Match unmatched images to nail polishes"
+          description="Match unmatched images to shoes"
         />
         <StyledSaveButton
           onClick={handleSave}
@@ -238,14 +231,14 @@ export default function ImageManager() {
               alt={image.name}
             />
             <Autocomplete
-              options={polishOptions}
-              value={image.selectedPolishId || ''}
-              onChange={(value) => handlePolishSelect(index, value)}
+              options={shoeOptions}
+              value={image.selectedShoeId || ''}
+              onChange={(value) => handleShoeSelect(index, value)}
               disabled={image.markedForDeletion}
-              placeholder="Select a polish..."
+              placeholder="Select a shoe..."
             />
             <StyledDeleteButton
-              onClick={() => toggleDeletion(index)}
+              onClick={() => handleMarkForDeletion(index)}
               $active={image.markedForDeletion}
             >
               {image.markedForDeletion ? 'Unmark for Deletion' : 'Mark for Deletion'}

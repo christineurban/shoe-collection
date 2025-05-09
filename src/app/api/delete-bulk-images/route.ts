@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     // Delete images from storage using admin client
     const { data, error } = await supabaseAdmin.storage
-      .from('nail-polish-images')
+      .from('shoe-images')
       .remove(images);
 
     if (error) {

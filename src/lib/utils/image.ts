@@ -1,54 +1,41 @@
-import { supabaseAdmin } from '@/lib/supabase';
-import sharp from 'sharp';
+import { createClient } from '@supabase/supabase-js';
 
-export function createUrlSafeFilename(brand: string, name: string): string {
-  // Remove special characters and spaces, convert to lowercase
+const supabaseUrl = process.env.DATABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+function createUrlSafeFilename(brand: string, name: string): string {
   const safeBrand = brand.toLowerCase().replace(/[^a-z0-9]/g, '-');
   const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-
-  // Remove consecutive dashes and trim dashes from ends
-  const cleanBrand = safeBrand.replace(/-+/g, '-').replace(/^-|-$/g, '');
-  const cleanName = safeName.replace(/-+/g, '-').replace(/^-|-$/g, '');
-
-  // Add timestamp to ensure uniqueness and prevent caching
-  const timestamp = Date.now();
-
-  const fileName = `${cleanBrand}_${cleanName}_${timestamp}.jpg`;
-  console.log('Generated filename:', fileName);
-  return fileName;
+  return `${safeBrand}-${safeName}`;
 }
 
-// Delete old image if it exists
-async function deleteOldImage(polish: { brands: { name: string }, name: string }) {
+async function deleteOldImage(shoe: { brand: string, name: string }) {
   try {
-    // Generate the old filename pattern (without timestamp)
-    const safeBrand = polish.brands.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const safeName = polish.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const cleanBrand = safeBrand.replace(/-+/g, '-').replace(/^-|-$/g, '');
-    const cleanName = safeName.replace(/-+/g, '-').replace(/^-|-$/g, '');
-    const filePattern = `${cleanBrand}_${cleanName}`;
+    // Create a URL-safe filename
+    const safeBrand = shoe.brand.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const safeName = shoe.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const fileName = `${safeBrand}-${safeName}`;
 
-    // List all files in the storage bucket
-    const { data: files, error: listError } = await supabaseAdmin.storage
-      .from('nail-polish-images')
-      .list();
+    // Delete the old image if it exists
+    const { data: existingFiles, error: listError } = await supabase
+      .storage
+      .from('shoe-images')
+      .list(fileName);
 
     if (listError) {
-      console.error('Error listing files:', listError);
+      console.error('Error listing existing files:', listError);
       return;
     }
 
-    // Find and delete any files matching the pattern
-    const matchingFiles = files?.filter(file => file.name.startsWith(filePattern));
-    if (matchingFiles && matchingFiles.length > 0) {
-      const { error: deleteError } = await supabaseAdmin.storage
-        .from('nail-polish-images')
-        .remove(matchingFiles.map(file => file.name));
+    if (existingFiles && existingFiles.length > 0) {
+      const { error: deleteError } = await supabase
+        .storage
+        .from('shoe-images')
+        .remove([fileName]);
 
       if (deleteError) {
-        console.error('Error deleting old files:', deleteError);
-      } else {
-        console.log('Successfully deleted old files:', matchingFiles.map(f => f.name));
+        console.error('Error deleting old image:', deleteError);
       }
     }
   } catch (error) {
@@ -56,71 +43,48 @@ async function deleteOldImage(polish: { brands: { name: string }, name: string }
   }
 }
 
-export async function uploadImageToSupabase(imageUrl: string, polish: { brands: { name: string }, name: string }): Promise<string> {
-  console.log('Starting image upload process for:', {
-    brand: polish.brands.name,
-    name: polish.name,
-    sourceUrl: imageUrl
-  });
-
+export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: string, name: string }): Promise<string> {
   try {
-    // Delete old image files first
-    await deleteOldImage(polish);
+    // Create metadata for the image
+    const metadata = {
+      brand: shoe.brand,
+      name: shoe.name,
+      uploadedAt: new Date().toISOString()
+    };
 
-    // Fetch the image
+    // Delete any existing image for this shoe
+    await deleteOldImage(shoe);
+
+    // Fetch the image from the URL
     const response = await fetch(imageUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
-    }
-    console.log('Successfully fetched image from source');
+    if (!response.ok) throw new Error('Failed to fetch image');
+    const imageBlob = await response.blob();
 
-    const imageBuffer = await response.arrayBuffer();
-    console.log('Image buffer size:', imageBuffer.byteLength);
+    // Create a URL-safe filename with brand and shoe name
+    const fileName = createUrlSafeFilename(shoe.brand, shoe.name);
 
-    // Compress the image using sharp
-    const compressedImageBuffer = await sharp(Buffer.from(imageBuffer))
-      .resize(800, 800, { // Resize to max dimensions while maintaining aspect ratio
-        fit: 'inside',
-        withoutEnlargement: true
-      })
-      .jpeg({ // Convert to JPEG and compress
-        quality: 80,
-        mozjpeg: true
-      })
-      .toBuffer();
-
-    console.log('Successfully compressed image. New size:', compressedImageBuffer.length);
-
-    // Create a URL-safe filename with brand and polish name
-    const fileName = createUrlSafeFilename(polish.brands.name, polish.name);
-
-    console.log('Uploading to Supabase with filename:', fileName);
-
-    // Upload to Supabase storage with upsert to handle duplicates
-    const { data, error } = await supabaseAdmin.storage
-      .from('nail-polish-images')
-      .upload(fileName, compressedImageBuffer, {
-        contentType: 'image/jpeg',
-        upsert: true
+    // Upload the image to Supabase Storage
+    const { data, error } = await supabase
+      .storage
+      .from('shoe-images')
+      .upload(fileName, imageBlob, {
+        contentType: imageBlob.type,
+        upsert: true,
+        cacheControl: '3600',
+        metadata
       });
 
-    if (error) {
-      console.error('Supabase upload error:', error);
-      throw new Error(`Failed to upload image to Supabase: ${error.message}`);
-    }
-
-    console.log('Supabase upload response:', data);
+    if (error) throw error;
 
     // Get the public URL
-    const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('nail-polish-images')
+    const { data: { publicUrl } } = supabase
+      .storage
+      .from('shoe-images')
       .getPublicUrl(fileName);
-
-    console.log('Generated public URL:', publicUrl);
 
     return publicUrl;
   } catch (error) {
-    console.error('Error in uploadImageToSupabase:', error);
+    console.error('Error uploading image:', error);
     throw error;
   }
 }

@@ -29,49 +29,42 @@ import { Modal } from '@/components/Modal';
 import { SuccessMessage } from '@/components/SuccessMessage';
 import { StyledNameCell, StyledPercentageHeader } from '@/components/Table/index.styled';
 import { Tooltip } from 'react-tooltip';
-
-interface Stats {
-  totalPolishes: number;
-  totalBrands: number;
-  totalColors: number;
-  totalFinishes: number;
-  mostPopularNewBrand: {
-    name: string;
-    count: number;
-  };
-  mostCommonBrand: {
-    name: string;
-    count: number;
-  };
-  mostCommonColor: {
-    name: string;
-    count: number;
-  };
-  mostCommonFinish: {
-    name: string;
-    count: number;
-  };
-}
-
-interface Attribute {
-  id: string;
-  name: string;
-  count: number;
-  percentage: number;
-}
+import { Stats } from '@/types/stats';
+import { Attribute } from '@/types/attribute';
+import { StatCard } from '@/components/StatCard';
+import { AttributeTable } from '@/components/AttributeTable';
+import { AttributeCard } from '@/components/AttributeCard';
+import { AddAttributeForm } from '@/components/AddAttributeForm';
+import { StyledDashboard, StyledAttributeSection } from './page.styled';
 
 type SortOrder = 'name-asc' | 'name-desc' | 'count-asc' | 'count-desc';
 type ViewMode = 'card' | 'table';
 
-export default function DashboardPage() {
+export default function Dashboard() {
   const router = useRouter();
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [colors, setColors] = useState<Attribute[]>([]);
-  const [finishes, setFinishes] = useState<Attribute[]>([]);
+  const [stats, setStats] = useState<Stats>({
+    totalShoes: 0,
+    totalBrands: 0,
+    totalColors: 0,
+    totalDressStyles: 0,
+    totalShoeTypes: 0,
+    totalHeelTypes: 0,
+    totalLocations: 0,
+    mostCommonBrand: { name: '', count: 0 },
+    mostCommonColor: { name: '', count: 0 },
+    mostCommonDressStyle: { name: '', count: 0 },
+    mostCommonShoeType: { name: '', count: 0 },
+    mostCommonHeelType: { name: '', count: 0 },
+    mostCommonLocation: { name: '', count: 0 }
+  });
+
   const [brands, setBrands] = useState<Attribute[]>([]);
-  const [selectedAttribute, setSelectedAttribute] = useState<'brands' | 'colors' | 'finishes' | null>(null);
+  const [colors, setColors] = useState<Attribute[]>([]);
+  const [dressStyles, setDressStyles] = useState<Attribute[]>([]);
+  const [shoeTypes, setShoeTypes] = useState<Attribute[]>([]);
+  const [heelTypes, setHeelTypes] = useState<Attribute[]>([]);
+  const [locations, setLocations] = useState<Attribute[]>([]);
+  const [selectedAttribute, setSelectedAttribute] = useState<'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations' | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('name-asc');
   const [searchTerm, setSearchTerm] = useState('');
   const [success, setSuccess] = useState<string | null>(null);
@@ -80,9 +73,12 @@ export default function DashboardPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const attributeListRef = useRef<HTMLDivElement>(null);
 
-  const singularForms: Record<'brands' | 'colors' | 'finishes', 'brand' | 'color' | 'finish'> = {
+  const singularForms: Record<'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations', 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location'> = {
     colors: 'color',
-    finishes: 'finish',
+    dressStyles: 'dressStyle',
+    shoeTypes: 'shoeType',
+    heelTypes: 'heelType',
+    locations: 'location',
     brands: 'brand'
   };
 
@@ -94,95 +90,110 @@ export default function DashboardPage() {
           fetch('/api/attributes')
         ]);
 
+        if (!statsResponse.ok || !attributesResponse.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
         const statsData = await statsResponse.json();
         const attributesData = await attributesResponse.json();
 
         setStats(statsData);
-        setColors(attributesData.colors);
-        setFinishes(attributesData.finishes);
         setBrands(attributesData.brands);
-        setError(null);
+        setColors(attributesData.colors);
+        setDressStyles(attributesData.dressStyles);
+        setShoeTypes(attributesData.shoeTypes);
+        setHeelTypes(attributesData.heelTypes);
+        setLocations(attributesData.locations);
       } catch (error) {
-        console.error('Failed to fetch data:', error);
-        setError('Failed to fetch data');
-      } finally {
-        setIsLoading(false);
+        console.error('Error fetching dashboard data:', error);
       }
     };
 
     fetchData();
   }, []);
 
-  const handleDelete = async (id: string, type: 'color' | 'finish' | 'brand') => {
+  const handleDelete = async (id: string, type: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     try {
-      const response = await fetch('/api/attributes', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, id })
+      const response = await fetch(`/api/attributes?type=${type}&id=${id}`, {
+        method: 'DELETE'
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete attribute');
+        throw new Error('Failed to delete attribute');
       }
 
-      const fetchAttributes = async () => {
-        const response = await fetch('/api/attributes');
-        const data = await response.json();
-        setColors(data.colors);
-        setFinishes(data.finishes);
-        setBrands(data.brands);
-      };
-
-      fetchAttributes();
-    } catch (error: any) {
+      const data = await response.json();
+      switch (type) {
+        case 'brand':
+          setBrands(data.brands);
+          break;
+        case 'color':
+          setColors(data.colors);
+          break;
+        case 'dressStyle':
+          setDressStyles(data.dressStyles);
+          break;
+        case 'shoeType':
+          setShoeTypes(data.shoeTypes);
+          break;
+        case 'heelType':
+          setHeelTypes(data.heelTypes);
+          break;
+        case 'location':
+          setLocations(data.locations);
+          break;
+      }
+    } catch (error) {
       console.error('Error deleting attribute:', error);
-      setError(error.message);
     }
   };
 
-  const handleAdd = async (e: React.FormEvent, type: 'color' | 'finish' | 'brand') => {
+  const handleAdd = async (e: React.FormEvent, type: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const name = formData.get('name') as string;
 
-    if (!newAttributeName.trim()) {
-      setError('Name cannot be empty');
-      setSuccess(null);
-      return;
-    }
+    if (!name) return;
 
     try {
       const response = await fetch('/api/attributes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type,
-          name: newAttributeName.trim()
-        })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type, name })
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to add attribute');
+        throw new Error('Failed to add attribute');
       }
 
-      const singularType = singularForms[`${type}s` as keyof typeof singularForms];
-      setNewAttributeName('');
-      setError(null);
-      setSuccess(`Successfully added ${singularType}: ${newAttributeName}`);
+      const data = await response.json();
+      switch (type) {
+        case 'brand':
+          setBrands(data.brands);
+          break;
+        case 'color':
+          setColors(data.colors);
+          break;
+        case 'dressStyle':
+          setDressStyles(data.dressStyles);
+          break;
+        case 'shoeType':
+          setShoeTypes(data.shoeTypes);
+          break;
+        case 'heelType':
+          setHeelTypes(data.heelTypes);
+          break;
+        case 'location':
+          setLocations(data.locations);
+          break;
+      }
 
-      const fetchAttributes = async () => {
-        const response = await fetch('/api/attributes');
-        const data = await response.json();
-        setColors(data.colors);
-        setFinishes(data.finishes);
-        setBrands(data.brands);
-      };
-
-      fetchAttributes();
-    } catch (error: any) {
+      form.reset();
+    } catch (error) {
       console.error('Error adding attribute:', error);
-      setError(error.message);
-      setSuccess(null);
     }
   };
 
@@ -211,101 +222,30 @@ export default function DashboardPage() {
     );
   };
 
-  const renderTable = (attributes: Attribute[], attributeType: 'color' | 'finish' | 'brand') => {
-    const columns = [
-      {
-        header: 'Name',
-        key: 'name' as const,
-        sortable: true,
-        render: (item: Attribute) => (
-          <StyledNameCell>
-            {item.name}
-            {Number(item.count) <= 0 && (
-              <>
-                <BsTrash
-                  onClick={() => handleDelete(item.id, attributeType)}
-                  role="button"
-                  aria-label={`Delete ${item.name}`}
-                  className="delete-icon"
-                  data-tooltip-id={`delete-tooltip-${item.id}`}
-                  data-tooltip-content={`Delete ${item.name}`}
-                />
-                <Tooltip id={`delete-tooltip-${item.id}`} />
-              </>
-            )}
-          </StyledNameCell>
-        )
-      },
-      {
-        header: 'Count',
-        key: 'count' as const,
-        sortable: true,
-        render: (item: Attribute) => item.count.toString()
-      },
-      {
-        header: <StyledPercentageHeader><span className="desktop-only">Percentage</span><span className="mobile-only">%</span></StyledPercentageHeader>,
-        key: 'percentage' as const,
-        sortable: true,
-        render: (item: Attribute) => `${item.percentage.toFixed(1)}%`
-      }
-    ];
-
-    const handleSort = (field: string) => {
-      const newOrder = field === 'name'
-        ? sortOrder === 'name-asc' ? 'name-desc' : 'name-asc'
-        : field === 'count'
-        ? sortOrder === 'count-asc' ? 'count-desc' : 'count-asc'
-        : sortOrder;
-      setSortOrder(newOrder as SortOrder);
-    };
-
-    const getSortDirection = (field: string) => {
-      if (field === 'name' && (sortOrder === 'name-asc' || sortOrder === 'name-desc')) {
-        return sortOrder === 'name-asc' ? 'asc' : 'desc';
-      }
-      if (field === 'count' && (sortOrder === 'count-asc' || sortOrder === 'count-desc')) {
-        return sortOrder === 'count-asc' ? 'asc' : 'desc';
-      }
-      return undefined;
-    };
-
-    const getSortField = () => {
-      if (sortOrder.startsWith('name-')) return 'name';
-      if (sortOrder.startsWith('count-')) return 'count';
-      return undefined;
-    };
-
+  const renderTable = (attributes: Attribute[], attributeType: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     return (
-      <Table
-        data={attributes}
-        columns={columns}
-        sortField={getSortField()}
-        sortDirection={getSortDirection(getSortField() || '')}
-        onSort={handleSort}
+      <AttributeTable
+        attributes={attributes}
+        onDelete={(id) => handleDelete(id, attributeType)}
       />
     );
   };
 
-  const renderCards = (attributes: Attribute[], attributeType: 'color' | 'finish' | 'brand') => {
+  const renderCards = (attributes: Attribute[], attributeType: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     return (
-      <StyledAttributeList>
-        {attributes.map(attr => (
-          <div key={attr.id}>
-            <Tile
-              title={attr.name}
-              value={`${attr.count} ${attr.count === 1 ? 'polish' : 'polishes'}`}
-              percentage={`${attr.percentage.toFixed(1)}%`}
-              variant="attribute"
-              showDelete={attr.count === 0}
-              onDelete={() => handleDelete(attr.id, attributeType)}
-            />
-          </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+        {attributes.map((attribute) => (
+          <AttributeCard
+            key={attribute.id}
+            attribute={attribute}
+            onDelete={() => handleDelete(attribute.id, attributeType)}
+          />
         ))}
-      </StyledAttributeList>
+      </div>
     );
   };
 
-  const handleStatClick = (type: 'brands' | 'colors' | 'finishes') => {
+  const handleStatClick = (type: 'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations') => {
     setSelectedAttribute(type);
 
     // Only scroll on mobile
@@ -325,75 +265,90 @@ export default function DashboardPage() {
     }
   };
 
-  const getAttributeList = (type: 'colors' | 'finishes' | 'brands'): Attribute[] => {
-    return type === 'colors' ? colors : type === 'finishes' ? finishes : brands;
+  const getAttributeList = (type: 'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations'): Attribute[] => {
+    switch (type) {
+      case 'brands':
+        return brands;
+      case 'colors':
+        return colors;
+      case 'dressStyles':
+        return dressStyles;
+      case 'shoeTypes':
+        return shoeTypes;
+      case 'heelTypes':
+        return heelTypes;
+      case 'locations':
+        return locations;
+    }
   };
-
-  if (isLoading) {
-    return <PageHeader title="Loading..." />;
-  }
-
-  if (error) {
-    return <PageHeader title="Error" description={error} />;
-  }
 
   if (!stats) {
     return <PageHeader title="No data available" />;
   }
 
   return (
-    <>
-      <PageHeader
-        title="Dashboard"
-        description="Click on a tile to view and manage details"
-      />
+    <StyledDashboard>
+      <h1>Dashboard</h1>
+
       <StyledStatsGrid>
-        <Tile
-          title="Total Polishes"
-          value={stats.totalPolishes}
-          description="Polishes in your collection"
-          onClick={() => router.push('/')}
+        <StatCard
+          title="Total Shoes"
+          value={stats.totalShoes}
+          description="Total number of shoes in collection"
         />
 
-        <Tile
+        <StatCard
           title="Brands"
           value={stats.totalBrands}
-          description="Different brands collected"
+          description="Different brands available"
           onClick={() => handleStatClick('brands')}
           $isActive={selectedAttribute === 'brands'}
         />
 
-        <Tile
+        <StatCard
           title="Colors"
           value={stats.totalColors}
-          description="Unique colors in your collection"
+          description="Different colors available"
           onClick={() => handleStatClick('colors')}
           $isActive={selectedAttribute === 'colors'}
         />
 
-        <Tile
-          title="Finishes"
-          value={stats.totalFinishes}
-          description="Different finishes available"
-          onClick={() => handleStatClick('finishes')}
-          $isActive={selectedAttribute === 'finishes'}
+        <StatCard
+          title="Dress Styles"
+          value={stats.totalDressStyles}
+          description="Different dress styles available"
+          onClick={() => handleStatClick('dressStyles')}
+          $isActive={selectedAttribute === 'dressStyles'}
         />
 
-        <Tile
-          title="Top New Brand"
-          value={stats.mostPopularNewBrand.name}
-          description={`${stats.mostPopularNewBrand.count} polishes`}
-          onClick={() => {
-            const params = new URLSearchParams();
-            params.append('brand', stats.mostPopularNewBrand.name);
-            router.push(`/?${params.toString()}`);
-          }}
+        <StatCard
+          title="Shoe Types"
+          value={stats.totalShoeTypes}
+          description="Different shoe types available"
+          onClick={() => handleStatClick('shoeTypes')}
+          $isActive={selectedAttribute === 'shoeTypes'}
         />
 
-        <Tile
-          title="Most Popular Brand"
+        <StatCard
+          title="Heel Types"
+          value={stats.totalHeelTypes}
+          description="Different heel types available"
+          onClick={() => handleStatClick('heelTypes')}
+          $isActive={selectedAttribute === 'heelTypes'}
+        />
+
+        <StatCard
+          title="Locations"
+          value={stats.totalLocations}
+          description="Different locations available"
+          onClick={() => handleStatClick('locations')}
+          $isActive={selectedAttribute === 'locations'}
+        />
+
+        <StatCard
+          title="Most Common Brand"
           value={stats.mostCommonBrand.name}
-          description={`${stats.mostCommonBrand.count} polishes`}
+          description={`${stats.mostCommonBrand.count} shoes`}
           onClick={() => {
             const params = new URLSearchParams();
             params.append('brand', stats.mostCommonBrand.name);
@@ -401,10 +356,10 @@ export default function DashboardPage() {
           }}
         />
 
-        <Tile
+        <StatCard
           title="Most Common Color"
           value={stats.mostCommonColor.name}
-          description={`${stats.mostCommonColor.count} polishes`}
+          description={`${stats.mostCommonColor.count} shoes`}
           onClick={() => {
             const params = new URLSearchParams();
             params.append('color', stats.mostCommonColor.name);
@@ -412,170 +367,60 @@ export default function DashboardPage() {
           }}
         />
 
-        <Tile
-          title="Most Common Finish"
-          value={stats.mostCommonFinish.name}
-          description={`${stats.mostCommonFinish.count} polishes`}
+        <StatCard
+          title="Most Common Dress Style"
+          value={stats.mostCommonDressStyle.name}
+          description={`${stats.mostCommonDressStyle.count} shoes`}
           onClick={() => {
             const params = new URLSearchParams();
-            params.append('finish', stats.mostCommonFinish.name);
+            params.append('dressStyle', stats.mostCommonDressStyle.name);
+            router.push(`/?${params.toString()}`);
+          }}
+        />
+
+        <StatCard
+          title="Most Common Shoe Type"
+          value={stats.mostCommonShoeType.name}
+          description={`${stats.mostCommonShoeType.count} shoes`}
+          onClick={() => {
+            const params = new URLSearchParams();
+            params.append('shoeType', stats.mostCommonShoeType.name);
+            router.push(`/?${params.toString()}`);
+          }}
+        />
+
+        <StatCard
+          title="Most Common Heel Type"
+          value={stats.mostCommonHeelType.name}
+          description={`${stats.mostCommonHeelType.count} shoes`}
+          onClick={() => {
+            const params = new URLSearchParams();
+            params.append('heelType', stats.mostCommonHeelType.name);
+            router.push(`/?${params.toString()}`);
+          }}
+        />
+
+        <StatCard
+          title="Most Common Location"
+          value={stats.mostCommonLocation.name}
+          description={`${stats.mostCommonLocation.count} shoes`}
+          onClick={() => {
+            const params = new URLSearchParams();
+            params.append('location', stats.mostCommonLocation.name);
             router.push(`/?${params.toString()}`);
           }}
         />
       </StyledStatsGrid>
 
-      {error && (
-        <StyledMessage $type="error">{error}</StyledMessage>
-      )}
-
       {selectedAttribute && (
-        <>
-          <StyledScrollIndicator>
-            <BsChevronDown />
-          </StyledScrollIndicator>
-
-          <div ref={attributeListRef}>
-            <StyledSectionHeading>
-              <h2>{selectedAttribute.charAt(0).toUpperCase() + selectedAttribute.slice(1)}</h2>
-              <StyledAddButtonContainer>
-                <a
-                  onClick={() => setIsAddModalOpen(true)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  + Add {singularForms[selectedAttribute]}
-                </a>
-              </StyledAddButtonContainer>
-            </StyledSectionHeading>
-
-            <StyledViewControls>
-              <StyledViewButton
-                onClick={() => setViewMode('card')}
-                $isActive={viewMode === 'card'}
-              >
-                <BsGrid /> Cards
-              </StyledViewButton>
-              <StyledViewButton
-                onClick={() => setViewMode('table')}
-                $isActive={viewMode === 'table'}
-              >
-                <BsTable /> Table
-              </StyledViewButton>
-            </StyledViewControls>
-
-            <StyledSortControls>
-              <StyledSortButton
-                onClick={() => {
-                  const newOrder = sortOrder.startsWith('name-')
-                    ? sortOrder === 'name-asc' ? 'name-desc' : 'name-asc'
-                    : 'name-asc';
-                  setSortOrder(newOrder);
-                }}
-                $isActive={sortOrder.startsWith('name-')}
-                $direction={sortOrder === 'name-asc' ? 'asc' : sortOrder === 'name-desc' ? 'desc' : undefined}
-              >
-                Name
-              </StyledSortButton>
-              <StyledSortButton
-                onClick={() => {
-                  const newOrder = sortOrder.startsWith('count-')
-                    ? sortOrder === 'count-asc' ? 'count-desc' : 'count-asc'
-                    : 'count-asc';
-                  setSortOrder(newOrder);
-                }}
-                $isActive={sortOrder.startsWith('count-')}
-                $direction={sortOrder === 'count-asc' ? 'asc' : sortOrder === 'count-desc' ? 'desc' : undefined}
-              >
-                Count
-              </StyledSortButton>
-            </StyledSortControls>
-
-            <StyledInputControls>
-              <StyledInputContainer>
-                <Input
-                  placeholder={`Search ${selectedAttribute}...`}
-                  value={searchTerm}
-                  onChange={setSearchTerm}
-                  aria-label={`Search ${selectedAttribute}`}
-                />
-              </StyledInputContainer>
-
-              <StyledAddForm onSubmit={(e) => handleAdd(e, singularForms[selectedAttribute])}>
-                <StyledInputContainer>
-                  <Input
-                    placeholder={`Add new ${singularForms[selectedAttribute]}...`}
-                    value={newAttributeName}
-                    onChange={setNewAttributeName}
-                    aria-label={`Add new ${singularForms[selectedAttribute]}`}
-                  />
-                </StyledInputContainer>
-                <Button type="submit">
-                  Add {singularForms[selectedAttribute]}
-                </Button>
-              </StyledAddForm>
-            </StyledInputControls>
-
-            {viewMode === 'card' ? (
-              renderCards(filterAttributes(sortAttributes(getAttributeList(selectedAttribute))), singularForms[selectedAttribute])
-            ) : (
-              renderTable(filterAttributes(sortAttributes(getAttributeList(selectedAttribute))), singularForms[selectedAttribute])
-            )}
-
-            <StyledNote>
-              Note: A {singularForms[selectedAttribute]} can only be deleted if there are no polishes associated with it
-            </StyledNote>
-
-            <Modal
-              isOpen={isAddModalOpen}
-              onClose={() => {
-                setIsAddModalOpen(false);
-                setNewAttributeName('');
-              }}
-              title={`Add new ${singularForms[selectedAttribute]}`}
-              footer={
-                <>
-                  <Button
-                    onClick={() => {
-                      setIsAddModalOpen(false);
-                      setNewAttributeName('');
-                    }}
-                    $variant="secondary"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={(e) => {
-                      handleAdd(e as any, singularForms[selectedAttribute]);
-                      setIsAddModalOpen(false);
-                    }}
-                  >
-                    Add {singularForms[selectedAttribute]}
-                  </Button>
-                </>
-              }
-            >
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                handleAdd(e, singularForms[selectedAttribute]);
-                setIsAddModalOpen(false);
-              }}>
-                <Input
-                  type="text"
-                  value={newAttributeName}
-                  onChange={setNewAttributeName}
-                  placeholder={`Enter ${singularForms[selectedAttribute]} name...`}
-                  autoFocus
-                />
-              </form>
-            </Modal>
-          </div>
-        </>
+        <StyledAttributeSection>
+          <h2>{selectedAttribute.charAt(0).toUpperCase() + selectedAttribute.slice(1)}</h2>
+          <AddAttributeForm
+            onSubmit={(e) => handleAdd(e, selectedAttribute.slice(0, -1) as 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location')}
+          />
+          {renderTable(getAttributeList(selectedAttribute), selectedAttribute.slice(0, -1) as 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location')}
+        </StyledAttributeSection>
       )}
-
-      <SuccessMessage
-        message={success}
-        onClose={() => setSuccess(null)}
-      />
-    </>
+    </StyledDashboard>
   );
 }

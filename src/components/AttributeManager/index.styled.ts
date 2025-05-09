@@ -46,7 +46,7 @@ export const StyledActionsCell = styled.td`
   text-align: right;
 `;
 
-export const StyledPolishCount = styled.span`
+export const StyledShoeCount = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
-  margin-right: 1rem;
+  font-size: 0.875rem;
 `;

@@ -1,33 +1,39 @@
 import styled from 'styled-components';
 
-export const StyledPagination = styled.div`
+export const StyledContainer = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
   margin: 2rem 0;
-  padding: 1rem;
+`;
 
-  button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
+export const StyledButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
 
-    &:hover:not(:disabled) {
-      background-color: #f0f0f0;
-    }
+export const StyledButton = styled.button`
+  padding: 0.5rem 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  background-color: ${({ theme }) => theme.colors.background.primary};
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  cursor: pointer;
+  transition: all ${({ theme }) => theme.transitions.base};
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.background.secondary};
   }
 
-  span {
-    font-size: 1rem;
-    color: #666;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
+`;
+
+export const StyledPageInfo = styled.p`
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
 `;
