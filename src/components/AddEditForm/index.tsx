@@ -64,6 +64,7 @@ function AddEditFormContent({
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo');
   const [formData, setFormData] = useState<AddEditFormData>({
+    id: initialData?.id,
     brand: initialData?.brand || '',
     colors: initialData?.colors || [],
     dressStyle: initialData?.dressStyle || '',
@@ -249,16 +250,16 @@ function AddEditFormContent({
               name="notes"
               value={formData.notes || ''}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              rows={4}
+              placeholder="Add any notes about this shoe"
             />
           </StyledFormGroup>
         </StyledFormSection>
 
         <StyledButtonGroup>
-          <Button onClick={() => router.back()} type="button" $variant="secondary" disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+          >
             {isLoading ? 'Saving...' : isEditing ? 'Update Shoe' : 'Add Shoe'}
           </Button>
         </StyledButtonGroup>
@@ -268,7 +269,11 @@ function AddEditFormContent({
         <StyledDangerZone>
           <h3>Danger Zone</h3>
           <p>Once you delete a shoe, there is no going back. Please be certain.</p>
-          <Button onClick={handleDelete} $variant="danger" disabled={isDeleting}>
+          <Button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            $variant="danger"
+          >
             {isDeleting ? 'Deleting...' : 'Delete Shoe'}
           </Button>
         </StyledDangerZone>
