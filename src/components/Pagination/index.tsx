@@ -1,46 +1,31 @@
-import {
-  StyledContainer,
-  StyledButton,
-  StyledButtonGroup,
-  StyledPageInfo
-} from './index.styled';
+import { StyledPagination } from './index.styled';
 
 interface PaginationProps {
   currentPage: number;
-  totalItems: number;
-  itemsPerPage: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
 }
 
-export const Pagination = ({
-  currentPage,
-  totalItems,
-  itemsPerPage,
-  onPageChange
-}: PaginationProps) => {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
+export const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) => {
   return (
-    <StyledContainer>
-      <StyledPageInfo>
-        Showing {startItem} to {endItem} of {totalItems} items
-      </StyledPageInfo>
-      <StyledButtonGroup>
-        <StyledButton
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </StyledButton>
-        <StyledButton
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </StyledButton>
-      </StyledButtonGroup>
-    </StyledContainer>
+    <StyledPagination>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        aria-label="Previous page"
+      >
+        Previous
+      </button>
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        aria-label="Next page"
+      >
+        Next
+      </button>
+    </StyledPagination>
   );
 };

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { ShoeGrid } from '@/components/ShoeGrid';
-import { StyledContainer as StyledPagination } from '@/components/Pagination/index.styled';
+import { Pagination } from '@/components/Pagination';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 
 interface Option {
@@ -170,25 +170,11 @@ function HomeContent() {
         currentFilters={currentFilters}
         totalShoes={totalShoes}
       />
-      <StyledPagination>
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          aria-label="Previous page"
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          aria-label="Next page"
-        >
-          Next
-        </button>
-      </StyledPagination>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </>
   );
 }
