@@ -5,7 +5,7 @@ export interface Shoe {
   name: string;
   brand: string;
   imageUrl: string | null;
-  color: string;
+  colors: string[];
   dressStyle: string;
   shoeType: string;
   heelType: string;
@@ -13,13 +13,15 @@ export interface Shoe {
   notes: string | null;
 }
 
-export interface ShoeWithRelations extends Omit<shoes, 'brand_id' | 'color_id' | 'location_id' | 'shoe_type_id' | 'heel_type_id' | 'dress_style_id'> {
+export interface ShoeWithRelations extends Omit<shoes, 'brand_id' | 'location_id' | 'shoe_type_id' | 'heel_type_id' | 'dress_style_id'> {
   brand: {
     name: string;
   };
-  color: {
-    name: string;
-  };
+  colors: Array<{
+    color: {
+      name: string;
+    };
+  }>;
   dress_style: {
     name: string;
   };

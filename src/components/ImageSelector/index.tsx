@@ -39,7 +39,7 @@ interface Shoe {
   brand: string;
   heelType: string;
   shoeType: string;
-  color: string;
+  colors: string[];
   location: string;
 }
 
@@ -79,6 +79,9 @@ export const ImageSelector = ({
       onImageSelected(item.id, imageUrl);
     } else {
       setSelectedImage(imageUrl);
+      if (onImageSelected) {
+        onImageSelected(item.id, imageUrl);
+      }
     }
   };
 
@@ -208,7 +211,11 @@ export const ImageSelector = ({
 
   const handlePastedImage = (imageUrl: string) => {
     setImages(prevImages => [imageUrl, ...prevImages]);
-    setSelectedImage(imageUrl);
+    if (bulkMode && onImageSelected) {
+      onImageSelected(item.id, imageUrl);
+    } else {
+      setSelectedImage(imageUrl);
+    }
   };
 
   if (!item) {
@@ -230,7 +237,7 @@ export const ImageSelector = ({
                 <StyledShoeLink href={polish ? `/polish/${item.id}` : `/shoe/${item.id}`}>
                   <h3>{item.brand} {item.heelType} {item.shoeType}</h3>
                 </StyledShoeLink>
-                <p>Color: {item.color}</p>
+                <p>Color: {'color' in item ? item.color : item.colors[0]}</p>
                 <p>Location: {item.location}</p>
               </div>
               <StyledActionsContainer>

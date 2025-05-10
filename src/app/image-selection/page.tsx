@@ -7,6 +7,55 @@ import { ImageSelector } from '@/components/ImageSelector';
 import { EmptyState } from '@/components/EmptyState';
 import { Pagination } from '@/components/Pagination';
 import { Shoe } from '@/types/shoe';
+import styled from 'styled-components';
+
+const StyledContainer = styled.div`
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const StyledHeader = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const StyledTitle = styled.h1`
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+`;
+
+const StyledDescription = styled.p`
+  color: ${({ theme }) => theme.colors.gray[600]};
+`;
+
+const StyledSaveButton = styled.button`
+  background: ${({ theme }) => theme.colors.primary[500]};
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin: 2rem 0;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.primary[600]};
+  }
+
+  &:disabled {
+    background: ${({ theme }) => theme.colors.gray[300]};
+    cursor: not-allowed;
+  }
+`;
+
+const StyledPaginationContainer = styled.div`
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
 
 interface PageProps {
   searchParams: {
@@ -96,7 +145,12 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
 
       if (!response.ok) throw new Error('Failed to save images');
 
-      const { successfulIds } = await response.json() as { successfulIds: string[] };
+      const { results } = await response.json() as { results: Array<{ id: string, success: boolean }> };
+
+      // Get IDs of successfully updated shoes
+      const successfulIds = results
+        .filter(result => result.success)
+        .map(result => result.id);
 
       // Remove successful shoes from the page
       setShoes(prev => prev.filter(s => !successfulIds.includes(s.id)));
@@ -144,11 +198,11 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div>
-      <div>
-        <h1>Image Selection</h1>
-        <p>Select images for multiple shoes and save them all at once.</p>
-      </div>
+    <StyledContainer>
+      <StyledHeader>
+        <StyledTitle>Image Selection</StyledTitle>
+        <StyledDescription>Select images for multiple shoes and save them all at once.</StyledDescription>
+      </StyledHeader>
 
       <div>
         {shoes.map(shoe => (
@@ -161,16 +215,14 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
         ))}
       </div>
 
-      <div>
-        <button
-          onClick={handleSave}
-          disabled={Object.keys(selectedImages).length === 0 || isSaving}
-        >
-          {isSaving ? 'Saving...' : 'Save Selected Images'}
-        </button>
-      </div>
+      <StyledSaveButton
+        onClick={handleSave}
+        disabled={Object.keys(selectedImages).length === 0 || isSaving}
+      >
+        {isSaving ? 'Saving...' : 'Save Selected Images'}
+      </StyledSaveButton>
 
-      <div>
+      <StyledPaginationContainer>
         <Pagination
           currentPage={currentPage}
           totalItems={totalItems}
@@ -180,7 +232,7 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
         <p>
           Showing {((currentPage - 1) * 25) + 1} to {Math.min(currentPage * 25, totalItems)} of {totalItems} shoes
         </p>
-      </div>
-    </div>
+      </StyledPaginationContainer>
+    </StyledContainer>
   );
 }

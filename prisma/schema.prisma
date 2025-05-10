@@ -17,11 +17,11 @@ model brands {
 }
 
 model colors {
-  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String  @unique
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime @db.Timestamptz(6)
-  shoes       shoes[]
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String       @unique
+  created_at  DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime     @db.Timestamptz(6)
+  shoes       shoe_colors[]
 }
 
 model locations {
@@ -60,7 +60,6 @@ model shoes {
   id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   image_url     String?
   brand_id      String       @db.Uuid
-  color_id      String       @db.Uuid
   location_id   String       @db.Uuid
   shoe_type_id  String       @db.Uuid
   heel_type_id  String       @db.Uuid
@@ -69,11 +68,23 @@ model shoes {
   created_at    DateTime     @default(now()) @db.Timestamptz(6)
   updated_at    DateTime     @db.Timestamptz(6)
   brand         brands       @relation(fields: [brand_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  color         colors       @relation(fields: [color_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  colors        shoe_colors[]
   location      locations    @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shoe_type     shoe_types   @relation(fields: [shoe_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   heel_type     heel_types   @relation(fields: [heel_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   dress_style   dress_styles @relation(fields: [dress_style_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("shoes")
+}
+
+model shoe_colors {
+  shoe_id    String   @db.Uuid
+  color_id   String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @db.Timestamptz(6)
+  shoe       shoes    @relation(fields: [shoe_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  color      colors   @relation(fields: [color_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([shoe_id, color_id])
+  @@map("shoe_colors")
 }

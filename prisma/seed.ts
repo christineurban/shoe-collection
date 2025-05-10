@@ -314,13 +314,19 @@ async function seedFromCsv() {
           data: {
             image_url: shoe.Image || null,
             brand_id: brandId,
-            color_id: colorId,
             location_id: locationId,
             shoe_type_id: shoeTypeId,
             heel_type_id: heelTypeId,
             dress_style_id: dressStyleId,
             notes: shoe.Notes || null,
             updated_at: new Date(),
+            colors: {
+              create: [{
+                color_id: colorId,
+                created_at: new Date(),
+                updated_at: new Date()
+              }]
+            }
           },
         });
         stats.successfullyAdded++;

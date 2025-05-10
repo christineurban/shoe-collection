@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '../Button';
 import { SingleSelect } from '../fields/SingleSelect';
+import { MultiSelect } from '../fields/MultiSelect';
 import { Input } from '../fields/Input';
 import { SuccessMessage } from '@/components/SuccessMessage';
 import {
@@ -16,12 +17,13 @@ import {
   StyledDangerZone
 } from './index.styled';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
+import type { Shoe } from '@/types/shoe';
 
 interface AddEditFormData {
   id?: string;
   imageUrl?: string;
   brand: string;
-  color: string;
+  colors: string[];
   dressStyle: string;
   shoeType: string;
   heelType: string;
@@ -30,7 +32,7 @@ interface AddEditFormData {
 }
 
 interface AddEditFormProps {
-  initialData?: AddEditFormData;
+  initialData?: Partial<Shoe>;
   isEditing?: boolean;
   brands?: string[];
   colors?: string[];
@@ -61,16 +63,16 @@ function AddEditFormContent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo');
-  const [formData, setFormData] = useState<AddEditFormData>(
-    initialData || {
-      brand: '',
-      color: '',
-      dressStyle: '',
-      shoeType: '',
-      heelType: '',
-      location: '',
-    }
-  );
+  const [formData, setFormData] = useState<AddEditFormData>({
+    brand: initialData?.brand || '',
+    colors: initialData?.colors || [],
+    dressStyle: initialData?.dressStyle || '',
+    shoeType: initialData?.shoeType || '',
+    heelType: initialData?.heelType || '',
+    location: initialData?.location || '',
+    imageUrl: initialData?.imageUrl || '',
+    notes: initialData?.notes || ''
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -147,6 +149,18 @@ function AddEditFormContent({
     }
   };
 
+  const handleInputChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleMultiSelectChange = (name: string, values: string[]) => {
+    setFormData(prev => ({ ...prev, [name]: values }));
+  };
+
   return (
     <>
       <StyledForm onSubmit={handleSubmit}>
@@ -159,16 +173,16 @@ function AddEditFormContent({
                 value={formData.brand}
                 options={brands}
                 placeholder="Select brand"
-                onChange={(value) => setFormData((prev) => ({ ...prev, brand: value }))}
+                onChange={(value) => handleSelectChange('brand', value)}
               />
             </StyledFormGroup>
             <StyledFormGroup>
-              <label>Color *</label>
-              <SingleSelect
-                value={formData.color}
+              <label>Colors *</label>
+              <MultiSelect
+                values={formData.colors}
                 options={colors}
-                placeholder="Select color"
-                onChange={(value) => setFormData((prev) => ({ ...prev, color: value }))}
+                placeholder="Select colors"
+                onChange={(values) => handleMultiSelectChange('colors', values)}
               />
             </StyledFormGroup>
           </StyledFormRow>
@@ -183,7 +197,7 @@ function AddEditFormContent({
                 value={formData.dressStyle}
                 options={dressStyles}
                 placeholder="Select dress style"
-                onChange={(value) => setFormData((prev) => ({ ...prev, dressStyle: value }))}
+                onChange={(value) => handleSelectChange('dressStyle', value)}
               />
             </StyledFormGroup>
             <StyledFormGroup>
@@ -192,7 +206,7 @@ function AddEditFormContent({
                 value={formData.shoeType}
                 options={shoeTypes}
                 placeholder="Select shoe type"
-                onChange={(value) => setFormData((prev) => ({ ...prev, shoeType: value }))}
+                onChange={(value) => handleSelectChange('shoeType', value)}
               />
             </StyledFormGroup>
           </StyledFormRow>
@@ -204,7 +218,7 @@ function AddEditFormContent({
                 value={formData.heelType}
                 options={heelTypes}
                 placeholder="Select heel type"
-                onChange={(value) => setFormData((prev) => ({ ...prev, heelType: value }))}
+                onChange={(value) => handleSelectChange('heelType', value)}
               />
             </StyledFormGroup>
             <StyledFormGroup>
@@ -213,16 +227,28 @@ function AddEditFormContent({
                 value={formData.location}
                 options={locations}
                 placeholder="Select location"
-                onChange={(value) => setFormData((prev) => ({ ...prev, location: value }))}
+                onChange={(value) => handleSelectChange('location', value)}
               />
             </StyledFormGroup>
           </StyledFormRow>
 
           <StyledFormGroup>
+            <label>Image URL</label>
+            <Input
+              type="text"
+              name="imageUrl"
+              value={formData.imageUrl}
+              onChange={(value) => handleInputChange('imageUrl', value)}
+              placeholder="Image URL"
+            />
+          </StyledFormGroup>
+
+          <StyledFormGroup>
             <label>Notes</label>
             <StyledTextarea
+              name="notes"
               value={formData.notes || ''}
-              onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
               rows={4}
             />
           </StyledFormGroup>
@@ -236,26 +262,20 @@ function AddEditFormContent({
             {isLoading ? 'Saving...' : isEditing ? 'Update Shoe' : 'Add Shoe'}
           </Button>
         </StyledButtonGroup>
-
-        {isEditing && (
-          <StyledDangerZone>
-            <h3>Danger Zone</h3>
-            <p>Once you delete a shoe, there is no going back. Please be certain.</p>
-            <Button
-              onClick={handleDelete}
-              type="button"
-              $variant="danger"
-              disabled={isDeleting}
-              $fullWidth
-            >
-              {isDeleting ? 'Deleting...' : 'Delete Shoe'}
-            </Button>
-          </StyledDangerZone>
-        )}
       </StyledForm>
 
+      {isEditing && (
+        <StyledDangerZone>
+          <h3>Danger Zone</h3>
+          <p>Once you delete a shoe, there is no going back. Please be certain.</p>
+          <Button onClick={handleDelete} $variant="danger" disabled={isDeleting}>
+            {isDeleting ? 'Deleting...' : 'Delete Shoe'}
+          </Button>
+        </StyledDangerZone>
+      )}
+
       <SuccessMessage
-        message={successMessage}
+        message={isSuccess ? successMessage : null}
         onClose={() => setIsSuccess(false)}
       />
     </>

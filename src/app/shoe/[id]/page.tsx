@@ -18,7 +18,7 @@ export default async function ShoePage({ params }: PageProps) {
       brand: data.brand.name,
       name: data.brand.name,
       imageUrl: data.image_url,
-      color: data.color.name,
+      colors: [data.colors[0].color.name],
       dressStyle: data.dress_style.name,
       shoeType: data.shoe_type.name,
       heelType: data.heel_type.name,

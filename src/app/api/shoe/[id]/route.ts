@@ -10,11 +10,15 @@ export async function GET(
       where: { id: params.id },
       include: {
         brand: true,
-        color: true,
-        dress_style: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
+        location: true,
         shoe_type: true,
         heel_type: true,
-        location: true
+        dress_style: true
       }
     });
 
@@ -29,7 +33,7 @@ export async function GET(
       id: shoe.id,
       imageUrl: shoe.image_url,
       brand: shoe.brand.name,
-      color: shoe.color.name,
+      color: shoe.colors[0].color.name,
       dressStyle: shoe.dress_style.name,
       shoeType: shoe.shoe_type.name,
       heelType: shoe.heel_type.name,
@@ -84,11 +88,15 @@ export async function PUT(
       },
       include: {
         brand: true,
-        color: true,
-        dress_style: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
+        location: true,
         shoe_type: true,
         heel_type: true,
-        location: true
+        dress_style: true
       }
     });
 
@@ -96,7 +104,7 @@ export async function PUT(
       id: updatedShoe.id,
       imageUrl: updatedShoe.image_url,
       brand: updatedShoe.brand.name,
-      color: updatedShoe.color.name,
+      color: updatedShoe.colors[0].color.name,
       dressStyle: updatedShoe.dress_style.name,
       shoeType: updatedShoe.shoe_type.name,
       heelType: updatedShoe.heel_type.name,

@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const hasImage = searchParams.get('hasImage');
     const search = searchParams.get('search') || '';
     const brands = searchParams.getAll('brand');
-    const colors = searchParams.getAll('color');
+    const colors = searchParams.getAll('colors');
     const dressStyles = searchParams.getAll('dressStyle');
     const shoeTypes = searchParams.getAll('shoeType');
     const heelTypes = searchParams.getAll('heelType');
@@ -53,7 +53,15 @@ export async function GET(request: Request) {
     }
 
     if (colors.length > 0) {
-      where.color = { name: { in: colors } };
+      where.colors = {
+        some: {
+          color: {
+            name: {
+              in: colors
+            }
+          }
+        }
+      };
     }
 
     if (dressStyles.length > 0) {
@@ -78,7 +86,11 @@ export async function GET(request: Request) {
         where,
         include: {
           brand: true,
-          color: true,
+          colors: {
+            include: {
+              color: true
+            }
+          },
           dress_style: true,
           shoe_type: true,
           heel_type: true,
@@ -100,7 +112,7 @@ export async function GET(request: Request) {
         id: shoe.id,
         imageUrl: shoe.image_url,
         brand: shoe.brand.name,
-        color: shoe.color.name,
+        colors: shoe.colors.map(sc => sc.color.name),
         dressStyle: shoe.dress_style.name,
         shoeType: shoe.shoe_type.name,
         heelType: shoe.heel_type.name,
@@ -125,39 +137,62 @@ export async function POST(request: Request) {
     const data = await request.json() as Shoe;
 
     // Get all the required IDs
-    const [brand, color, dressStyle, shoeType, heelType, location] = await Promise.all([
+    const [brand, dressStyle, shoeType, heelType, location] = await Promise.all([
       prisma.brands.findUnique({ where: { name: data.brand } }),
-      prisma.colors.findUnique({ where: { name: data.color } }),
       prisma.dress_styles.findUnique({ where: { name: data.dressStyle } }),
       prisma.shoe_types.findUnique({ where: { name: data.shoeType } }),
       prisma.heel_types.findUnique({ where: { name: data.heelType } }),
       prisma.locations.findUnique({ where: { name: data.location } })
     ]);
 
-    if (!brand || !color || !dressStyle || !shoeType || !heelType || !location) {
+    // Get all color IDs
+    const colorRecords = await Promise.all(
+      data.colors.map((colorName: string) =>
+        prisma.colors.findUnique({ where: { name: colorName } })
+      )
+    );
+
+    if (!brand || !dressStyle || !shoeType || !heelType || !location) {
       return NextResponse.json(
         { error: 'One or more required attributes not found' },
         { status: 404 }
       );
     }
 
-    // Create the shoe record with all relations
+    if (colorRecords.some(record => !record)) {
+      return NextResponse.json(
+        { error: 'One or more colors not found' },
+        { status: 404 }
+      );
+    }
+
+    const now = new Date();
     const newShoe = await prisma.shoes.create({
       data: {
         brand_id: brand.id,
-        color_id: color.id,
         dress_style_id: dressStyle.id,
         shoe_type_id: shoeType.id,
         heel_type_id: heelType.id,
         location_id: location.id,
         image_url: data.imageUrl,
         notes: data.notes,
-        created_at: new Date(),
-        updated_at: new Date()
+        created_at: now,
+        updated_at: now,
+        colors: {
+          create: colorRecords.map(color => ({
+            color_id: color!.id,
+            created_at: now,
+            updated_at: now
+          }))
+        }
       },
       include: {
         brand: true,
-        color: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
         dress_style: true,
         shoe_type: true,
         heel_type: true,
@@ -165,7 +200,17 @@ export async function POST(request: Request) {
       }
     });
 
-    return NextResponse.json(newShoe);
+    return NextResponse.json({
+      id: newShoe.id,
+      imageUrl: newShoe.image_url,
+      brand: newShoe.brand.name,
+      colors: newShoe.colors.map(sc => sc.color.name),
+      dressStyle: newShoe.dress_style.name,
+      shoeType: newShoe.shoe_type.name,
+      heelType: newShoe.heel_type.name,
+      location: newShoe.location.name,
+      notes: newShoe.notes
+    });
   } catch (error) {
     console.error('Error creating shoe:', error);
     return NextResponse.json(

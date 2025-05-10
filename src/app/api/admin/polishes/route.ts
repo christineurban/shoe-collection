@@ -6,7 +6,11 @@ export async function GET() {
     const shoes = await prisma.shoes.findMany({
       include: {
         brand: true,
-        color: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
         location: true,
         shoe_type: true,
         heel_type: true,

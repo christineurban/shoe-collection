@@ -6,18 +6,31 @@ export async function POST(request: Request) {
     const data = await request.json();
 
     // Get all the required IDs
-    const [brand, color, dressStyle, shoeType, heelType, location] = await Promise.all([
+    const [brand, dressStyle, shoeType, heelType, location] = await Promise.all([
       prisma.brands.findUnique({ where: { name: data.brand } }),
-      prisma.colors.findUnique({ where: { name: data.color } }),
       prisma.dress_styles.findUnique({ where: { name: data.dressStyle } }),
       prisma.shoe_types.findUnique({ where: { name: data.shoeType } }),
       prisma.heel_types.findUnique({ where: { name: data.heelType } }),
       prisma.locations.findUnique({ where: { name: data.location } })
     ]);
 
-    if (!brand || !color || !dressStyle || !shoeType || !heelType || !location) {
+    // Get all color IDs
+    const colorRecords = await Promise.all(
+      data.colors.map((colorName: string) =>
+        prisma.colors.findUnique({ where: { name: colorName } })
+      )
+    );
+
+    if (!brand || !dressStyle || !shoeType || !heelType || !location) {
       return NextResponse.json(
         { error: 'One or more required attributes not found' },
+        { status: 404 }
+      );
+    }
+
+    if (colorRecords.some(record => !record)) {
+      return NextResponse.json(
+        { error: 'One or more colors not found' },
         { status: 404 }
       );
     }
@@ -26,7 +39,6 @@ export async function POST(request: Request) {
     const newShoe = await prisma.shoes.create({
       data: {
         brand_id: brand.id,
-        color_id: color.id,
         dress_style_id: dressStyle.id,
         shoe_type_id: shoeType.id,
         heel_type_id: heelType.id,
@@ -34,16 +46,22 @@ export async function POST(request: Request) {
         image_url: data.imageUrl,
         notes: data.notes,
         created_at: now,
-        updated_at: now
-      }
-    });
-
-    // Fetch the complete shoe data with relations
-    const completeShoe = await prisma.shoes.findUnique({
-      where: { id: newShoe.id },
+        updated_at: now,
+        colors: {
+          create: colorRecords.map(color => ({
+            color_id: color!.id,
+            created_at: now,
+            updated_at: now
+          }))
+        }
+      },
       include: {
         brand: true,
-        color: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
         dress_style: true,
         shoe_type: true,
         heel_type: true,
@@ -51,20 +69,16 @@ export async function POST(request: Request) {
       }
     });
 
-    if (!completeShoe) {
-      throw new Error('Failed to fetch created shoe');
-    }
-
     return NextResponse.json({
-      id: completeShoe.id,
-      imageUrl: completeShoe.image_url,
-      brand: completeShoe.brand.name,
-      color: completeShoe.color.name,
-      dressStyle: completeShoe.dress_style.name,
-      shoeType: completeShoe.shoe_type.name,
-      heelType: completeShoe.heel_type.name,
-      location: completeShoe.location.name,
-      notes: completeShoe.notes
+      id: newShoe.id,
+      imageUrl: newShoe.image_url,
+      brand: newShoe.brand.name,
+      colors: newShoe.colors.map(sc => sc.color.name),
+      dressStyle: newShoe.dress_style.name,
+      shoeType: newShoe.shoe_type.name,
+      heelType: newShoe.heel_type.name,
+      location: newShoe.location.name,
+      notes: newShoe.notes
     });
   } catch (error) {
     console.error('Error creating shoe:', error);

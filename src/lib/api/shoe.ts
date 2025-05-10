@@ -6,7 +6,11 @@ export async function getShoeById(id: string): Promise<ShoeWithRelations> {
     where: { id },
     include: {
       brand: true,
-      color: true,
+      colors: {
+        include: {
+          color: true
+        }
+      },
       dress_style: true,
       shoe_type: true,
       heel_type: true,

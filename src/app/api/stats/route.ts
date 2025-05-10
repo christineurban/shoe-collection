@@ -8,11 +8,15 @@ export async function GET() {
     const shoes = await prisma.shoes.findMany({
       include: {
         brand: true,
-        color: true,
-        dress_style: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
+        location: true,
         shoe_type: true,
         heel_type: true,
-        location: true
+        dress_style: true
       }
     });
 
@@ -23,7 +27,7 @@ export async function GET() {
     }, {} as Record<string, number>);
 
     const colorCounts = shoes.reduce((acc, shoe) => {
-      acc[shoe.color.name] = (acc[shoe.color.name] || 0) + 1;
+      acc[shoe.colors[0].color.name] = (acc[shoe.colors[0].color.name] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
