@@ -5,6 +5,14 @@ export async function GET() {
   try {
     const totalShoes = await prisma.shoes.count();
 
+    // Get all brands, colors, etc. first
+    const allBrands = await prisma.brands.findMany();
+    const allColors = await prisma.colors.findMany();
+    const allDressStyles = await prisma.dress_styles.findMany();
+    const allShoeTypes = await prisma.shoe_types.findMany();
+    const allHeelTypes = await prisma.heel_types.findMany();
+    const allLocations = await prisma.locations.findMany();
+
     const shoes = await prisma.shoes.findMany({
       include: {
         brand: true,
@@ -61,26 +69,57 @@ export async function GET() {
       );
     };
 
+    // Create detailed lists including unused attributes with count 0
+    const brands = allBrands.map(brand => ({
+      name: brand.name,
+      count: brandCounts[brand.name] || 0
+    }));
+
+    const colors = allColors.map(color => ({
+      name: color.name,
+      count: colorCounts[color.name] || 0
+    }));
+
+    const dressStyles = allDressStyles.map(style => ({
+      name: style.name,
+      count: dressStyleCounts[style.name] || 0
+    }));
+
+    const shoeTypes = allShoeTypes.map(type => ({
+      name: type.name,
+      count: shoeTypeCounts[type.name] || 0
+    }));
+
+    const heelTypes = allHeelTypes.map(type => ({
+      name: type.name,
+      count: heelTypeCounts[type.name] || 0
+    }));
+
+    const locations = allLocations.map(location => ({
+      name: location.name,
+      count: locationCounts[location.name] || 0
+    }));
+
     const stats = {
       totalShoes,
-      totalBrands: Object.keys(brandCounts).length,
-      totalColors: Object.keys(colorCounts).length,
-      totalDressStyles: Object.keys(dressStyleCounts).length,
-      totalShoeTypes: Object.keys(shoeTypeCounts).length,
-      totalHeelTypes: Object.keys(heelTypeCounts).length,
-      totalLocations: Object.keys(locationCounts).length,
+      totalBrands: brands.filter(b => b.count > 0).length,
+      totalColors: colors.filter(c => c.count > 0).length,
+      totalDressStyles: dressStyles.filter(d => d.count > 0).length,
+      totalShoeTypes: shoeTypes.filter(s => s.count > 0).length,
+      totalHeelTypes: heelTypes.filter(h => h.count > 0).length,
+      totalLocations: locations.filter(l => l.count > 0).length,
       mostCommonBrand: findMostCommon(brandCounts),
       mostCommonColor: findMostCommon(colorCounts),
       mostCommonDressStyle: findMostCommon(dressStyleCounts),
       mostCommonShoeType: findMostCommon(shoeTypeCounts),
       mostCommonHeelType: findMostCommon(heelTypeCounts),
       mostCommonLocation: findMostCommon(locationCounts),
-      brands: Object.entries(brandCounts).map(([name, count]) => ({ name, count })),
-      colors: Object.entries(colorCounts).map(([name, count]) => ({ name, count })),
-      dressStyles: Object.entries(dressStyleCounts).map(([name, count]) => ({ name, count })),
-      shoeTypes: Object.entries(shoeTypeCounts).map(([name, count]) => ({ name, count })),
-      heelTypes: Object.entries(heelTypeCounts).map(([name, count]) => ({ name, count })),
-      locations: Object.entries(locationCounts).map(([name, count]) => ({ name, count }))
+      brands,
+      colors,
+      dressStyles,
+      shoeTypes,
+      heelTypes,
+      locations
     };
 
     return NextResponse.json(stats);

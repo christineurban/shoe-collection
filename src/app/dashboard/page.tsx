@@ -117,6 +117,14 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  const fetchStats = async () => {
+    const response = await fetch('/api/stats');
+    if (response.ok) {
+      const statsData = await response.json();
+      setStats(statsData);
+    }
+  };
+
   const handleDelete = async (id: string, type: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     try {
       const response = await fetch(`/api/attributes?type=${type}&id=${id}`, {
@@ -148,17 +156,14 @@ export default function Dashboard() {
           setLocations(data.locations);
           break;
       }
+      await fetchStats();
+      setSuccess(`Successfully deleted ${formatAttributeType(type)}`);
     } catch (error) {
       console.error('Error deleting attribute:', error);
     }
   };
 
-  const handleAdd = async (e: React.FormEvent, type: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const name = formData.get('name') as string;
-
+  const handleAdd = async (name: string, type: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     if (!name) return;
 
     try {
@@ -195,14 +200,24 @@ export default function Dashboard() {
           setLocations(data.locations);
           break;
       }
-
-      form.reset();
+      setNewAttributeName('');
+      await fetchStats();
+      setSuccess(`Successfully added ${formatAttributeType(type)}: ${name}`);
     } catch (error) {
       console.error('Error adding attribute:', error);
     }
   };
 
-  const sortAttributes = (attributes: Attribute[]): Attribute[] => {
+  const handleFormSubmit = (e: React.FormEvent, type: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
+    e.preventDefault();
+    handleAdd(newAttributeName, type);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewAttributeName(e.target.value);
+  };
+
+  const sortAttributes = (attributes: Attribute[] = []): Attribute[] => {
     return [...attributes].sort((a, b) => {
       switch (sortOrder) {
         case 'name-asc':
@@ -256,6 +271,8 @@ export default function Dashboard() {
   };
 
   const handleStatClick = (type: 'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations') => {
+    if (selectedAttribute === type) return;
+
     setSelectedAttribute(type);
     if (attributeListRef.current) {
       attributeListRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -312,6 +329,11 @@ export default function Dashboard() {
       <PageHeader
         title="Dashboard"
         description="Click on a tile to view and manage details"
+      />
+
+      <SuccessMessage
+        message={success}
+        onClose={() => setSuccess(null)}
       />
 
       <StyledStatsGrid>
@@ -444,9 +466,10 @@ export default function Dashboard() {
                 />
               </StyledInputContainer>
 
-              <StyledAddForm onSubmit={(e) => handleAdd(e, singularForms[selectedAttribute])}>
+              <StyledAddForm onSubmit={(e) => handleFormSubmit(e, singularForms[selectedAttribute])}>
                 <StyledInputContainer>
                   <Input
+                    name="name"
                     placeholder={`Add new ${formatAttributeType(singularForms[selectedAttribute])}...`}
                     value={newAttributeName}
                     onChange={setNewAttributeName}
@@ -489,7 +512,7 @@ export default function Dashboard() {
                   </Button>
                   <Button
                     onClick={(e) => {
-                      handleAdd(e as any, singularForms[selectedAttribute]);
+                      handleFormSubmit(e as any, singularForms[selectedAttribute]);
                       setIsAddModalOpen(false);
                     }}
                   >
@@ -500,7 +523,7 @@ export default function Dashboard() {
             >
               <form onSubmit={(e) => {
                 e.preventDefault();
-                handleAdd(e, singularForms[selectedAttribute]);
+                handleFormSubmit(e, singularForms[selectedAttribute]);
                 setIsAddModalOpen(false);
               }}>
                 <Input

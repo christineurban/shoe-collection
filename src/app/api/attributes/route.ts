@@ -171,7 +171,65 @@ export async function POST(request: Request) {
         break;
     }
 
-    return NextResponse.json(result);
+    // Fetch updated lists and counts after creation
+    const totalShoes = await prisma.shoes.count();
+
+    const brands = await prisma.brands.findMany({ include: { shoes: true } });
+    const brandsData = brands.map(brand => ({
+      id: brand.id,
+      name: brand.name,
+      count: brand.shoes.length,
+      percentage: Number(((brand.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const colors = await prisma.colors.findMany({ include: { shoes: true } });
+    const colorsData = colors.map(color => ({
+      id: color.id,
+      name: color.name,
+      count: color.shoes.length,
+      percentage: Number(((color.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const dressStyles = await prisma.dress_styles.findMany({ include: { shoes: true } });
+    const dressStylesData = dressStyles.map(style => ({
+      id: style.id,
+      name: style.name,
+      count: style.shoes.length,
+      percentage: Number(((style.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const shoeTypes = await prisma.shoe_types.findMany({ include: { shoes: true } });
+    const shoeTypesData = shoeTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      count: type.shoes.length,
+      percentage: Number(((type.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const heelTypes = await prisma.heel_types.findMany({ include: { shoes: true } });
+    const heelTypesData = heelTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      count: type.shoes.length,
+      percentage: Number(((type.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const locations = await prisma.locations.findMany({ include: { shoes: true } });
+    const locationsData = locations.map(location => ({
+      id: location.id,
+      name: location.name,
+      count: location.shoes.length,
+      percentage: Number(((location.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    return NextResponse.json({
+      brands: brandsData,
+      colors: colorsData,
+      dressStyles: dressStylesData,
+      shoeTypes: shoeTypesData,
+      heelTypes: heelTypesData,
+      locations: locationsData
+    });
   } catch (error) {
     console.error('Error creating attribute:', error);
     return NextResponse.json(
@@ -246,7 +304,65 @@ export async function DELETE(request: Request) {
         break;
     }
 
-    return NextResponse.json(result);
+    // Fetch updated lists and counts after deletion
+    const totalShoes = await prisma.shoes.count();
+
+    const brands = await prisma.brands.findMany({ include: { shoes: true } });
+    const brandsData = brands.map(brand => ({
+      id: brand.id,
+      name: brand.name,
+      count: brand.shoes.length,
+      percentage: Number(((brand.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const colors = await prisma.colors.findMany({ include: { shoes: true } });
+    const colorsData = colors.map(color => ({
+      id: color.id,
+      name: color.name,
+      count: color.shoes.length,
+      percentage: Number(((color.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const dressStyles = await prisma.dress_styles.findMany({ include: { shoes: true } });
+    const dressStylesData = dressStyles.map(style => ({
+      id: style.id,
+      name: style.name,
+      count: style.shoes.length,
+      percentage: Number(((style.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const shoeTypes = await prisma.shoe_types.findMany({ include: { shoes: true } });
+    const shoeTypesData = shoeTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      count: type.shoes.length,
+      percentage: Number(((type.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const heelTypes = await prisma.heel_types.findMany({ include: { shoes: true } });
+    const heelTypesData = heelTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      count: type.shoes.length,
+      percentage: Number(((type.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    const locations = await prisma.locations.findMany({ include: { shoes: true } });
+    const locationsData = locations.map(location => ({
+      id: location.id,
+      name: location.name,
+      count: location.shoes.length,
+      percentage: Number(((location.shoes.length / totalShoes) * 100).toFixed(1))
+    }));
+
+    return NextResponse.json({
+      brands: brandsData,
+      colors: colorsData,
+      dressStyles: dressStylesData,
+      shoeTypes: shoeTypesData,
+      heelTypes: heelTypesData,
+      locations: locationsData
+    });
   } catch (error) {
     console.error('Error deleting attribute:', error);
     return NextResponse.json(
