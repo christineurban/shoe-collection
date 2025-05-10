@@ -8,10 +8,10 @@ export const StyledContainer = styled.div`
   position: relative;
   width: 100%;
   isolation: isolate;
-  z-index: 0;
+  z-index: 1;
 
   &:focus-within {
-    z-index: 1;
+    z-index: 1001;
   }
 `;
 
@@ -91,7 +91,8 @@ export const StyledDropdown = styled.div<{ $isOpen: boolean }>`
     opacity: ${({ $isOpen }) => ($isOpen ? '1' : '0')};
     overflow-y: ${({ $isOpen }) => ($isOpen ? 'auto' : 'hidden')};
     transition: all 0.2s ease;
-    z-index: 10;
+    z-index: 1000;
     width: 100%;
     margin-top: 4px;
+    top: 100%;
 `;

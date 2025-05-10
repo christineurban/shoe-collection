@@ -16,12 +16,13 @@ interface SingleSelectProps {
   options: string[];
   placeholder?: string;
   onChange: (value: string) => void;
+  onOptionsChange?: (newOptions: string[]) => void;
   disableSearch?: boolean;
   isBrand?: boolean;
   isColor?: boolean;
 }
 
-export const SingleSelect = ({ value, options, placeholder = 'Select...', onChange, disableSearch = false, isBrand = false, isColor = false }: SingleSelectProps) => {
+export const SingleSelect = ({ value, options, placeholder = 'Select...', onChange, onOptionsChange, disableSearch = false, isBrand = false, isColor = false }: SingleSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -88,30 +89,10 @@ export const SingleSelect = ({ value, options, placeholder = 'Select...', onChan
 
     if (!searchTerm.trim()) return;
 
-    try {
-      const response = await fetch('/api/attributes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          type: isBrand ? 'brand' : 'color',
-          name: searchTerm.trim()
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create ${isBrand ? 'brand' : 'color'}`);
-      }
-
-      const data = await response.json();
-      onChange(searchTerm.trim());
-      setIsOpen(false);
-      setSearchTerm('');
-    } catch (error) {
-      console.error(`Error creating ${isBrand ? 'brand' : 'color'}:`, error);
-      alert(`Failed to create ${isBrand ? 'brand' : 'color'}. Please try again.`);
-    }
+    const newBrand = searchTerm.trim();
+    setSearchTerm('');
+    setIsOpen(false);
+    onChange(newBrand);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -174,7 +155,10 @@ export const SingleSelect = ({ value, options, placeholder = 'Select...', onChan
           </StyledOption>
         ))}
         {filteredOptions.length === 0 && searchTerm.trim() && (isBrand || isColor) && (
-          <StyledCreateNew onClick={handleCreateNew}>
+          <StyledCreateNew
+            type="button"
+            onClick={handleCreateNew}
+          >
             Create new {isBrand ? 'brand' : 'color'}: "{searchTerm.trim()}"
           </StyledCreateNew>
         )}

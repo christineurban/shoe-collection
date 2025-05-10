@@ -94,6 +94,12 @@ export default function AddShoePage() {
           shoeTypes={options.shoeTypes}
           heelTypes={options.heelTypes}
           locations={options.locations}
+          onBrandsChange={(newBrands) => {
+            setOptions(prev => ({
+              ...prev,
+              brands: newBrands
+            }));
+          }}
         />
       </StyledFormContainer>
     </StyledContainer>

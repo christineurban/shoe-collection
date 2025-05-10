@@ -46,6 +46,7 @@ interface AddEditFormProps {
   shoeTypes?: string[];
   heelTypes?: string[];
   locations?: string[];
+  onBrandsChange?: (newBrands: string[]) => void;
 }
 
 export const AddEditForm = (props: AddEditFormProps) => {
@@ -64,7 +65,8 @@ function AddEditFormContent({
   dressStyles = [],
   shoeTypes = [],
   heelTypes = [],
-  locations = []
+  locations = [],
+  onBrandsChange
 }: AddEditFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,15 +101,9 @@ function AddEditFormContent({
         const imageFormData = new FormData();
         imageFormData.append('image', imageFile);
 
-        const uploadResponse = await fetch('/api/update-image', {
+        const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id: formData.id,
-            imageUrl: URL.createObjectURL(imageFile)
-          }),
+          body: imageFormData,
         });
 
         if (!uploadResponse.ok) {
@@ -119,7 +115,7 @@ function AddEditFormContent({
       }
 
       // Save the shoe with the image URL
-      const endpoint = isEditing ? `/api/shoe/${formData.id}` : '/api/shoe';
+      const endpoint = isEditing ? `/api/shoe/${formData.id}` : '/api/shoe/add';
       const response = await fetch(endpoint, {
         method: isEditing ? 'PUT' : 'POST',
         headers: {
@@ -192,11 +188,8 @@ function AddEditFormContent({
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (field: keyof AddEditFormData, value: string | string[]) => {
-    setFormData({
-      ...formData,
-      [field]: value
-    });
+  const handleSelectChange = (field: keyof AddEditFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleMultiSelectChange = (name: string, values: string[]) => {
@@ -287,6 +280,11 @@ function AddEditFormContent({
                 options={brands}
                 placeholder="Select brand"
                 onChange={(value) => handleSelectChange('brand', value)}
+                onOptionsChange={(newBrands) => {
+                  if (onBrandsChange) {
+                    onBrandsChange(newBrands);
+                  }
+                }}
                 isBrand={true}
               />
             </StyledFormGroup>

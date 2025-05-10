@@ -91,12 +91,16 @@ export const StyledNoMatches = styled.div`
   color: #666;
 `;
 
-export const StyledCreateNew = styled.div`
+export const StyledCreateNew = styled.button`
+  width: 100%;
   padding: 0.75rem 1rem;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.primary[500]};
   font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
   transition: all ${({ theme }) => theme.transitions.base};
+  background: none;
+  border: none;
+  text-align: left;
 
   &:hover {
     background: ${({ theme }) => theme.colors.primary[50]};
