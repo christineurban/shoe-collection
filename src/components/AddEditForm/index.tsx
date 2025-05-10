@@ -26,7 +26,6 @@ interface AddEditFormData {
   shoeType: string;
   heelType: string;
   location: string;
-  link?: string;
   notes?: string;
 }
 
@@ -218,19 +217,7 @@ function AddEditFormContent({
               />
             </StyledFormGroup>
           </StyledFormRow>
-        </StyledFormSection>
 
-        <StyledFormSection>
-          <h3>Additional Information</h3>
-          <StyledFormGroup>
-            <label>Link</label>
-            <Input
-              type="url"
-              value={formData.link || ''}
-              onChange={(value) => setFormData((prev) => ({ ...prev, link: value }))}
-              placeholder="https://example.com/shoe"
-            />
-          </StyledFormGroup>
           <StyledFormGroup>
             <label>Notes</label>
             <StyledTextarea
