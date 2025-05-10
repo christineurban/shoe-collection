@@ -149,10 +149,7 @@ export default function ImageManager() {
   if (isLoading) {
     return (
       <StyledContainer>
-        <PageHeader
-          title="Image Manager"
-          description="Loading images..."
-        />
+        <PageHeader title="Loading..." />
       </StyledContainer>
     );
   }
@@ -161,10 +158,9 @@ export default function ImageManager() {
     return (
       <StyledContainer>
         <PageHeader
-          title="Image Manager"
-          description="An error occurred while loading the image manager"
+          title="Error"
+          description={error}
         />
-        <StyledErrorMessage>{error}</StyledErrorMessage>
       </StyledContainer>
     );
   }

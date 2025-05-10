@@ -5,45 +5,44 @@ import { AddEditForm } from '@/components/AddEditForm';
 import { getShoeById } from '@/lib/api/shoe';
 import type { Shoe } from '@/types/shoe';
 import { PageHeader } from '@/components/PageHeader';
+import { StyledContainer } from '@/app/shoe/add/page.styled';
 
 interface Options {
   brands: string[];
   colors: string[];
 }
 
-interface EditPageProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    shoe?: string;
-  };
-}
-
-export default function EditPage({ params, searchParams }: EditPageProps) {
+export default function EditShoePage({ params }: { params: { id: string } }) {
   const [shoe, setShoe] = useState<Shoe | null>(null);
-  const [options, setOptions] = useState<Options>({
-    brands: [],
-    colors: [],
-  });
+  const [options, setOptions] = useState<Options>({ brands: [], colors: [] });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch shoe data
-        const response = await fetch(`/api/shoe/${params.id}`);
-        if (!response.ok) throw new Error('Failed to fetch shoe');
-        const shoeData = await response.json();
-        setShoe(shoeData);
+        const [shoeResponse, brandsResponse, colorsResponse] = await Promise.all([
+          getShoeById(params.id),
+          fetch('/api/brands'),
+          fetch('/api/colors')
+        ]);
 
-        // Fetch options
-        const optionsResponse = await fetch('/api/options');
-        if (!optionsResponse.ok) throw new Error('Failed to fetch options');
-        const optionsData = await optionsResponse.json();
-        setOptions(optionsData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        if (!brandsResponse.ok || !colorsResponse.ok) {
+          throw new Error('Failed to fetch options');
+        }
+
+        const [brands, colors] = await Promise.all([
+          brandsResponse.json(),
+          colorsResponse.json()
+        ]);
+
+        setShoe(shoeResponse);
+        setOptions({
+          brands: brands.map((b: { name: string }) => b.name),
+          colors: colors.map((c: { name: string }) => c.name)
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setIsLoading(false);
       }
@@ -52,36 +51,47 @@ export default function EditPage({ params, searchParams }: EditPageProps) {
     fetchData();
   }, [params.id]);
 
-  if (isLoading || !shoe) {
+  if (isLoading) {
     return (
-      <PageHeader
-        title="Loading..."
-      />
+      <StyledContainer>
+        <PageHeader title="Loading..." />
+      </StyledContainer>
     );
   }
 
-  const initialValues = {
-    brand: shoe.brand,
-    color: shoe.color,
-    location: shoe.location,
-    shoeType: shoe.shoeType,
-    heelType: shoe.heelType,
-    dressStyle: shoe.dressStyle,
-    imageUrl: shoe.imageUrl || undefined,
-    notes: shoe.notes || '',
-  };
+  if (error) {
+    return (
+      <StyledContainer>
+        <PageHeader
+          title="Error"
+          description={error}
+        />
+      </StyledContainer>
+    );
+  }
+
+  if (!shoe) {
+    return (
+      <StyledContainer>
+        <PageHeader
+          title="Error"
+          description="Shoe not found"
+        />
+      </StyledContainer>
+    );
+  }
 
   return (
-    <>
+    <StyledContainer>
       <PageHeader
-        title={`Edit ${shoe.brand} ${shoe.heelType} ${shoe.shoeType}`}
+        title="Edit Shoe"
+        description="Update the details below to modify this shoe"
       />
       <AddEditForm
-        initialData={initialValues}
-        isEditing={true}
+        shoe={shoe}
         brands={options.brands}
         colors={options.colors}
       />
-    </>
+    </StyledContainer>
   );
 }

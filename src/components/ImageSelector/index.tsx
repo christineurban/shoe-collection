@@ -237,7 +237,7 @@ export const ImageSelector = ({
                 <StyledShoeLink href={polish ? `/polish/${item.id}` : `/shoe/${item.id}`}>
                   <h3>{item.brand} {item.heelType} {item.shoeType}</h3>
                 </StyledShoeLink>
-                <p>Color: {'color' in item ? item.color : item.colors[0]}</p>
+                <p>Color: {'color' in item ? item.color : item.colors.join(', ')}</p>
                 <p>Location: {item.location}</p>
               </div>
               <StyledActionsContainer>

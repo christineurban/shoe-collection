@@ -6,27 +6,11 @@ import { useAuth } from '@/lib/auth/AuthContext';
 import { ImageSelector } from '@/components/ImageSelector';
 import { EmptyState } from '@/components/EmptyState';
 import { Pagination } from '@/components/Pagination';
+import { PageHeader } from '@/components/PageHeader';
 import { Shoe } from '@/types/shoe';
 import styled from 'styled-components';
 
-const StyledContainer = styled.div`
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
 
-const StyledHeader = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const StyledTitle = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-`;
-
-const StyledDescription = styled.p`
-  color: ${({ theme }) => theme.colors.gray[600]};
-`;
 
 const StyledSaveButton = styled.button`
   background: ${({ theme }) => theme.colors.primary[500]};
@@ -55,6 +39,29 @@ const StyledPaginationContainer = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+`;
+
+const StyledLoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+`;
+
+const StyledLoadingSpinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 4px solid ${({ theme }) => theme.colors.gray[200]};
+  border-top: 4px solid ${({ theme }) => theme.colors.primary[500]};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 interface PageProps {
@@ -181,28 +188,41 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
   };
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+        <PageHeader
+          title="Error"
+          description={error}
+        />
+    );
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+        <PageHeader title="Loading..." />
+    );
   }
 
   if (shoes.length === 0) {
     return (
-      <EmptyState
-        title="No Shoes Need Images"
-        description="All shoes in your collection have images."
-      />
+      <>
+        <PageHeader
+          title="Image Selection"
+          description="Select images for multiple shoes and save them all at once."
+        />
+        <EmptyState
+          title="No Shoes Need Images"
+          description="All shoes in your collection have images."
+        />
+      </>
     );
   }
 
   return (
-    <StyledContainer>
-      <StyledHeader>
-        <StyledTitle>Image Selection</StyledTitle>
-        <StyledDescription>Select images for multiple shoes and save them all at once.</StyledDescription>
-      </StyledHeader>
+    <>
+      <PageHeader
+        title="Image Selection"
+        description="Select images for multiple shoes and save them all at once."
+      />
 
       <div>
         {shoes.map(shoe => (
@@ -233,6 +253,6 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
           Showing {((currentPage - 1) * 25) + 1} to {Math.min(currentPage * 25, totalItems)} of {totalItems} shoes
         </p>
       </StyledPaginationContainer>
-    </StyledContainer>
+    </>
   );
 }

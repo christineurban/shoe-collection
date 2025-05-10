@@ -72,6 +72,8 @@ export default function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('card');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const attributeListRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const singularForms: Record<'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations', 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location'> = {
     colors: 'color',
@@ -106,6 +108,9 @@ export default function Dashboard() {
         setLocations(attributesData.locations);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        setError('Failed to fetch data');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -282,6 +287,25 @@ export default function Dashboard() {
       .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
       .toLowerCase(); // Convert to lowercase
   };
+
+  if (isLoading) {
+    return (
+      <StyledDashboard>
+        <PageHeader title="Loading..." />
+      </StyledDashboard>
+    );
+  }
+
+  if (error) {
+    return (
+      <StyledDashboard>
+        <PageHeader
+          title="Error"
+          description={error}
+        />
+      </StyledDashboard>
+    );
+  }
 
   return (
     <StyledDashboard>

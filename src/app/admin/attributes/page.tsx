@@ -8,6 +8,8 @@ import { useState } from 'react';
 
 export default function AttributesPage() {
   const [activeTab, setActiveTab] = useState('brands');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const tabs = [
     {
@@ -22,8 +24,27 @@ export default function AttributesPage() {
     }
   ];
 
+  if (isLoading) {
+    return (
+      <StyledContainer>
+        <PageHeader title="Loading..." />
+      </StyledContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <StyledContainer>
+        <PageHeader
+          title="Error"
+          description={error}
+        />
+      </StyledContainer>
+    );
+  }
+
   return (
-    <>
+    <StyledContainer>
       <PageHeader
         title="Manage Attributes"
         description="Add, view, and delete brands and colors. Attributes can only be deleted if they are not used by any shoe."
@@ -33,6 +54,6 @@ export default function AttributesPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-    </>
+    </StyledContainer>
   );
 }
