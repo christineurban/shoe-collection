@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { Autocomplete } from '@/components/Autocomplete';
+import { Autocomplete } from '@/components/fields/Autocomplete';
 import {
   StyledContainer,
   StyledGrid,

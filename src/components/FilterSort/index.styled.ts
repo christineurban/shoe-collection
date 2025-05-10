@@ -16,171 +16,34 @@ export const StyledFiltersContainer = styled.div`
   }
 `;
 
-export const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[4]};
-  margin-bottom: ${({ theme }) => theme.spacing[4]};
-`;
-
-export const StyledFilterSection = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing[4]};
-  align-items: flex-start;
-  padding: ${({ theme }) => theme.spacing[4]};
-  background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
-`;
-
-export const StyledFilterGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[2]};
-  min-width: 200px;
-  flex: 1;
-`;
-
-export const StyledFilterLabel = styled.label`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-`;
-
-export const StyledFilterSelect = styled.select`
-  padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[3]}`};
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  background: ${({ theme }) => theme.colors.background.primary};
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
+export const StyledContainer = styled.div<{ $isVisible: boolean }>`
+  background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9);
   width: 100%;
+  display: ${({ $isVisible }) => ($isVisible ? 'grid' : 'none')};
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 1.5rem;
 
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary[500]};
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary[100]};
+  /* For 2 columns layout */
+  @media (min-width: 600px) and (max-width: 1199px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  &[multiple] {
-    height: 120px;
-  }
-`;
-
-export const StyledSearchInput = styled.input`
-  padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[3]}`};
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  background: ${({ theme }) => theme.colors.background.primary};
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  width: 100%;
-
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary[500]};
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary[100]};
+  /* For 3 columns layout */
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.text.secondary};
+  @media (min-width: 768px) {
+    padding: 2rem;
+    gap: 2rem;
   }
-`;
-
-export const StyledSortSelect = styled(StyledFilterSelect)`
-  min-width: 200px;
-`;
-
-export const StyledResultsCount = styled.div`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  text-align: right;
-`;
-
-export const StyledFilterButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing[2]};
-  padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[4]}`};
-  background: ${({ theme }) => theme.colors.background.primary};
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.base};
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.gray[50]};
-    border-color: ${({ theme }) => theme.colors.gray[300]};
-  }
-
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary[500]};
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary[100]};
-  }
-`;
-
-export const StyledFilterIcon = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${({ theme }) => theme.typography.fontSize.lg};
-`;
-
-export const StyledFilterCount = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing[2]};
-  margin-left: ${({ theme }) => theme.spacing[2]};
-`;
-
-export const StyledFilterCountBadge = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 ${({ theme }) => theme.spacing[1]};
-  background: ${({ theme }) => theme.colors.primary[500]};
-  color: white;
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  font-size: ${({ theme }) => theme.typography.fontSize.xs};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-`;
-
-export const StyledFilterCountText = styled.span`
-  font-size: ${({ theme }) => theme.typography.fontSize.xs};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-`;
-
-export const StyledFilterCountReset = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing[1]};
-  padding: ${({ theme }) => `${theme.spacing[1]} ${theme.spacing[2]}`};
-  background: ${({ theme }) => theme.colors.gray[100]};
-  border: none;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.xs};
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.base};
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.gray[200]};
-    color: ${({ theme }) => theme.colors.text.primary};
-  }
-`;
-
-export const StyledFilterCountResetIcon = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
 `;
 
 export const StyledClearAllContainer = styled.div`
@@ -209,6 +72,27 @@ export const StyledClearAllContainer = styled.div`
     grid-column: 3;
     grid-row: 3;
     align-self: flex-end;
+  }
+`;
+
+export const StyledFilterGroup = styled.div`
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.5rem;
+  min-width: 0;
+  height: 100%;
+  margin-bottom: 1rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 767px) {
+    margin-bottom: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    margin-bottom: 0;
   }
 `;
 
@@ -491,4 +375,20 @@ export const StyledDrawerCloseButton = styled.button`
   &:hover {
     color: ${({ theme }) => theme.colors.text.primary};
   }
+`;
+
+export const StyledFilterCountBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  padding: 0 0.4em;
+  background: ${({ theme }) => theme.colors.primary[600]};
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 999px;
+  margin-left: 0.5em;
+  line-height: 1;
 `;

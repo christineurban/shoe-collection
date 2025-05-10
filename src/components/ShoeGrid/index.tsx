@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ShoeFilter } from '@/components/ShoeFilter';
+import { FilterSort } from '@/components/FilterSort';
 import { ShoeCard } from '@/components/ShoeCard';
 import { useRouter } from 'next/navigation';
 import {
@@ -13,6 +13,11 @@ import {
 import { BsGrid } from 'react-icons/bs';
 import { MdOutlineViewAgenda } from 'react-icons/md';
 import { useAuth } from '@/lib/auth/AuthContext';
+
+interface Option {
+  value: string;
+  label: string;
+}
 
 interface Shoe {
   id: string;
@@ -34,11 +39,11 @@ interface ShoeGridProps {
   heelTypes: string[];
   locations: string[];
   currentFilters: {
-    brand: string[];
-    dressStyle: string[];
-    shoeType: string[];
-    heelType: string[];
-    location: string[];
+    brand: Option[];
+    dressStyle: Option[];
+    shoeType: Option[];
+    heelType: Option[];
+    location: Option[];
     search: string;
     sort: string;
     hasImage: string;
@@ -68,7 +73,7 @@ export const ShoeGrid = ({
 
   return (
     <>
-      <ShoeFilter
+      <FilterSort
         brands={brands}
         dressStyles={dressStyles}
         shoeTypes={shoeTypes}

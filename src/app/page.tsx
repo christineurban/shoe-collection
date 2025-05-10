@@ -7,6 +7,11 @@ import { ShoeGrid } from '@/components/ShoeGrid';
 import { StyledContainer as StyledPagination } from '@/components/Pagination/index.styled';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 
+interface Option {
+  value: string;
+  label: string;
+}
+
 interface Shoe {
   id: string;
   brand: string;
@@ -51,11 +56,11 @@ function HomeContent() {
 
   // Get current filters from URL
   const currentFilters = {
-    brand: searchParams.getAll('brand'),
-    dressStyle: searchParams.getAll('dressStyle'),
-    shoeType: searchParams.getAll('shoeType'),
-    heelType: searchParams.getAll('heelType'),
-    location: searchParams.getAll('location'),
+    brand: searchParams.getAll('brand').map(value => ({ value, label: value })),
+    dressStyle: searchParams.getAll('dressStyle').map(value => ({ value, label: value })),
+    shoeType: searchParams.getAll('shoeType').map(value => ({ value, label: value })),
+    heelType: searchParams.getAll('heelType').map(value => ({ value, label: value })),
+    location: searchParams.getAll('location').map(value => ({ value, label: value })),
     search: searchParams.get('search') || '',
     sort: searchParams.get('sort') || '',
     hasImage: searchParams.get('hasImage') || '',
@@ -89,19 +94,19 @@ function HomeContent() {
         if (currentFilters.search) params.set('search', currentFilters.search);
         if (currentFilters.hasImage) params.set('hasImage', currentFilters.hasImage);
         if (currentFilters.brand.length > 0) {
-          currentFilters.brand.forEach(brand => params.append('brand', brand));
+          currentFilters.brand.forEach(brand => params.append('brand', brand.value));
         }
         if (currentFilters.dressStyle.length > 0) {
-          currentFilters.dressStyle.forEach(style => params.append('dressStyle', style));
+          currentFilters.dressStyle.forEach(style => params.append('dressStyle', style.value));
         }
         if (currentFilters.shoeType.length > 0) {
-          currentFilters.shoeType.forEach(type => params.append('shoeType', type));
+          currentFilters.shoeType.forEach(type => params.append('shoeType', type.value));
         }
         if (currentFilters.heelType.length > 0) {
-          currentFilters.heelType.forEach(type => params.append('heelType', type));
+          currentFilters.heelType.forEach(type => params.append('heelType', type.value));
         }
         if (currentFilters.location.length > 0) {
-          currentFilters.location.forEach(location => params.append('location', location));
+          currentFilters.location.forEach(location => params.append('location', location.value));
         }
         params.set('page', currentFilters.page);
         params.set('limit', '45');
