@@ -318,14 +318,14 @@ export default function Dashboard() {
         <Tile
           title="Total Shoes"
           value={stats.totalShoes}
-          description="shoes in collection"
+          description="Shoes in collection"
           onClick={() => router.push('/')}
           variant="stat"
         />
         <Tile
           title="Brands"
           value={stats.totalBrands}
-          description="Different brands available"
+          description="Brands available"
           onClick={() => handleStatClick('brands')}
           $isActive={selectedAttribute === 'brands'}
           variant="stat"
@@ -333,7 +333,7 @@ export default function Dashboard() {
         <Tile
           title="Colors"
           value={stats.totalColors}
-          description="Different colors available"
+          description="Colors available"
           onClick={() => handleStatClick('colors')}
           $isActive={selectedAttribute === 'colors'}
           variant="stat"
@@ -341,7 +341,7 @@ export default function Dashboard() {
         <Tile
           title="Dress Styles"
           value={stats.totalDressStyles}
-          description="Different dress styles available"
+          description="Dress styles available"
           onClick={() => handleStatClick('dressStyles')}
           $isActive={selectedAttribute === 'dressStyles'}
           variant="stat"
@@ -349,7 +349,7 @@ export default function Dashboard() {
         <Tile
           title="Shoe Types"
           value={stats.totalShoeTypes}
-          description="Different shoe types available"
+          description="Shoe types available"
           onClick={() => handleStatClick('shoeTypes')}
           $isActive={selectedAttribute === 'shoeTypes'}
           variant="stat"
@@ -357,7 +357,7 @@ export default function Dashboard() {
         <Tile
           title="Heel Types"
           value={stats.totalHeelTypes}
-          description="Different heel types available"
+          description="Heel types available"
           onClick={() => handleStatClick('heelTypes')}
           $isActive={selectedAttribute === 'heelTypes'}
           variant="stat"
@@ -365,7 +365,7 @@ export default function Dashboard() {
         <Tile
           title="Locations"
           value={stats.totalLocations}
-          description="Different locations available"
+          description="Locations available"
           onClick={() => handleStatClick('locations')}
           $isActive={selectedAttribute === 'locations'}
           variant="stat"
