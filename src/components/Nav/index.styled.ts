@@ -110,6 +110,7 @@ export const StyledLinks = styled.div<{ $isOpen: boolean }>`
     transition: all 0.3s ease;
     box-shadow: ${({ theme }) => theme.shadows.md};
     backdrop-filter: blur(8px);
+    border-bottom: 1px solid #479bcb30;
   }
 
   @media (max-width: 480px) {
