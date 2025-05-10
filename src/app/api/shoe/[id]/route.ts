@@ -29,7 +29,18 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(shoe);
+    // Return a flat Shoe object
+    return NextResponse.json({
+      id: shoe.id,
+      brand: shoe.brand.name,
+      imageUrl: shoe.image_url,
+      colors: shoe.colors.map((c: any) => c.color.name),
+      dressStyle: shoe.dress_style.name,
+      shoeType: shoe.shoe_type.name,
+      heelType: shoe.heel_type.name,
+      location: shoe.location.name,
+      notes: shoe.notes,
+    });
   } catch (error) {
     console.error('Error fetching shoe:', error);
     return NextResponse.json(
