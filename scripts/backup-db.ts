@@ -92,10 +92,16 @@ async function backupDatabase() {
         name: 'shoes',
         query: () => prisma.shoes.findMany({
           include: {
-            color: true,
+            colors: {
+              include: {
+                color: true
+              }
+            },
             dress_style: true,
             shoe_type: true,
-            brand: true
+            brand: true,
+            location: true,
+            heel_type: true
           }
         })
       }
