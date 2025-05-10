@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
@@ -5,9 +7,21 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
+    // Get or create brand
+    let brand = await prisma.brands.findUnique({ where: { name: data.brand } });
+    if (!brand) {
+      brand = await prisma.brands.create({
+        data: {
+          name: data.brand,
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      });
+      console.log('Created new brand:', brand.name);
+    }
+
     // Get all the required IDs
-    const [brand, dressStyle, shoeType, heelType, location] = await Promise.all([
-      prisma.brands.findUnique({ where: { name: data.brand } }),
+    const [dressStyle, shoeType, heelType, location] = await Promise.all([
       prisma.dress_styles.findUnique({ where: { name: data.dressStyle } }),
       prisma.shoe_types.findUnique({ where: { name: data.shoeType } }),
       prisma.heel_types.findUnique({ where: { name: data.heelType } }),
@@ -21,7 +35,8 @@ export async function POST(request: Request) {
       )
     );
 
-    if (!brand || !dressStyle || !shoeType || !heelType || !location) {
+
+    if (!dressStyle || !shoeType || !heelType || !location) {
       return NextResponse.json(
         { error: 'One or more required attributes not found' },
         { status: 404 }
@@ -36,6 +51,7 @@ export async function POST(request: Request) {
     }
 
     const now = new Date();
+
     const newShoe = await prisma.shoes.create({
       data: {
         brand_id: brand.id,
@@ -69,6 +85,8 @@ export async function POST(request: Request) {
       }
     });
 
+    console.log('Successfully created shoe:', newShoe.id);
+
     return NextResponse.json({
       id: newShoe.id,
       imageUrl: newShoe.image_url,
@@ -81,7 +99,6 @@ export async function POST(request: Request) {
       notes: newShoe.notes
     });
   } catch (error) {
-    console.error('Error creating shoe:', error);
     return NextResponse.json(
       { error: 'Failed to create shoe' },
       { status: 500 }

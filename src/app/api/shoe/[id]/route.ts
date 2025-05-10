@@ -121,9 +121,35 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // First get the shoe to get its brand_id
+    const shoe = await prisma.shoes.findUnique({
+      where: { id: params.id },
+      select: { brand_id: true }
+    });
+
+    if (!shoe) {
+      return NextResponse.json(
+        { error: 'Shoe not found' },
+        { status: 404 }
+      );
+    }
+
+    // Delete the shoe
     await prisma.shoes.delete({
       where: { id: params.id }
     });
+
+    // Check if this was the last shoe for this brand
+    const remainingShoes = await prisma.shoes.count({
+      where: { brand_id: shoe.brand_id }
+    });
+
+    // If no shoes left for this brand, delete the brand
+    if (remainingShoes === 0) {
+      await prisma.brands.delete({
+        where: { id: shoe.brand_id }
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
