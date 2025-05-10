@@ -154,8 +154,11 @@ function AddEditFormContent({
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleSelectChange = (field: keyof AddEditFormData, value: string | string[]) => {
+    setFormData({
+      ...formData,
+      [field]: value
+    });
   };
 
   const handleMultiSelectChange = (name: string, values: string[]) => {
@@ -175,6 +178,7 @@ function AddEditFormContent({
                 options={brands}
                 placeholder="Select brand"
                 onChange={(value) => handleSelectChange('brand', value)}
+                isBrand={true}
               />
             </StyledFormGroup>
             <StyledFormGroup>
@@ -182,8 +186,7 @@ function AddEditFormContent({
               <MultiSelect
                 values={formData.colors}
                 options={colors}
-                placeholder="Select colors"
-                onChange={(values) => handleMultiSelectChange('colors', values)}
+                onChange={(newColors) => setFormData({ ...formData, colors: newColors })}
               />
             </StyledFormGroup>
           </StyledFormRow>
