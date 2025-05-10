@@ -237,17 +237,6 @@ function AddEditFormContent({
           </StyledFormRow>
 
           <StyledFormGroup>
-            <label>Image URL</label>
-            <Input
-              type="text"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={(value) => handleInputChange('imageUrl', value)}
-              placeholder="Image URL"
-            />
-          </StyledFormGroup>
-
-          <StyledFormGroup>
             <label>Notes</label>
             <StyledTextarea
               name="notes"
