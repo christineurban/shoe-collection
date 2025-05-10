@@ -1,8 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabaseAdmin } from '@/lib/supabase';
 
 function createUrlSafeFilename(brand: string, heelType: string, shoeType: string, id: string): string {
   const safeBrand = brand.toLowerCase().replace(/[^a-z0-9]/g, '-');
@@ -17,7 +13,7 @@ async function deleteOldImage(shoe: { brand: string, heel_type: { name: string }
     const fileName = createUrlSafeFilename(shoe.brand, shoe.heel_type.name, shoe.shoe_type.name, shoe.id);
 
     // Delete the old image if it exists
-    const { data: existingFiles, error: listError } = await supabase
+    const { data: existingFiles, error: listError } = await supabaseAdmin
       .storage
       .from('shoe-images')
       .list(fileName);
@@ -28,7 +24,7 @@ async function deleteOldImage(shoe: { brand: string, heel_type: { name: string }
     }
 
     if (existingFiles && existingFiles.length > 0) {
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await supabaseAdmin
         .storage
         .from('shoe-images')
         .remove([fileName]);
@@ -65,7 +61,7 @@ export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: str
     const fileName = createUrlSafeFilename(shoe.brand, shoe.heel_type.name, shoe.shoe_type.name, shoe.id);
 
     // Upload the image to Supabase Storage
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .storage
       .from('shoe-images')
       .upload(fileName, imageBlob, {
@@ -78,7 +74,7 @@ export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: str
     if (error) throw error;
 
     // Get the public URL
-    const { data: { publicUrl } } = supabase
+    const { data: { publicUrl } } = supabaseAdmin
       .storage
       .from('shoe-images')
       .getPublicUrl(fileName);

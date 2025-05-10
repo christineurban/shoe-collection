@@ -64,7 +64,9 @@ export async function POST(request: Request) {
     const currentShoe = await prisma.shoes.findUnique({
       where: { id },
       include: {
-        brand: true
+        brand: true,
+        heel_type: true,
+        shoe_type: true
       }
     });
 
@@ -134,7 +136,9 @@ export async function POST(request: Request) {
       // Upload new image to Supabase storage
       const supabaseUrl = await uploadImageToSupabase(imageUrl.trim(), {
         brand: currentShoe.brand.name,
-        name: currentShoe.brand.name // Using brand name as the name since there's no name field in the shoes table
+        heel_type: { name: currentShoe.heel_type.name },
+        shoe_type: { name: currentShoe.shoe_type.name },
+        id: currentShoe.id
       });
       console.log('Supabase upload successful, URL:', supabaseUrl);
 

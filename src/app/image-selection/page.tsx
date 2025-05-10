@@ -108,6 +108,7 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
         const response = await fetch(`/api/shoes?hasImage=false&page=${currentPage}&limit=25`);
         if (!response.ok) throw new Error('Failed to fetch shoe details');
         const data = await response.json();
+        console.log('Shoes data from API:', data.shoes);
         setShoes(data.shoes);
         setTotalItems(data.total);
       } catch (err) {
@@ -231,6 +232,7 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
             shoe={shoe}
             onImageSelected={handleImageSelected}
             selectedImage={selectedImages[shoe.id]}
+            bulkMode={true}
           />
         ))}
       </div>

@@ -21,31 +21,20 @@ import { Button } from '@/components/Button';
 import { ImagePasteZone } from './ImagePasteZone';
 import { SuccessMessage } from '@/components/SuccessMessage';
 
-interface Polish {
-  id: string;
-  name: string;
-  imageUrl: string | null;
-  brand: string;
-  heelType: string;
-  shoeType: string;
-  color: string;
-  location: string;
-}
-
 interface Shoe {
   id: string;
-  name: string;
-  imageUrl: string | null;
   brand: string;
-  heelType: string;
-  shoeType: string;
+  imageUrl: string | null;
   colors: string[];
+  dressStyle: string;
+  shoeType: string;
+  heelType: string;
   location: string;
+  notes: string | null;
 }
 
 interface ImageSelectorProps {
-  polish?: Polish;
-  shoe?: Shoe;
+  shoe: Shoe;
   onImageSaved?: () => void;
   bulkMode?: boolean;
   onImageSelected?: (id: string, imageUrl: string | null) => void;
@@ -54,7 +43,6 @@ interface ImageSelectorProps {
 }
 
 export const ImageSelector = ({
-  polish,
   shoe,
   onImageSaved,
   bulkMode = false,
@@ -62,9 +50,6 @@ export const ImageSelector = ({
   selectedImage: externalSelectedImage,
   returnTo
 }: ImageSelectorProps) => {
-  const item = polish || shoe;
-  if (!item) return null;
-
   const [selectedImage, setSelectedImage] = useState<string | null>(externalSelectedImage || null);
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,11 +61,11 @@ export const ImageSelector = ({
 
   const handleImageSelect = (imageUrl: string) => {
     if (bulkMode && onImageSelected) {
-      onImageSelected(item.id, imageUrl);
+      onImageSelected(shoe.id, imageUrl);
     } else {
       setSelectedImage(imageUrl);
       if (onImageSelected) {
-        onImageSelected(item.id, imageUrl);
+        onImageSelected(shoe.id, imageUrl);
       }
     }
   };
@@ -95,7 +80,7 @@ export const ImageSelector = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: item.id
+          id: shoe.id
         }),
       });
 
@@ -134,7 +119,7 @@ export const ImageSelector = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: item.id,
+          id: shoe.id,
           imageUrl: selectedImage
         }),
       });
@@ -164,7 +149,7 @@ export const ImageSelector = ({
 
   const handleMarkNoImage = async () => {
     if (bulkMode && onImageSelected) {
-      onImageSelected(item.id, 'n/a');
+      onImageSelected(shoe.id, 'n/a');
       return;
     }
 
@@ -177,7 +162,7 @@ export const ImageSelector = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: item.id,
+          id: shoe.id,
           imageUrl: 'n/a'
         }),
       });
@@ -212,15 +197,11 @@ export const ImageSelector = ({
   const handlePastedImage = (imageUrl: string) => {
     setImages(prevImages => [imageUrl, ...prevImages]);
     if (bulkMode && onImageSelected) {
-      onImageSelected(item.id, imageUrl);
+      onImageSelected(shoe.id, imageUrl);
     } else {
       setSelectedImage(imageUrl);
     }
   };
-
-  if (!item) {
-    return null;
-  }
 
   return (
     <AnimatePresence>
@@ -234,11 +215,11 @@ export const ImageSelector = ({
           <StyledMetadata>
             <StyledMetadataContainer>
               <div>
-                <StyledShoeLink href={polish ? `/polish/${item.id}` : `/shoe/${item.id}`}>
-                  <h3>{item.brand} {item.heelType} {item.shoeType}</h3>
+                <StyledShoeLink href={`/shoe/${shoe.id}`}>
+                  <h3>{shoe.brand} {shoe.heelType} {shoe.shoeType}</h3>
                 </StyledShoeLink>
-                <p>Color: {'color' in item ? item.color : item.colors.join(', ')}</p>
-                <p>Location: {item.location}</p>
+                <p>Colors: {shoe.colors.join(', ')}</p>
+                <p>Location: {shoe.location}</p>
               </div>
               <StyledActionsContainer>
                 <StyledButtonGroup>
@@ -264,12 +245,12 @@ export const ImageSelector = ({
 
           {!isCollapsed && (
             <>
-              {item.imageUrl && item.imageUrl !== 'n/a' && (
+              {shoe.imageUrl && shoe.imageUrl !== 'n/a' && (
                 <StyledCurrentImageContainer>
                   <h3>Current Image</h3>
                   <StyledCurrentImage
-                    src={item.imageUrl}
-                    alt={`Current image for ${item.brand} - ${item.name}`}
+                    src={shoe.imageUrl}
+                    alt={`Current image for ${shoe.brand} - ${shoe.heelType} ${shoe.shoeType}`}
                   />
                 </StyledCurrentImageContainer>
               )}
@@ -281,7 +262,7 @@ export const ImageSelector = ({
                   <h3>Preview Image</h3>
                   <StyledImage
                     src={selectedImage}
-                    alt={`Preview image for ${item.brand} - ${item.name}`}
+                    alt={`Preview image for ${shoe.brand} - ${shoe.heelType} ${shoe.shoeType}`}
                     onClick={() => handleImageSelect(selectedImage)}
                     $isSelected={bulkMode ? externalSelectedImage === selectedImage : selectedImage === selectedImage}
                   />
@@ -294,12 +275,12 @@ export const ImageSelector = ({
                     <StyledImageContainer key={index}>
                       <StyledImage
                         src={img}
-                        alt={`${item.brand} - ${item.name} - Image ${index + 1}`}
+                        alt={`${shoe.brand} - ${shoe.heelType} ${shoe.shoeType} - Image ${index + 1}`}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           const hiddenImg = document.createElement('img');
                           hiddenImg.src = img;
-                          hiddenImg.alt = `${item.brand} - ${item.name} - Image ${index + 1}`;
+                          hiddenImg.alt = `${shoe.brand} - ${shoe.heelType} ${shoe.shoeType} - Image ${index + 1}`;
                           hiddenImg.style.display = 'none';
                           target.replaceWith(hiddenImg);
                         }}

@@ -19,7 +19,7 @@ interface ShoeRecord {
   Color: string;
   Type: string;
   'Heel or Flat': string;
-  DressStyle: string;
+  'Dress Style': string;
   Notes: string;
 }
 
@@ -271,7 +271,7 @@ async function seedFromCsv() {
     console.log('\nCreating dress styles...');
     console.time('Dress styles creation');
     const dressStyleMap = new Map<string, string>();
-    const uniqueDressStyles = new Set(records.map(s => s.DressStyle).filter(Boolean));
+    const uniqueDressStyles = new Set(records.map(s => s['Dress Style']).filter(Boolean));
     let dressStyleCount = 0;
     for (const dressStyle of uniqueDressStyles) {
       if (dressStyle && !dressStyleMap.has(dressStyle)) {
@@ -308,7 +308,7 @@ async function seedFromCsv() {
         const locationId = shoe.Location ? locationMap.get(shoe.Location) || defaultLocation.id : defaultLocation.id;
         const shoeTypeId = shoe.Type ? shoeTypeMap.get(shoe.Type) || defaultShoeType.id : defaultShoeType.id;
         const heelTypeId = shoe['Heel or Flat'] ? heelTypeMap.get(shoe['Heel or Flat']) || defaultHeelType.id : defaultHeelType.id;
-        const dressStyleId = shoe.DressStyle ? dressStyleMap.get(shoe.DressStyle) || defaultDressStyle.id : defaultDressStyle.id;
+        const dressStyleId = shoe['Dress Style'] ? dressStyleMap.get(shoe['Dress Style']) || defaultDressStyle.id : defaultDressStyle.id;
 
         await prisma.shoes.create({
           data: {
