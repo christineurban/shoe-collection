@@ -123,12 +123,13 @@ function AddEditFormContent({
         },
         body: JSON.stringify({
           ...formData,
-          imageUrl
+          imageUrl: imageUrl || null
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save shoe');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save shoe');
       }
 
       const savedShoe = await response.json();

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         shoe_type_id: shoeType.id,
         heel_type_id: heelType.id,
         location_id: location.id,
-        image_url: data.imageUrl,
+        image_url: data.imageUrl || null,
         notes: data.notes,
         created_at: now,
         updated_at: now,
