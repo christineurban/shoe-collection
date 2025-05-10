@@ -15,10 +15,10 @@ export async function GET(
             color: true
           }
         },
-        location: true,
+        dress_style: true,
         shoe_type: true,
         heel_type: true,
-        dress_style: true
+        location: true
       }
     });
 
@@ -29,17 +29,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      id: shoe.id,
-      imageUrl: shoe.image_url,
-      brand: shoe.brand.name,
-      color: shoe.colors[0].color.name,
-      dressStyle: shoe.dress_style.name,
-      shoeType: shoe.shoe_type.name,
-      heelType: shoe.heel_type.name,
-      location: shoe.location.name,
-      notes: shoe.notes
-    });
+    return NextResponse.json(shoe);
   } catch (error) {
     console.error('Error fetching shoe:', error);
     return NextResponse.json(

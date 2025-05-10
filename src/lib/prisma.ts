@@ -9,7 +9,7 @@ const prismaClientSingleton = () => {
   const connectionUrl = process.env.DATABASE_URL + '?pgbouncer=true&connection_limit=1&pool_timeout=0';
 
   return new PrismaClient({
-    log: ['query', 'error', 'warn'],
+    log: ['error', 'warn'],
     datasources: {
       db: {
         url: connectionUrl
