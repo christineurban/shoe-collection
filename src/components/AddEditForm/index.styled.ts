@@ -85,19 +85,12 @@ export const StyledTextarea = styled.textarea`
 
 export const StyledButtonGroup = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 2px solid ${({ theme }) => theme.colors.border.medium};
-
-  button {
-    min-width: 120px;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column-reverse;
-  }
+  width: 100%;
+  max-width: 300px;
+  justify-content: center;
+  margin: 0 auto;
 `;
 
 export const StyledDangerZone = styled.div`
@@ -150,11 +143,6 @@ export const StyledImagePreview = styled.div`
     height: 100%;
     object-fit: cover;
   }
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-    aspect-ratio: 4/3;
-  }
 `;
 
 export const StyledImageCaptureButton = styled.button`
@@ -169,11 +157,11 @@ export const StyledImageCaptureButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  width: fit-content;
+  width: 100%;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  margin: 0 auto;
+  justify-content: center;
 
   &:hover {
     background: ${({ theme }) => theme.colors.primary[600]};
@@ -186,13 +174,6 @@ export const StyledImageCaptureButton = styled.button`
   &:disabled {
     background: ${({ theme }) => theme.colors.gray[300]};
     cursor: not-allowed;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: center;
-    padding: 1.25rem 2rem;
-    font-size: ${({ theme }) => theme.typography.fontSize.lg};
   }
 `;
 

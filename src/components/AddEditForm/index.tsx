@@ -209,6 +209,19 @@ function AddEditFormContent({
     }
   };
 
+  const handleTakePhoto = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.setAttribute('capture', 'environment');
+      fileInputRef.current.click();
+      // Remove the capture attribute after clicking to allow gallery selection next time
+      setTimeout(() => {
+        if (fileInputRef.current) {
+          fileInputRef.current.removeAttribute('capture');
+        }
+      }, 100);
+    }
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -237,14 +250,24 @@ function AddEditFormContent({
                 </StyledImagePlaceholder>
               )}
             </StyledImagePreview>
-            <StyledImageCaptureButton
-              type="button"
-              onClick={handleImageCapture}
-              disabled={isLoading}
-            >
-              <FaCamera />
-              {previewUrl ? 'Change Image' : 'Add Photo'}
-            </StyledImageCaptureButton>
+            <StyledButtonGroup>
+              <StyledImageCaptureButton
+                type="button"
+                onClick={handleImageCapture}
+                disabled={isLoading}
+              >
+                <FaCamera />
+                {previewUrl ? 'Change Image' : 'Choose from Gallery'}
+              </StyledImageCaptureButton>
+              <StyledImageCaptureButton
+                type="button"
+                onClick={handleTakePhoto}
+                disabled={isLoading}
+              >
+                <FaCamera />
+                Take Photo
+              </StyledImageCaptureButton>
+            </StyledButtonGroup>
             <StyledImageInput
               ref={fileInputRef}
               type="file"
