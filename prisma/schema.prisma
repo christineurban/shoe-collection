@@ -59,7 +59,6 @@ model dress_styles {
 model shoes {
   id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   image_url     String?
-  link          String?
   brand_id      String       @db.Uuid
   color_id      String       @db.Uuid
   location_id   String       @db.Uuid

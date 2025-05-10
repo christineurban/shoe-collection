@@ -24,7 +24,6 @@ import { SuccessMessage } from '@/components/SuccessMessage';
 interface Polish {
   id: string;
   name: string;
-  link: string | null;
   imageUrl: string | null;
   brand: string;
   heelType: string;

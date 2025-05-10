@@ -24,7 +24,6 @@ export default async function ShoePage({ params }: PageProps) {
       heelType: data.heel_type.name,
       location: data.location.name,
       notes: data.notes,
-      link: data.link
     };
 
     return (

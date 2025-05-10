@@ -1,7 +1,27 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { parse } from 'csv-parse/sync';
 import { PrismaClient } from '@prisma/client';
 import readline from 'readline';
 
-const prisma = new PrismaClient();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const prisma = new PrismaClient({
+  log: ['query', 'error', 'warn'],
+});
+
+interface ShoeRecord {
+  Image: string;
+  Brand: string;
+  Location: string;
+  Color: string;
+  Type: string;
+  'Heel or Flat': string;
+  DressStyle: string;
+  Notes: string;
+}
 
 async function promptForConfirmation(): Promise<boolean> {
   const rl = readline.createInterface({
@@ -21,7 +41,8 @@ async function promptForConfirmation(): Promise<boolean> {
   return answer.toLowerCase() === 'y';
 }
 
-async function main() {
+async function seedFromCsv() {
+  console.time('Total seeding time');
   const shouldProceed = await promptForConfirmation();
 
   if (!shouldProceed) {
@@ -29,674 +50,316 @@ async function main() {
     process.exit(0);
   }
 
-  // Brands
-  const brands = [
-    'Altra',
-    'Amazon',
-    'Amazon Essentials',
-    'Brooks',
-    'Calvin Klein',
-    'Clarks',
-    'Cole Haan',
-    'Columbia',
-    'Dolce Vita',
-    'Ecco',
-    'Franco Sarto',
-    'Hoka',
-    'Ivanka Trump',
-    'Jessica Simpson',
-    'Joie',
-    'Kelly & Katie',
-    'Kelsi Dagger',
-    'Marc Fisher',
-    'New Balance',
-    'Nike',
-    'Nine West',
-    'Old Navy',
-    'Olukai',
-    'Rainbow',
-    'Reebok',
-    'Reef',
-    'Sam Edelman',
-    'Skechers',
-    'Soda',
-    'Sorel',
-    'Target',
-    'Tommy Hilfiger',
-    'Ugg',
-    'Unknown',
-    'Vepose',
-    'Yellow Box'
-  ];
+  const stats = {
+    totalRows: 0,
+    successfullyAdded: 0,
+    failedToAdd: 0,
+    failures: [] as { brand: string; error: string }[],
+  };
 
-  // Colors
-  const colors = [
-    'Red',
-    'Pink',
-    'Blue',
-    'Purple',
-    'Brown',
-    'Beige',
-    'Gold',
-    'Silver',
-    'Black',
-    'Gray',
-    'White',
-  ];
+  try {
+    console.log('Starting CSV read...');
+    console.time('CSV read');
+    // Read the CSV file
+    const csvFilePath = path.join(__dirname, 'seeds', 'shoes.csv');
+    const fileContent = fs.readFileSync(csvFilePath, 'utf-8');
 
-  // Locations
-  const locations = [
-    'Bedroom Closet',
-    'Front Closet',
-    'Garage',
-  ];
+    // Parse CSV content
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true,
+    }) as ShoeRecord[];
+    console.timeEnd('CSV read');
 
-  // Shoe Types
-  const shoeTypes = [
-    'Boot',
-    'Sandal',
-    'Pump',
-    'Mule',
-    'Loafer',
-    'Ballet Flat',
-    'Sneaker',
-    'Gym',
-    'Hiking',
-  ];
+    stats.totalRows = records.length;
+    console.log(`Found ${stats.totalRows} rows in CSV file`);
 
-  // Heel Types
-  const heelTypes = [
-    'Heel',
-    'Flat',
-  ];
+    // Clear existing data in correct order
+    console.log('Clearing existing data...');
+    console.time('Data clearing');
+    await prisma.shoes.deleteMany();
+    console.log('✓ Shoes deleted');
+    await prisma.brands.deleteMany();
+    console.log('✓ Brands deleted');
+    await prisma.colors.deleteMany();
+    console.log('✓ Colors deleted');
+    await prisma.locations.deleteMany();
+    console.log('✓ Locations deleted');
+    await prisma.shoe_types.deleteMany();
+    console.log('✓ Shoe types deleted');
+    await prisma.heel_types.deleteMany();
+    console.log('✓ Heel types deleted');
+    await prisma.dress_styles.deleteMany();
+    console.log('✓ Dress styles deleted');
+    console.timeEnd('Data clearing');
 
-  // Dress Styles
-  const dressStyles = [
-    'Either',
-    'Casual',
-    'Dressy',
-  ];
-
-  const now = new Date();
-
-  // Create all lookup values
-  for (const brand of brands) {
-    await prisma.brands.upsert({
-      where: { name: brand },
-      update: {},
-      create: {
-        name: brand,
-        updated_at: now
-      },
+    // Create default records first
+    console.log('\nCreating default records...');
+    const defaultBrand = await prisma.brands.create({
+      data: { name: 'Unknown', updated_at: new Date() },
     });
-  }
-
-  for (const color of colors) {
-    await prisma.colors.upsert({
-      where: { name: color },
-      update: {},
-      create: {
-        name: color,
-        updated_at: now
-      },
+    const defaultColor = await prisma.colors.create({
+      data: { name: 'Unknown', updated_at: new Date() },
     });
-  }
-
-  for (const location of locations) {
-    await prisma.locations.upsert({
-      where: { name: location },
-      update: {},
-      create: {
-        name: location,
-        updated_at: now
-      },
+    const defaultLocation = await prisma.locations.create({
+      data: { name: 'Unknown', updated_at: new Date() },
     });
-  }
-
-  for (const shoeType of shoeTypes) {
-    await prisma.shoe_types.upsert({
-      where: { name: shoeType },
-      update: {},
-      create: {
-        name: shoeType,
-        updated_at: now
-      },
+    const defaultShoeType = await prisma.shoe_types.create({
+      data: { name: 'Unknown', updated_at: new Date() },
     });
-  }
-
-  for (const heelType of heelTypes) {
-    await prisma.heel_types.upsert({
-      where: { name: heelType },
-      update: {},
-      create: {
-        name: heelType,
-        updated_at: now
-      },
+    const defaultHeelType = await prisma.heel_types.create({
+      data: { name: 'Unknown', updated_at: new Date() },
     });
-  }
-
-  for (const dressStyle of dressStyles) {
-    await prisma.dress_styles.upsert({
-      where: { name: dressStyle },
-      update: {},
-      create: {
-        name: dressStyle,
-        updated_at: now
-      },
+    const defaultDressStyle = await prisma.dress_styles.create({
+      data: { name: 'Unknown', updated_at: new Date() },
     });
-  }
 
-  // Create shoes
-  const shoes = [
-    {
-      image_url: null,
-      brand: 'Amazon',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Ballet Flat',
-      heel_type: 'Flat',
-      dress_style: 'Either',
-      notes: 'foldable flats'
-    },
-    {
-      image_url: null,
-      brand: 'Ugg',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Boot',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Marc Fisher',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either',
-      notes: 'Marc Fisher Women\'s Alva Ankle Boot'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Front Closet',
-      color: 'Beige',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Soda',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Vepose',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Columbia',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Kelsi Dagger',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Franco Sarto',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Dolce Vita',
-      location: 'Bedroom Closet',
-      color: 'Brown',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Nine West',
-      location: 'Bedroom Closet',
-      color: 'Brown',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Sam Edelman',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Tommy Hilfiger',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Garage',
-      color: 'Beige',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Joie',
-      location: 'Garage',
-      color: 'Beige',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Joie',
-      location: 'Garage',
-      color: 'Black',
-      shoe_type: 'Boot',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Reebok',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Gym',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Altra',
-      location: 'Garage',
-      color: 'White',
-      shoe_type: 'Gym',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Nike',
-      location: 'Garage',
-      color: 'Purple',
-      shoe_type: 'Gym',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Columbia',
-      location: 'Bedroom Closet',
-      color: 'Gray',
-      shoe_type: 'Hiking',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Amazon Essentials',
-      location: 'Front Closet',
-      color: 'Beige',
-      shoe_type: 'Loafer',
-      heel_type: 'Flat',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Amazon',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Mule',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Clarks',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Mule',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Dolce Vita',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Mule',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Ivanka Trump',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Pump',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Garage',
-      color: 'Beige',
-      shoe_type: 'Pump',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Old Navy',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Old Navy',
-      location: 'Front Closet',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Yellow Box',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Rainbow',
-      location: 'Bedroom Closet',
-      color: 'Brown',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Olukai',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Reef',
-      location: 'Bedroom Closet',
-      color: 'Brown',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Target',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Flat',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Either'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Kelly & Katie',
-      location: 'Bedroom Closet',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Garage',
-      color: 'Silver',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Unknown',
-      location: 'Garage',
-      color: 'Silver',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Jessica Simpson',
-      location: 'Garage',
-      color: 'Black',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Jessica Simpson',
-      location: 'Garage',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Dressy'
-    },
-    {
-      image_url: null,
-      brand: 'Calvin Klein',
-      location: 'Garage',
-      color: 'Beige',
-      shoe_type: 'Sandal',
-      heel_type: 'Heel',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Target',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Sorel',
-      location: 'Front Closet',
-      color: 'Black',
-      shoe_type: 'Sneaker',
-      heel_type: 'Heel',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Hoka',
-      location: 'Front Closet',
-      color: 'White',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Skechers',
-      location: 'Bedroom Closet',
-      color: 'Pink',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Nike',
-      location: 'Bedroom Closet',
-      color: 'White',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Altra',
-      location: 'Bedroom Closet',
-      color: 'Blue',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Brooks',
-      location: 'Bedroom Closet',
-      color: 'Blue',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Nike',
-      location: 'Bedroom Closet',
-      color: 'Black',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'Nike',
-      location: 'Bedroom Closet',
-      color: 'White',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    },
-    {
-      image_url: null,
-      brand: 'New Balance',
-      location: 'Bedroom Closet',
-      color: 'Gray',
-      shoe_type: 'Sneaker',
-      heel_type: 'Flat',
-      dress_style: 'Casual'
-    }
-  ];
-
-  // Create shoes
-  for (const shoe of shoes) {
-    const brand = await prisma.brands.findUnique({ where: { name: shoe.brand } });
-    const color = await prisma.colors.findUnique({ where: { name: shoe.color } });
-    const location = await prisma.locations.findUnique({ where: { name: shoe.location } });
-    const shoeType = await prisma.shoe_types.findUnique({ where: { name: shoe.shoe_type } });
-    const heelType = await prisma.heel_types.findUnique({ where: { name: shoe.heel_type } });
-    const dressStyle = await prisma.dress_styles.findUnique({ where: { name: shoe.dress_style } });
-
-    if (!brand || !color || !location || !shoeType || !heelType || !dressStyle) {
-      console.error(`Missing reference data for shoe: ${JSON.stringify(shoe)}`);
-      continue;
-    }
-
-    await prisma.shoes.create({
-      data: {
-        image_url: shoe.image_url,
-        brand_id: brand.id,
-        color_id: color.id,
-        location_id: location.id,
-        shoe_type_id: shoeType.id,
-        heel_type_id: heelType.id,
-        dress_style_id: dressStyle.id,
-        notes: shoe.notes,
-        updated_at: now
+    // Create brands first
+    console.log('\nCreating brands...');
+    console.time('Brands creation');
+    const brandMap = new Map<string, string>();
+    const uniqueBrands = new Set(records.map(s => s.Brand));
+    let brandCount = 0;
+    for (const brand of uniqueBrands) {
+      if (brand && !brandMap.has(brand)) {
+        try {
+          const brandRecord = await prisma.brands.create({
+            data: { name: brand, updated_at: new Date() },
+          });
+          brandMap.set(brand, brandRecord.id);
+        } catch (error) {
+          // If brand already exists, find it
+          const existingBrand = await prisma.brands.findUnique({
+            where: { name: brand },
+          });
+          if (existingBrand) {
+            brandMap.set(brand, existingBrand.id);
+          } else {
+            brandMap.set(brand, defaultBrand.id);
+          }
+        }
+        brandCount++;
+        if (brandCount % 5 === 0) {
+          console.log(`Created ${brandCount} brands...`);
+        }
       }
-    });
-  }
+    }
+    console.log(`✓ Created ${brandCount} brands`);
+    console.timeEnd('Brands creation');
 
-  console.log('Seed data created successfully');
+    // Create colors
+    console.log('\nCreating colors...');
+    console.time('Colors creation');
+    const colorMap = new Map<string, string>();
+    const uniqueColors = new Set(records.map(s => s.Color).filter(Boolean));
+    let colorCount = 0;
+    for (const color of uniqueColors) {
+      if (color && !colorMap.has(color)) {
+        try {
+          const colorRecord = await prisma.colors.create({
+            data: { name: color, updated_at: new Date() },
+          });
+          colorMap.set(color, colorRecord.id);
+        } catch (error) {
+          // If color already exists, find it
+          const existingColor = await prisma.colors.findUnique({
+            where: { name: color },
+          });
+          if (existingColor) {
+            colorMap.set(color, existingColor.id);
+          } else {
+            colorMap.set(color, defaultColor.id);
+          }
+        }
+        colorCount++;
+      }
+    }
+    console.log(`✓ Created ${colorCount} colors`);
+    console.timeEnd('Colors creation');
+
+    // Create locations
+    console.log('\nCreating locations...');
+    console.time('Locations creation');
+    const locationMap = new Map<string, string>();
+    const uniqueLocations = new Set(records.map(s => s.Location).filter(Boolean));
+    let locationCount = 0;
+    for (const location of uniqueLocations) {
+      if (location && !locationMap.has(location)) {
+        try {
+          const locationRecord = await prisma.locations.create({
+            data: { name: location, updated_at: new Date() },
+          });
+          locationMap.set(location, locationRecord.id);
+        } catch (error) {
+          // If location already exists, find it
+          const existingLocation = await prisma.locations.findUnique({
+            where: { name: location },
+          });
+          if (existingLocation) {
+            locationMap.set(location, existingLocation.id);
+          } else {
+            locationMap.set(location, defaultLocation.id);
+          }
+        }
+        locationCount++;
+      }
+    }
+    console.log(`✓ Created ${locationCount} locations`);
+    console.timeEnd('Locations creation');
+
+    // Create shoe types
+    console.log('\nCreating shoe types...');
+    console.time('Shoe types creation');
+    const shoeTypeMap = new Map<string, string>();
+    const uniqueShoeTypes = new Set(records.map(s => s.Type).filter(Boolean));
+    let shoeTypeCount = 0;
+    for (const shoeType of uniqueShoeTypes) {
+      if (shoeType && !shoeTypeMap.has(shoeType)) {
+        try {
+          const shoeTypeRecord = await prisma.shoe_types.create({
+            data: { name: shoeType, updated_at: new Date() },
+          });
+          shoeTypeMap.set(shoeType, shoeTypeRecord.id);
+        } catch (error) {
+          // If shoe type already exists, find it
+          const existingShoeType = await prisma.shoe_types.findUnique({
+            where: { name: shoeType },
+          });
+          if (existingShoeType) {
+            shoeTypeMap.set(shoeType, existingShoeType.id);
+          } else {
+            shoeTypeMap.set(shoeType, defaultShoeType.id);
+          }
+        }
+        shoeTypeCount++;
+      }
+    }
+    console.log(`✓ Created ${shoeTypeCount} shoe types`);
+    console.timeEnd('Shoe types creation');
+
+    // Create heel types
+    console.log('\nCreating heel types...');
+    console.time('Heel types creation');
+    const heelTypeMap = new Map<string, string>();
+    const uniqueHeelTypes = new Set(records.map(s => s['Heel or Flat']).filter(Boolean));
+    let heelTypeCount = 0;
+    for (const heelType of uniqueHeelTypes) {
+      if (heelType && !heelTypeMap.has(heelType)) {
+        try {
+          const heelTypeRecord = await prisma.heel_types.create({
+            data: { name: heelType, updated_at: new Date() },
+          });
+          heelTypeMap.set(heelType, heelTypeRecord.id);
+        } catch (error) {
+          // If heel type already exists, find it
+          const existingHeelType = await prisma.heel_types.findUnique({
+            where: { name: heelType },
+          });
+          if (existingHeelType) {
+            heelTypeMap.set(heelType, existingHeelType.id);
+          } else {
+            heelTypeMap.set(heelType, defaultHeelType.id);
+          }
+        }
+        heelTypeCount++;
+      }
+    }
+    console.log(`✓ Created ${heelTypeCount} heel types`);
+    console.timeEnd('Heel types creation');
+
+    // Create dress styles
+    console.log('\nCreating dress styles...');
+    console.time('Dress styles creation');
+    const dressStyleMap = new Map<string, string>();
+    const uniqueDressStyles = new Set(records.map(s => s.DressStyle).filter(Boolean));
+    let dressStyleCount = 0;
+    for (const dressStyle of uniqueDressStyles) {
+      if (dressStyle && !dressStyleMap.has(dressStyle)) {
+        try {
+          const dressStyleRecord = await prisma.dress_styles.create({
+            data: { name: dressStyle, updated_at: new Date() },
+          });
+          dressStyleMap.set(dressStyle, dressStyleRecord.id);
+        } catch (error) {
+          // If dress style already exists, find it
+          const existingDressStyle = await prisma.dress_styles.findUnique({
+            where: { name: dressStyle },
+          });
+          if (existingDressStyle) {
+            dressStyleMap.set(dressStyle, existingDressStyle.id);
+          } else {
+            dressStyleMap.set(dressStyle, defaultDressStyle.id);
+          }
+        }
+        dressStyleCount++;
+      }
+    }
+    console.log(`✓ Created ${dressStyleCount} dress styles`);
+    console.timeEnd('Dress styles creation');
+
+    // Insert all shoes with relationships
+    console.log('\nCreating shoes...');
+    console.time('Shoes creation');
+    let processedCount = 0;
+    for (const shoe of records) {
+      try {
+        const brandId = shoe.Brand ? brandMap.get(shoe.Brand) || defaultBrand.id : defaultBrand.id;
+        const colorId = shoe.Color ? colorMap.get(shoe.Color) || defaultColor.id : defaultColor.id;
+        const locationId = shoe.Location ? locationMap.get(shoe.Location) || defaultLocation.id : defaultLocation.id;
+        const shoeTypeId = shoe.Type ? shoeTypeMap.get(shoe.Type) || defaultShoeType.id : defaultShoeType.id;
+        const heelTypeId = shoe['Heel or Flat'] ? heelTypeMap.get(shoe['Heel or Flat']) || defaultHeelType.id : defaultHeelType.id;
+        const dressStyleId = shoe.DressStyle ? dressStyleMap.get(shoe.DressStyle) || defaultDressStyle.id : defaultDressStyle.id;
+
+        await prisma.shoes.create({
+          data: {
+            image_url: shoe.Image || null,
+            brand_id: brandId,
+            color_id: colorId,
+            location_id: locationId,
+            shoe_type_id: shoeTypeId,
+            heel_type_id: heelTypeId,
+            dress_style_id: dressStyleId,
+            notes: shoe.Notes || null,
+            updated_at: new Date(),
+          },
+        });
+        stats.successfullyAdded++;
+        processedCount++;
+        if (processedCount % 10 === 0) {
+          console.log(`Processed ${processedCount}/${stats.totalRows} shoes...`);
+        }
+      } catch (error) {
+        stats.failedToAdd++;
+        stats.failures.push({
+          brand: shoe.Brand || 'Unknown',
+          error: error instanceof Error ? error.message : String(error),
+        });
+        console.error(`Error processing shoe ${processedCount + 1}:`, error);
+      }
+    }
+    console.timeEnd('Shoes creation');
+
+    // Print final statistics
+    console.log('\nSeeding completed!');
+    console.log('-------------------');
+    console.log(`Total rows in CSV: ${stats.totalRows}`);
+    console.log(`Successfully added: ${stats.successfullyAdded}`);
+    console.log(`Failed to add: ${stats.failedToAdd}`);
+
+    if (stats.failures.length > 0) {
+      console.log('\nFailures:');
+      stats.failures.forEach(failure => {
+        console.log(`- ${failure.brand}: ${failure.error}`);
+      });
+    }
+
+  } catch (error) {
+    console.error('Error seeding database:', error);
+    process.exit(1);
+  } finally {
+    console.timeEnd('Total seeding time');
+    await prisma.$disconnect();
+  }
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+seedFromCsv();

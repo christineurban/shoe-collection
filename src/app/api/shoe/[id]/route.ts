@@ -28,7 +28,6 @@ export async function GET(
     return NextResponse.json({
       id: shoe.id,
       imageUrl: shoe.image_url,
-      link: shoe.link,
       brand: shoe.brand.name,
       color: shoe.color.name,
       dressStyle: shoe.dress_style.name,
@@ -80,7 +79,6 @@ export async function PUT(
         heel_type_id: heelType.id,
         location_id: location.id,
         image_url: data.imageUrl,
-        link: data.link,
         notes: data.notes,
         updated_at: new Date()
       },
@@ -97,7 +95,6 @@ export async function PUT(
     return NextResponse.json({
       id: updatedShoe.id,
       imageUrl: updatedShoe.image_url,
-      link: updatedShoe.link,
       brand: updatedShoe.brand.name,
       color: updatedShoe.color.name,
       dressStyle: updatedShoe.dress_style.name,

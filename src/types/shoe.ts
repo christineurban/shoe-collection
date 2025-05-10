@@ -4,7 +4,6 @@ export interface Shoe {
   id: string;
   name: string;
   brand: string;
-  link?: string | null;
   imageUrl: string | null;
   color: string;
   dressStyle: string;

@@ -60,18 +60,15 @@ export default function EditPage({ params, searchParams }: EditPageProps) {
     );
   }
 
-  const transformedShoe = {
-    id: shoe.id,
+  const initialValues = {
     brand: shoe.brand,
-    name: shoe.name,
-    imageUrl: shoe.imageUrl || undefined,
     color: shoe.color,
     location: shoe.location,
     shoeType: shoe.shoeType,
     heelType: shoe.heelType,
     dressStyle: shoe.dressStyle,
-    link: shoe.link || undefined,
-    notes: shoe.notes || undefined
+    imageUrl: shoe.imageUrl || undefined,
+    notes: shoe.notes || '',
   };
 
   return (
@@ -80,7 +77,7 @@ export default function EditPage({ params, searchParams }: EditPageProps) {
         title={`Edit ${shoe.brand} ${shoe.heelType} ${shoe.shoeType}`}
       />
       <AddEditForm
-        initialData={transformedShoe}
+        initialData={initialValues}
         isEditing={true}
         brands={options.brands}
         colors={options.colors}
