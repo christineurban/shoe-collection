@@ -88,3 +88,14 @@ model shoe_colors {
   @@id([shoe_id, color_id])
   @@map("shoe_colors")
 }
+
+model images {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  data        Bytes
+  contentType String
+  filename    String
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @db.Timestamptz(6)
+
+  @@map("images")
+}

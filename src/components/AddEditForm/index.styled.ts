@@ -16,6 +16,8 @@ export const StyledForm = styled.form`
 
   @media (max-width: 768px) {
     padding: 1.5rem;
+    margin: 0;
+    border-radius: 0;
   }
 `;
 
@@ -115,5 +117,116 @@ export const StyledDangerZone = styled.div`
   p {
     margin-bottom: 16px;
     color: ${({ theme }) => theme.colors.error};
+  }
+`;
+
+export const StyledImageSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+`;
+
+export const StyledImagePreview = styled.div`
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
+  border: 2px dashed ${({ theme }) => theme.colors.border.default};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background: ${({ theme }) => theme.colors.background.secondary};
+  touch-action: manipulation;
+  margin: 0 auto;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    aspect-ratio: 4/3;
+  }
+`;
+
+export const StyledImageCaptureButton = styled.button`
+  background: ${({ theme }) => theme.colors.primary[500]};
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  cursor: pointer;
+  transition: all ${({ theme }) => theme.transitions.base};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  margin: 0 auto;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary[600]};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    background: ${({ theme }) => theme.colors.gray[300]};
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    padding: 1.25rem 2rem;
+    font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  }
+`;
+
+export const StyledImageInput = styled.input`
+  display: none;
+`;
+
+export const StyledImagePlaceholder = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  text-align: center;
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    color: ${({ theme }) => theme.colors.text.secondary};
+  }
+
+  p {
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    svg {
+      width: 64px;
+      height: 64px;
+    }
   }
 `;

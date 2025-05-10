@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '../Button';
 import { SingleSelect } from '../fields/SingleSelect';
 import { MultiSelect } from '../fields/MultiSelect';
 import { Input } from '../fields/Input';
 import { SuccessMessage } from '@/components/SuccessMessage';
+import { FaCamera } from 'react-icons/fa';
 import {
   StyledForm,
   StyledFormGroup,
@@ -14,7 +15,12 @@ import {
   StyledButtonGroup,
   StyledFormSection,
   StyledFormRow,
-  StyledDangerZone
+  StyledDangerZone,
+  StyledImageSection,
+  StyledImagePreview,
+  StyledImageCaptureButton,
+  StyledImageInput,
+  StyledImagePlaceholder
 } from './index.styled';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 import type { Shoe } from '@/types/shoe';
@@ -63,6 +69,7 @@ function AddEditFormContent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<AddEditFormData>({
     id: initialData?.id,
     brand: initialData?.brand || '',
@@ -78,19 +85,50 @@ function AddEditFormContent({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.imageUrl || null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // If there's a new image, upload it first
+      let imageUrl = formData.imageUrl;
+      if (imageFile) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', imageFile);
+
+        const uploadResponse = await fetch('/api/update-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: formData.id,
+            imageUrl: URL.createObjectURL(imageFile)
+          }),
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const uploadData = await uploadResponse.json();
+        imageUrl = uploadData.data.image_url;
+      }
+
+      // Save the shoe with the image URL
       const endpoint = isEditing ? `/api/shoe/${formData.id}` : '/api/shoe';
       const response = await fetch(endpoint, {
         method: isEditing ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          imageUrl
+        }),
       });
 
       if (!response.ok) {
@@ -165,9 +203,57 @@ function AddEditFormContent({
     setFormData(prev => ({ ...prev, [name]: values }));
   };
 
+  const handleImageCapture = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Store the file for later upload
+    setImageFile(file);
+
+    // Create a temporary preview URL
+    const preview = URL.createObjectURL(file);
+    setPreviewUrl(preview);
+  };
+
   return (
     <>
       <StyledForm onSubmit={handleSubmit}>
+        <StyledFormSection>
+          <h3>Image</h3>
+          <StyledImageSection>
+            <StyledImagePreview>
+              {previewUrl ? (
+                <img src={previewUrl} alt="Shoe preview" />
+              ) : (
+                <StyledImagePlaceholder>
+                  <FaCamera />
+                  <p>No image selected</p>
+                </StyledImagePlaceholder>
+              )}
+            </StyledImagePreview>
+            <StyledImageCaptureButton
+              type="button"
+              onClick={handleImageCapture}
+              disabled={isLoading}
+            >
+              <FaCamera />
+              {previewUrl ? 'Change Image' : 'Add Photo'}
+            </StyledImageCaptureButton>
+            <StyledImageInput
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </StyledImageSection>
+        </StyledFormSection>
+
         <StyledFormSection>
           <h3>Basic Information</h3>
           <StyledFormRow>
