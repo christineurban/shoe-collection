@@ -5,14 +5,9 @@ import { useState, useEffect } from 'react';
 import { ImageSelector } from '@/components/ImageSelector';
 import { PageHeader } from '@/components/PageHeader';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
-import Link from 'next/link';
 import { Shoe } from '@/types/shoe';
 import {
-  StyledErrorContainer,
-  StyledErrorMessage,
   StyledLink,
-  StyledLinkContainer,
-  StyledDivider
 } from './page.styled';
 
 export default function SelectImagePage({ params }: { params: { id: string } }) {
@@ -82,10 +77,8 @@ function SelectImagePageContent({ params }: { params: { id: string } }) {
   return (
     <div>
       <PageHeader
-        title={`Select Image for ${shoe.brand} - ${shoe.name}`}
-        description={shoe.link
-          ? `Paste an image from your clipboard to add it to this shoe.`
-          : 'Paste an image from your clipboard to add it to this shoe.'}
+        title={`Select Image for ${shoe.brand} ${shoe.heelType} ${shoe.shoeType}`}
+        description="Paste an image from your clipboard to add it to this shoe"
       />
       <ImageSelector
         shoe={shoe}
@@ -93,14 +86,6 @@ function SelectImagePageContent({ params }: { params: { id: string } }) {
         onImageSelected={() => {}}
         selectedImage={null}
       />
-      {!shoe.link && (
-        <div>
-          <p>No link provided for this shoe.</p>
-          <StyledLink href={`/shoe/${params.id}/edit`}>
-            Add a link
-          </StyledLink>
-        </div>
-      )}
     </div>
   );
 }

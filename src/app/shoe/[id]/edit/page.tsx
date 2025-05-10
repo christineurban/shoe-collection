@@ -77,7 +77,7 @@ export default function EditPage({ params, searchParams }: EditPageProps) {
   return (
     <>
       <PageHeader
-        title={`Edit ${shoe.brand} - ${shoe.name}`}
+        title={`Edit ${shoe.brand} ${shoe.heelType} ${shoe.shoeType}`}
       />
       <AddEditForm
         initialData={transformedShoe}

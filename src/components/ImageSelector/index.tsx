@@ -3,119 +3,316 @@
 import { useState } from 'react';
 import {
   StyledContainer,
+  StyledImagesGrid,
   StyledImageContainer,
   StyledImage,
-  StyledContent,
-  StyledName,
-  StyledBrand,
-  StyledImageInput,
-  StyledImageInputLabel,
-  StyledImageInputText,
-  StyledImageInputIcon,
-  StyledRemoveButton,
-  StyledRemoveIcon,
-  StyledLoadingSpinner,
-  StyledLoadingText
+  StyledMetadata,
+  StyledShoeLink,
+  StyledImagePreviewContainer,
+  StyledMetadataContainer,
+  StyledActionsContainer,
+  StyledButtonGroup,
+  StyledCurrentImageContainer,
+  StyledCurrentImage,
+  StyledShoeCard,
 } from './index.styled';
-import { useRouter } from 'next/navigation';
-import { Shoe } from '@/types/shoe';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/Button';
+import { ImagePasteZone } from './ImagePasteZone';
+import { SuccessMessage } from '@/components/SuccessMessage';
 
-interface ImageSelectorProps {
-  shoe: Shoe;
-  returnTo?: string;
-  onImageSelected: (shoeId: string, imageUrl: string | null) => void;
-  selectedImage: string | null;
+interface Polish {
+  id: string;
+  name: string;
+  link: string | null;
+  imageUrl: string | null;
+  brand: string;
+  heelType: string;
+  shoeType: string;
+  color: string;
+  location: string;
 }
 
-export const ImageSelector: React.FC<ImageSelectorProps> = ({ shoe, returnTo, onImageSelected, selectedImage }) => {
+interface Shoe {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  brand: string;
+  heelType: string;
+  shoeType: string;
+  color: string;
+  location: string;
+}
+
+interface ImageSelectorProps {
+  polish?: Polish;
+  shoe?: Shoe;
+  onImageSaved?: () => void;
+  bulkMode?: boolean;
+  onImageSelected?: (id: string, imageUrl: string | null) => void;
+  selectedImage?: string | null;
+  returnTo?: string;
+}
+
+export const ImageSelector = ({
+  polish,
+  shoe,
+  onImageSaved,
+  bulkMode = false,
+  onImageSelected,
+  selectedImage: externalSelectedImage,
+  returnTo
+}: ImageSelectorProps) => {
+  const item = polish || shoe;
+  if (!item) return null;
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(externalSelectedImage || null);
+  const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const { url } = await response.json();
-      await handleImageSaved(url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
+  const handleImageSelect = (imageUrl: string) => {
+    if (bulkMode && onImageSelected) {
+      onImageSelected(item.id, imageUrl);
+    } else {
+      setSelectedImage(imageUrl);
     }
   };
 
-  const handleRemoveImage = () => {
-    // Implement the logic to remove the image
-  };
-
-  const handleImageSaved = async (imageUrl: string) => {
+  const handleRemoveImage = async () => {
     try {
-      const response = await fetch(`/api/shoe/${shoe.id}/update-image`, {
-        method: 'PUT',
+      setIsRemoving(true);
+
+      const response = await fetch('/api/remove-image', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ imageUrl }),
+        body: JSON.stringify({
+          id: item.id
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update shoe image');
-      }
-
-      if (returnTo) {
-        router.push(returnTo);
+      if (response.ok) {
+        setSuccessMessage('Image removed successfully!');
+        setIsSuccess(true);
+        if (onImageSaved) {
+          setTimeout(() => {
+            onImageSaved();
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            setIsSuccess(false);
+          }, 1500);
+        }
       } else {
-        router.push(`/shoe/${shoe.id}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to remove image');
       }
-
-      onImageSelected(shoe.id, imageUrl);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to update shoe image');
+      console.error('Error removing image:', error);
+    } finally {
+      setIsRemoving(false);
     }
   };
 
+  const handleSaveImage = async () => {
+    if (!selectedImage) return;
+
+    try {
+      setIsSaving(true);
+
+      const response = await fetch('/api/update-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: item.id,
+          imageUrl: selectedImage
+        }),
+      });
+
+      if (response.ok) {
+        setSuccessMessage('Image saved successfully!');
+        setIsSuccess(true);
+        if (onImageSaved) {
+          setTimeout(() => {
+            onImageSaved();
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            setIsSuccess(false);
+          }, 1500);
+        }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save image');
+      }
+    } catch (error) {
+      console.error('Error saving image:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleMarkNoImage = async () => {
+    if (bulkMode && onImageSelected) {
+      onImageSelected(item.id, 'n/a');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      const response = await fetch('/api/update-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: item.id,
+          imageUrl: 'n/a'
+        }),
+      });
+
+      if (response.ok) {
+        setSuccessMessage('Marked as no image available!');
+        setIsSuccess(true);
+        if (onImageSaved) {
+          setTimeout(() => {
+            onImageSaved();
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            setIsSuccess(false);
+          }, 1500);
+        }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to mark as no image available');
+      }
+    } catch (error) {
+      console.error('Error marking as no image available:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const handlePastedImage = (imageUrl: string) => {
+    setImages(prevImages => [imageUrl, ...prevImages]);
+    setSelectedImage(imageUrl);
+  };
+
+  if (!item) {
+    return null;
+  }
+
   return (
-    <StyledContainer>
-      <StyledImageContainer>
-        <StyledImageInputLabel>
-          <StyledImageInput
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            disabled={isLoading}
-          />
-          <StyledImageInputIcon>+</StyledImageInputIcon>
-          <StyledImageInputText>Add Image</StyledImageInputText>
-        </StyledImageInputLabel>
-        {isLoading && (
-          <>
-            <StyledLoadingSpinner />
-            <StyledLoadingText>Uploading...</StyledLoadingText>
-          </>
-        )}
-      </StyledImageContainer>
-      <StyledContent>
-        <StyledName>{shoe.name}</StyledName>
-        <StyledBrand>{shoe.brand}</StyledBrand>
-        {error && <div>Error: {error}</div>}
-      </StyledContent>
-    </StyledContainer>
+    <AnimatePresence>
+      <StyledContainer
+        as={motion.div}
+        initial={{ opacity: 1, height: 'auto' }}
+        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <StyledShoeCard>
+          <StyledMetadata>
+            <StyledMetadataContainer>
+              <div>
+                <StyledShoeLink href={polish ? `/polish/${item.id}` : `/shoe/${item.id}`}>
+                  <h3>{item.brand} {item.heelType} {item.shoeType}</h3>
+                </StyledShoeLink>
+                <p>Color: {item.color}</p>
+                <p>Location: {item.location}</p>
+              </div>
+              <StyledActionsContainer>
+                <StyledButtonGroup>
+                  <Button
+                    onClick={handleMarkNoImage}
+                    disabled={bulkMode ? false : isSaving}
+                    $variant="tertiary"
+                  >
+                    Mark as No Image Available
+                  </Button>
+                  {!bulkMode && (
+                    <Button
+                      onClick={handleSaveImage}
+                      disabled={!selectedImage || isSaving}
+                    >
+                      {isSaving ? 'Saving...' : 'Save Image'}
+                    </Button>
+                  )}
+                </StyledButtonGroup>
+              </StyledActionsContainer>
+            </StyledMetadataContainer>
+          </StyledMetadata>
+
+          {!isCollapsed && (
+            <>
+              {item.imageUrl && item.imageUrl !== 'n/a' && (
+                <StyledCurrentImageContainer>
+                  <h3>Current Image</h3>
+                  <StyledCurrentImage
+                    src={item.imageUrl}
+                    alt={`Current image for ${item.brand} - ${item.name}`}
+                  />
+                </StyledCurrentImageContainer>
+              )}
+
+              <ImagePasteZone onImagePasted={handlePastedImage} />
+
+              {selectedImage && selectedImage !== 'n/a' && (
+                <StyledImagePreviewContainer>
+                  <h3>Preview Image</h3>
+                  <StyledImage
+                    src={selectedImage}
+                    alt={`Preview image for ${item.brand} - ${item.name}`}
+                    onClick={() => handleImageSelect(selectedImage)}
+                    $isSelected={bulkMode ? externalSelectedImage === selectedImage : selectedImage === selectedImage}
+                  />
+                </StyledImagePreviewContainer>
+              )}
+
+              {images.length > 0 && (
+                <StyledImagesGrid>
+                  {images.map((img, index) => (
+                    <StyledImageContainer key={index}>
+                      <StyledImage
+                        src={img}
+                        alt={`${item.brand} - ${item.name} - Image ${index + 1}`}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          const hiddenImg = document.createElement('img');
+                          hiddenImg.src = img;
+                          hiddenImg.alt = `${item.brand} - ${item.name} - Image ${index + 1}`;
+                          hiddenImg.style.display = 'none';
+                          target.replaceWith(hiddenImg);
+                        }}
+                        onClick={() => handleImageSelect(img)}
+                        $isSelected={bulkMode ? externalSelectedImage === img : selectedImage === img}
+                      />
+                    </StyledImageContainer>
+                  ))}
+                </StyledImagesGrid>
+              )}
+            </>
+          )}
+        </StyledShoeCard>
+
+        <SuccessMessage
+          message={isSuccess ? successMessage : null}
+          onClose={() => setIsSuccess(false)}
+        />
+      </StyledContainer>
+    </AnimatePresence>
   );
 };

@@ -1,21 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.DATABASE_URL!;
+const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-function createUrlSafeFilename(brand: string, name: string): string {
+function createUrlSafeFilename(brand: string, heelType: string, shoeType: string, id: string): string {
   const safeBrand = brand.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  const safeName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  return `${safeBrand}-${safeName}`;
+  const safeHeelType = heelType.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const safeShoeType = shoeType.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  return `${safeBrand}-${safeHeelType}-${safeShoeType}-${id}`;
 }
 
-async function deleteOldImage(shoe: { brand: string, name: string }) {
+async function deleteOldImage(shoe: { brand: string, heel_type: { name: string }, shoe_type: { name: string }, id: string }) {
   try {
     // Create a URL-safe filename
-    const safeBrand = shoe.brand.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const safeName = shoe.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const fileName = `${safeBrand}-${safeName}`;
+    const fileName = createUrlSafeFilename(shoe.brand, shoe.heel_type.name, shoe.shoe_type.name, shoe.id);
 
     // Delete the old image if it exists
     const { data: existingFiles, error: listError } = await supabase
@@ -43,12 +42,14 @@ async function deleteOldImage(shoe: { brand: string, name: string }) {
   }
 }
 
-export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: string, name: string }): Promise<string> {
+export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: string, heel_type: { name: string }, shoe_type: { name: string }, id: string }): Promise<string> {
   try {
     // Create metadata for the image
     const metadata = {
       brand: shoe.brand,
-      name: shoe.name,
+      heelType: shoe.heel_type.name,
+      shoeType: shoe.shoe_type.name,
+      id: shoe.id,
       uploadedAt: new Date().toISOString()
     };
 
@@ -60,8 +61,8 @@ export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: str
     if (!response.ok) throw new Error('Failed to fetch image');
     const imageBlob = await response.blob();
 
-    // Create a URL-safe filename with brand and shoe name
-    const fileName = createUrlSafeFilename(shoe.brand, shoe.name);
+    // Create a URL-safe filename with brand, heel type, shoe type, and ID
+    const fileName = createUrlSafeFilename(shoe.brand, shoe.heel_type.name, shoe.shoe_type.name, shoe.id);
 
     // Upload the image to Supabase Storage
     const { data, error } = await supabase

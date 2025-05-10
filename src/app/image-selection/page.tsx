@@ -24,12 +24,27 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.page || '1'));
   const [totalItems, setTotalItems] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check');
+        const data = await response.json();
+        setAuthChecked(true);
+        if (!data.isAuthenticated) {
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        router.push('/login');
+      }
+    };
+    checkAuth();
+  }, [router]);
+
+  useEffect(() => {
+    if (!authChecked) return;
 
     const fetchShoes = async () => {
       try {
@@ -47,7 +62,7 @@ export default function ImageSelectionPage({ searchParams }: PageProps) {
     };
 
     fetchShoes();
-  }, [currentPage, isAuthenticated, router]);
+  }, [currentPage, authChecked]);
 
   const handleImageSelected = (shoeId: string, imageUrl: string | null) => {
     setSelectedImages(prev => {

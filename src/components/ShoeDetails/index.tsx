@@ -28,30 +28,25 @@ import {
   StyledLoadingSpinner,
   StyledLoadingText,
 } from './index.styled';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface ShoeDetailsProps {
   shoe: Shoe;
-  onChooseImage?: (id: string) => void;
+  title?: string;
 }
 
-export const ShoeDetails = ({ shoe, onChooseImage }: ShoeDetailsProps) => {
+export const ShoeDetails = ({ shoe, title }: ShoeDetailsProps) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChooseImage = async () => {
-    if (!onChooseImage) return;
-    setIsLoading(true);
-    try {
-      await onChooseImage(shoe.id);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleChooseImage = () => {
+    router.push(`/shoe/${shoe.id}/select-image`);
   };
 
   return (
     <StyledContainer>
+      <PageHeader title={title || `${shoe.brand} ${shoe.heelType} ${shoe.shoeType}`} />
       <StyledImageContainer>
         {!shoe.imageUrl ? (
           isAuthenticated ? (
