@@ -114,10 +114,6 @@ export const ShoeGrid = ({
               brand={shoe.brand}
               name={shoe.name}
               imageUrl={shoe.imageUrl}
-              color={shoe.color}
-              dressStyle={shoe.dressStyle}
-              shoeType={shoe.shoeType}
-              heelType={shoe.heelType}
               location={shoe.location}
               onChooseImage={isAuthenticated ? handleChooseImage : undefined}
             />

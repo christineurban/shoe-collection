@@ -17,7 +17,9 @@ import {
   StyledInputControls,
   StyledNote,
   StyledAddButtonContainer,
-  StyledScrollIndicator
+  StyledScrollIndicator,
+  StyledDashboard,
+  StyledAttributeSection
 } from './page.styled';
 import { BsGrid, BsTable, BsTrash, BsChevronDown } from 'react-icons/bs';
 import { Table } from '@/components/Table';
@@ -31,11 +33,9 @@ import { StyledNameCell, StyledPercentageHeader } from '@/components/Table/index
 import { Tooltip } from 'react-tooltip';
 import { Stats } from '@/types/stats';
 import { Attribute } from '@/types/attribute';
-import { StatCard } from '@/components/StatCard';
 import { AttributeTable } from '@/components/AttributeTable';
 import { AttributeCard } from '@/components/AttributeCard';
 import { AddAttributeForm } from '@/components/AddAttributeForm';
-import { StyledDashboard, StyledAttributeSection } from './page.styled';
 
 type SortOrder = 'name-asc' | 'name-desc' | 'count-asc' | 'count-desc';
 type ViewMode = 'card' | 'table';
@@ -233,35 +233,27 @@ export default function Dashboard() {
 
   const renderCards = (attributes: Attribute[], attributeType: 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location') => {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-        {attributes.map((attribute) => (
-          <AttributeCard
-            key={attribute.id}
-            attribute={attribute}
-            onDelete={() => handleDelete(attribute.id, attributeType)}
-          />
+      <StyledAttributeList>
+        {attributes.map(attr => (
+          <div key={attr.id}>
+            <Tile
+              title={attr.name}
+              value={`${attr.count} ${attr.count === 1 ? 'shoe' : 'shoes'}`}
+              percentage={`${attr.percentage.toFixed(1)}%`}
+              variant="attribute"
+              showDelete={attr.count === 0}
+              onDelete={() => handleDelete(attr.id, attributeType)}
+            />
+          </div>
         ))}
-      </div>
+      </StyledAttributeList>
     );
   };
 
   const handleStatClick = (type: 'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations') => {
     setSelectedAttribute(type);
-
-    // Only scroll on mobile
-    if (window.innerWidth <= 768) {
-      setTimeout(() => {
-        if (attributeListRef.current) {
-          const navHeight = 64; // Height of the nav bar
-          const elementPosition = attributeListRef.current.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - navHeight;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+    if (attributeListRef.current) {
+      attributeListRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -279,81 +271,225 @@ export default function Dashboard() {
         return heelTypes;
       case 'locations':
         return locations;
+      default:
+        return [];
     }
   };
 
-  if (!stats) {
-    return <PageHeader title="No data available" />;
-  }
+  const formatAttributeType = (type: string): string => {
+    return type
+      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+      .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+      .toLowerCase(); // Convert to lowercase
+  };
 
   return (
     <StyledDashboard>
-      <h1>Dashboard</h1>
+      <PageHeader
+        title="Dashboard"
+        description="Click on a tile to view and manage details"
+      />
 
       <StyledStatsGrid>
-        <StatCard
+        <Tile
           title="Total Shoes"
           value={stats.totalShoes}
-          description="Total number of shoes in collection"
+          description="shoes in collection"
+          onClick={() => router.push('/')}
+          variant="stat"
         />
-
-        <StatCard
+        <Tile
           title="Brands"
           value={stats.totalBrands}
           description="Different brands available"
           onClick={() => handleStatClick('brands')}
           $isActive={selectedAttribute === 'brands'}
+          variant="stat"
         />
-
-        <StatCard
+        <Tile
           title="Colors"
           value={stats.totalColors}
           description="Different colors available"
           onClick={() => handleStatClick('colors')}
           $isActive={selectedAttribute === 'colors'}
+          variant="stat"
         />
-
-        <StatCard
+        <Tile
           title="Dress Styles"
           value={stats.totalDressStyles}
           description="Different dress styles available"
           onClick={() => handleStatClick('dressStyles')}
           $isActive={selectedAttribute === 'dressStyles'}
+          variant="stat"
         />
-
-        <StatCard
+        <Tile
           title="Shoe Types"
           value={stats.totalShoeTypes}
           description="Different shoe types available"
           onClick={() => handleStatClick('shoeTypes')}
           $isActive={selectedAttribute === 'shoeTypes'}
+          variant="stat"
         />
-
-        <StatCard
+        <Tile
           title="Heel Types"
           value={stats.totalHeelTypes}
           description="Different heel types available"
           onClick={() => handleStatClick('heelTypes')}
           $isActive={selectedAttribute === 'heelTypes'}
+          variant="stat"
         />
-
-        <StatCard
+        <Tile
           title="Locations"
           value={stats.totalLocations}
           description="Different locations available"
           onClick={() => handleStatClick('locations')}
           $isActive={selectedAttribute === 'locations'}
+          variant="stat"
         />
       </StyledStatsGrid>
 
       {selectedAttribute && (
-        <StyledAttributeSection>
-          <h2>{selectedAttribute.charAt(0).toUpperCase() + selectedAttribute.slice(1)}</h2>
-          <AddAttributeForm
-            onSubmit={(e) => handleAdd(e, selectedAttribute.slice(0, -1) as 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location')}
-          />
-          {renderTable(getAttributeList(selectedAttribute), selectedAttribute.slice(0, -1) as 'brand' | 'color' | 'dressStyle' | 'shoeType' | 'heelType' | 'location')}
-        </StyledAttributeSection>
+        <>
+          <StyledScrollIndicator>
+            <BsChevronDown />
+          </StyledScrollIndicator>
+
+          <div ref={attributeListRef}>
+            <StyledSectionHeading>
+              <h2>{selectedAttribute.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h2>
+              <StyledAddButtonContainer>
+                <a
+                  onClick={() => setIsAddModalOpen(true)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  + Add {singularForms[selectedAttribute]}
+                </a>
+              </StyledAddButtonContainer>
+            </StyledSectionHeading>
+
+            <StyledViewControls>
+              <StyledViewButton
+                onClick={() => setViewMode('card')}
+                $isActive={viewMode === 'card'}
+              >
+                <BsGrid /> Cards
+              </StyledViewButton>
+              <StyledViewButton
+                onClick={() => setViewMode('table')}
+                $isActive={viewMode === 'table'}
+              >
+                <BsTable /> Table
+              </StyledViewButton>
+            </StyledViewControls>
+
+            <StyledSortControls>
+              <StyledSortButton
+                onClick={() => {
+                  const newOrder = sortOrder.startsWith('name-')
+                    ? sortOrder === 'name-asc' ? 'name-desc' : 'name-asc'
+                    : 'name-asc';
+                  setSortOrder(newOrder);
+                }}
+                $isActive={sortOrder.startsWith('name-')}
+                $direction={sortOrder === 'name-asc' ? 'asc' : sortOrder === 'name-desc' ? 'desc' : undefined}
+              >
+                Name
+              </StyledSortButton>
+              <StyledSortButton
+                onClick={() => {
+                  const newOrder = sortOrder.startsWith('count-')
+                    ? sortOrder === 'count-asc' ? 'count-desc' : 'count-asc'
+                    : 'count-asc';
+                  setSortOrder(newOrder);
+                }}
+                $isActive={sortOrder.startsWith('count-')}
+                $direction={sortOrder === 'count-asc' ? 'asc' : sortOrder === 'count-desc' ? 'desc' : undefined}
+              >
+                Count
+              </StyledSortButton>
+            </StyledSortControls>
+
+            <StyledInputControls>
+              <StyledInputContainer>
+                <Input
+                  placeholder={`Search ${formatAttributeType(selectedAttribute)}...`}
+                  value={searchTerm}
+                  onChange={setSearchTerm}
+                  aria-label={`Search ${formatAttributeType(selectedAttribute)}`}
+                />
+              </StyledInputContainer>
+
+              <StyledAddForm onSubmit={(e) => handleAdd(e, singularForms[selectedAttribute])}>
+                <StyledInputContainer>
+                  <Input
+                    placeholder={`Add new ${formatAttributeType(singularForms[selectedAttribute])}...`}
+                    value={newAttributeName}
+                    onChange={setNewAttributeName}
+                    aria-label={`Add new ${formatAttributeType(singularForms[selectedAttribute])}`}
+                  />
+                </StyledInputContainer>
+                <Button type="submit">
+                  Add {formatAttributeType(singularForms[selectedAttribute])}
+                </Button>
+              </StyledAddForm>
+            </StyledInputControls>
+
+            {viewMode === 'card' ? (
+              renderCards(filterAttributes(sortAttributes(getAttributeList(selectedAttribute))), singularForms[selectedAttribute])
+            ) : (
+              renderTable(filterAttributes(sortAttributes(getAttributeList(selectedAttribute))), singularForms[selectedAttribute])
+            )}
+
+            <StyledNote>
+              Note: A {formatAttributeType(singularForms[selectedAttribute])} can only be deleted if there are no shoes associated with it
+            </StyledNote>
+
+            <Modal
+              isOpen={isAddModalOpen}
+              onClose={() => {
+                setIsAddModalOpen(false);
+                setNewAttributeName('');
+              }}
+              title={`Add new ${formatAttributeType(singularForms[selectedAttribute])}`}
+              footer={
+                <>
+                  <Button
+                    onClick={() => {
+                      setIsAddModalOpen(false);
+                      setNewAttributeName('');
+                    }}
+                    $variant="secondary"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={(e) => {
+                      handleAdd(e as any, singularForms[selectedAttribute]);
+                      setIsAddModalOpen(false);
+                    }}
+                  >
+                    Add {formatAttributeType(singularForms[selectedAttribute])}
+                  </Button>
+                </>
+              }
+            >
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleAdd(e, singularForms[selectedAttribute]);
+                setIsAddModalOpen(false);
+              }}>
+                <Input
+                  type="text"
+                  value={newAttributeName}
+                  onChange={setNewAttributeName}
+                  placeholder={`Enter ${formatAttributeType(singularForms[selectedAttribute])} name...`}
+                  autoFocus
+                />
+              </form>
+            </Modal>
+          </div>
+        </>
       )}
     </StyledDashboard>
   );
