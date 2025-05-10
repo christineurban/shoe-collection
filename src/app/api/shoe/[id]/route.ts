@@ -67,14 +67,20 @@ export async function PUT(
       where: { id: params.id },
       data: {
         brand_id: brand.id,
-        color_id: color.id,
         dress_style_id: dressStyle.id,
         shoe_type_id: shoeType.id,
         heel_type_id: heelType.id,
         location_id: location.id,
         image_url: data.imageUrl,
         notes: data.notes,
-        updated_at: new Date()
+        updated_at: new Date(),
+        colors: {
+          deleteMany: {},
+          create: [{
+            color_id: color.id,
+            updated_at: new Date()
+          }]
+        }
       },
       include: {
         brand: true,
@@ -94,7 +100,7 @@ export async function PUT(
       id: updatedShoe.id,
       imageUrl: updatedShoe.image_url,
       brand: updatedShoe.brand.name,
-      color: updatedShoe.colors[0].color.name,
+      colors: updatedShoe.colors.map((c: { color: { name: string } }) => c.color.name),
       dressStyle: updatedShoe.dress_style.name,
       shoeType: updatedShoe.shoe_type.name,
       heelType: updatedShoe.heel_type.name,

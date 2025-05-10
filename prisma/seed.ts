@@ -98,21 +98,6 @@ async function seedFromCsv() {
     const defaultBrand = await prisma.brands.create({
       data: { name: 'Unknown', updated_at: new Date() },
     });
-    const defaultColor = await prisma.colors.create({
-      data: { name: 'Unknown', updated_at: new Date() },
-    });
-    const defaultLocation = await prisma.locations.create({
-      data: { name: 'Unknown', updated_at: new Date() },
-    });
-    const defaultShoeType = await prisma.shoe_types.create({
-      data: { name: 'Unknown', updated_at: new Date() },
-    });
-    const defaultHeelType = await prisma.heel_types.create({
-      data: { name: 'Unknown', updated_at: new Date() },
-    });
-    const defaultDressStyle = await prisma.dress_styles.create({
-      data: { name: 'Unknown', updated_at: new Date() },
-    });
 
     // Create brands first
     console.log('\nCreating brands...');
@@ -167,8 +152,6 @@ async function seedFromCsv() {
           });
           if (existingColor) {
             colorMap.set(color, existingColor.id);
-          } else {
-            colorMap.set(color, defaultColor.id);
           }
         }
         colorCount++;
@@ -197,8 +180,6 @@ async function seedFromCsv() {
           });
           if (existingLocation) {
             locationMap.set(location, existingLocation.id);
-          } else {
-            locationMap.set(location, defaultLocation.id);
           }
         }
         locationCount++;
@@ -227,8 +208,6 @@ async function seedFromCsv() {
           });
           if (existingShoeType) {
             shoeTypeMap.set(shoeType, existingShoeType.id);
-          } else {
-            shoeTypeMap.set(shoeType, defaultShoeType.id);
           }
         }
         shoeTypeCount++;
@@ -257,8 +236,6 @@ async function seedFromCsv() {
           });
           if (existingHeelType) {
             heelTypeMap.set(heelType, existingHeelType.id);
-          } else {
-            heelTypeMap.set(heelType, defaultHeelType.id);
           }
         }
         heelTypeCount++;
@@ -287,8 +264,6 @@ async function seedFromCsv() {
           });
           if (existingDressStyle) {
             dressStyleMap.set(dressStyle, existingDressStyle.id);
-          } else {
-            dressStyleMap.set(dressStyle, defaultDressStyle.id);
           }
         }
         dressStyleCount++;
@@ -304,11 +279,17 @@ async function seedFromCsv() {
     for (const shoe of records) {
       try {
         const brandId = shoe.Brand ? brandMap.get(shoe.Brand) || defaultBrand.id : defaultBrand.id;
-        const colorId = shoe.Color ? colorMap.get(shoe.Color) || defaultColor.id : defaultColor.id;
-        const locationId = shoe.Location ? locationMap.get(shoe.Location) || defaultLocation.id : defaultLocation.id;
-        const shoeTypeId = shoe.Type ? shoeTypeMap.get(shoe.Type) || defaultShoeType.id : defaultShoeType.id;
-        const heelTypeId = shoe['Heel or Flat'] ? heelTypeMap.get(shoe['Heel or Flat']) || defaultHeelType.id : defaultHeelType.id;
-        const dressStyleId = shoe['Dress Style'] ? dressStyleMap.get(shoe['Dress Style']) || defaultDressStyle.id : defaultDressStyle.id;
+        const colorId = shoe.Color ? colorMap.get(shoe.Color) : null;
+        const locationId = shoe.Location ? locationMap.get(shoe.Location) : null;
+        const shoeTypeId = shoe.Type ? shoeTypeMap.get(shoe.Type) : null;
+        const heelTypeId = shoe['Heel or Flat'] ? heelTypeMap.get(shoe['Heel or Flat']) : null;
+        const dressStyleId = shoe['Dress Style'] ? dressStyleMap.get(shoe['Dress Style']) : null;
+
+        // Skip shoes with missing required attributes
+        if (!colorId || !locationId || !shoeTypeId || !heelTypeId || !dressStyleId) {
+          console.warn(`Skipping shoe with missing required attributes: ${JSON.stringify(shoe)}`);
+          continue;
+        }
 
         await prisma.shoes.create({
           data: {

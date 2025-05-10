@@ -153,7 +153,7 @@ function ShoeDetailsContent({ shoe, title }: ShoeDetailsProps) {
         </div>
         <StyledDetailsContent>
           <h2>Details</h2>
-          <p><strong>Color</strong>{shoe.color}</p>
+          <p><strong>Color</strong>{shoe.colors.join(', ')}</p>
           <p><strong>Dress Style</strong>{shoe.dressStyle}</p>
           <p><strong>Shoe Type</strong>{shoe.shoeType}</p>
           <p><strong>Heel Type</strong>{shoe.heelType}</p>

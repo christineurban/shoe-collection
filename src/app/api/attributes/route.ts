@@ -201,7 +201,7 @@ export async function DELETE(request: Request) {
         inUse = (await prisma.shoes.count({ where: { brand_id: id } })) > 0;
         break;
       case 'color':
-        inUse = (await prisma.shoes.count({ where: { color_id: id } })) > 0;
+        inUse = (await prisma.shoe_colors.count({ where: { color_id: id } })) > 0;
         break;
       case 'dressStyle':
         inUse = (await prisma.shoes.count({ where: { dress_style_id: id } })) > 0;

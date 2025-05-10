@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -21,7 +23,11 @@ export async function GET(request: Request) {
       },
       include: {
         brand: true,
-        color: true,
+        colors: {
+          include: {
+            color: true
+          }
+        },
         dress_style: true,
         shoe_type: true,
         heel_type: true,
@@ -33,7 +39,7 @@ export async function GET(request: Request) {
       id: shoe.id,
       imageUrl: shoe.image_url,
       brand: shoe.brand.name,
-      color: shoe.color.name,
+      colors: shoe.colors.map(c => c.color.name),
       dressStyle: shoe.dress_style.name,
       shoeType: shoe.shoe_type.name,
       heelType: shoe.heel_type.name,

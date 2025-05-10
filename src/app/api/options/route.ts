@@ -26,11 +26,11 @@ export async function GET() {
 
     return NextResponse.json({
       brands: brands.map(b => b.name),
-      colors: colors.map(c => c.name),
-      dressStyles: dressStyles.map(d => d.name),
-      shoeTypes: shoeTypes.map(s => s.name),
-      heelTypes: heelTypes.map(h => h.name),
-      locations: locations.map(l => l.name)
+      colors: colors.filter(c => c.name !== 'Unknown').map(c => c.name),
+      dressStyles: dressStyles.filter(d => d.name !== 'Unknown').map(d => d.name),
+      shoeTypes: shoeTypes.filter(s => s.name !== 'Unknown').map(s => s.name),
+      heelTypes: heelTypes.filter(h => h.name !== 'Unknown').map(h => h.name),
+      locations: locations.filter(l => l.name !== 'Unknown').map(l => l.name)
     });
   } catch (error) {
     console.error('Error fetching options:', error);

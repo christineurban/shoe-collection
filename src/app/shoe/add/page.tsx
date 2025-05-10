@@ -14,33 +14,42 @@ const StyledFormContainer = styled.div`
 interface Options {
   brands: string[];
   colors: string[];
+  dressStyles: string[];
+  shoeTypes: string[];
+  heelTypes: string[];
+  locations: string[];
 }
 
 export default function AddShoePage() {
-  const [options, setOptions] = useState<Options>({ brands: [], colors: [] });
+  const [options, setOptions] = useState<Options>({
+    brands: [],
+    colors: [],
+    dressStyles: [],
+    shoeTypes: [],
+    heelTypes: [],
+    locations: []
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const [brandsResponse, colorsResponse] = await Promise.all([
-          fetch('/api/brands'),
-          fetch('/api/colors')
-        ]);
+        const response = await fetch('/api/options');
 
-        if (!brandsResponse.ok || !colorsResponse.ok) {
+        if (!response.ok) {
           throw new Error('Failed to fetch options');
         }
 
-        const [brands, colors] = await Promise.all([
-          brandsResponse.json(),
-          colorsResponse.json()
-        ]);
+        const data = await response.json();
 
         setOptions({
-          brands: brands.map((b: { name: string }) => b.name),
-          colors: colors.map((c: { name: string }) => c.name)
+          brands: data.brands,
+          colors: data.colors,
+          dressStyles: data.dressStyles,
+          shoeTypes: data.shoeTypes,
+          heelTypes: data.heelTypes,
+          locations: data.locations
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -81,6 +90,10 @@ export default function AddShoePage() {
         <AddEditForm
           brands={options.brands}
           colors={options.colors}
+          dressStyles={options.dressStyles}
+          shoeTypes={options.shoeTypes}
+          heelTypes={options.heelTypes}
+          locations={options.locations}
         />
       </StyledFormContainer>
     </StyledContainer>

@@ -2,7 +2,6 @@
 
 import { AttributeManager } from '@/components/AttributeManager';
 import { PageHeader } from '@/components/PageHeader';
-import styled from 'styled-components';
 import { Tabs } from '@/components/Tabs';
 import { useState } from 'react';
 
@@ -26,25 +25,21 @@ export default function AttributesPage() {
 
   if (isLoading) {
     return (
-      <StyledContainer>
-        <PageHeader title="Loading..." />
-      </StyledContainer>
+      <PageHeader title="Loading..." />
     );
   }
 
   if (error) {
     return (
-      <StyledContainer>
-        <PageHeader
-          title="Error"
-          description={error}
-        />
-      </StyledContainer>
+      <PageHeader
+        title="Error"
+        description={error}
+      />
     );
   }
 
   return (
-    <StyledContainer>
+    <>
       <PageHeader
         title="Manage Attributes"
         description="Add, view, and delete brands and colors. Attributes can only be deleted if they are not used by any shoe."
@@ -54,6 +49,6 @@ export default function AttributesPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-    </StyledContainer>
+    </>
   );
 }
