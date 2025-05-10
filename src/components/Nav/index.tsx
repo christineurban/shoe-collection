@@ -25,7 +25,7 @@ export function Nav() {
 
   const protectedRoutes = [
     { path: '/dashboard', label: 'Dashboard' },
-    { path: '/polish/add', label: 'Add New Shoe' },
+    { path: '/shoe/add', label: 'Add New Shoe' },
   ];
 
   const routes = [

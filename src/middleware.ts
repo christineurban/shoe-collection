@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const isAuthenticated = request.cookies.get('shoe-auth')?.value === 'true';
+  const isAuthenticated = request.cookies.get('shoe-collection-auth')?.value === 'true';
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
