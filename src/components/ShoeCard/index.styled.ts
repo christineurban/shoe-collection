@@ -2,41 +2,81 @@ import styled from 'styled-components';
 import { getColorMapping, getTextColor } from '@/utils/colors';
 import Image from 'next/image';
 
-export const StyledCard = styled.div<{ $isAuthenticated: boolean }>`
+export const StyledCard = styled.div<{ $isAuthenticated?: boolean }>`
+  container-name: card;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
   background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  box-shadow: ${({ theme }) => theme.shadows.md};
   overflow: hidden;
-  box-shadow: ${({ theme }) => theme.shadows.sm};
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
-  transition: all ${({ theme }) => theme.transitions.base};
-  cursor: ${({ $isAuthenticated }) => ($isAuthenticated ? 'pointer' : 'default')};
+  cursor: ${({ $isAuthenticated }) => $isAuthenticated ? 'pointer' : 'default'};
+  transition: ${({ theme }) => theme.transitions.base};
 
-  &:hover {
-    transform: ${({ $isAuthenticated }) => ($isAuthenticated ? 'translateY(-2px)' : 'none')};
-    box-shadow: ${({ theme, $isAuthenticated }) =>
-      $isAuthenticated ? theme.shadows.md : theme.shadows.sm};
-  }
+  ${({ $isAuthenticated, theme }) => $isAuthenticated && `
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: ${theme.shadows.lg};
+    }
+  `}
 
-  @container card (max-width: 200px) {
-    border-radius: ${({ theme }) => theme.borderRadius.md};
+  &:focus {
+    outline: none;
+    box-shadow: ${({ theme }) => theme.shadows.focus};
   }
 `;
 
 export const StyledImageContainer = styled.div`
   position: relative;
   width: 100%;
-  padding-top: 100%;
-  background: ${({ theme }) => theme.colors.gray[50]};
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.gray[100]};
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
   overflow: hidden;
 `;
 
-export const StyledImage = styled(Image)`
-  position: absolute;
-  top: 0;
-  left: 0;
+export const StyledChooseImageButton = styled.button<{ $isNoImage?: boolean; $isAuthenticated?: boolean }>`
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme, $isNoImage }) =>
+    $isNoImage
+      ? theme.colors.gray[200]
+      : theme.colors.background.muted};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  border: none;
+  cursor: ${({ $isAuthenticated }) => $isAuthenticated ? 'pointer' : 'default'};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
+  transition: ${({ theme }) => theme.transitions.base};
+
+  ${({ $isAuthenticated, theme, $isNoImage }) => $isAuthenticated && `
+    &:hover {
+      background-color: ${$isNoImage
+        ? theme.colors.gray[300]
+        : theme.colors.gray[200]};
+      color: ${theme.colors.gray[700]};
+    }
+  `}
+
+  &:focus {
+    outline: none;
+    box-shadow: ${({ theme }) => theme.shadows.focus};
+  }
+`;
+
+export const StyledImage = styled(Image)`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: ${({ theme }) => theme.colors.gray[100]};
+  border-radius: ${({ theme }) => `${theme.borderRadius.sm} ${theme.borderRadius.sm} 0 0`};
 `;
 
 export const StyledContent = styled.div`
@@ -44,10 +84,35 @@ export const StyledContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing[2]};
+  position: relative;
 
   @container card (max-width: 200px) {
-    padding: ${({ theme }) => theme.spacing[2]};
+    padding: ${({ theme }) => theme.spacing[3]};
+    gap: ${({ theme }) => theme.spacing[2]};
+  }
+`;
+
+export const StyledMetadata = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing[2]};
+
+  @container card (max-width: 200px) {
+    flex-direction: column;
+    align-items: stretch;
     gap: ${({ theme }) => theme.spacing[1]};
+  }
+`;
+
+export const StyledBrandNameContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing[1]};
+  flex: 1;
+
+  @container card (max-width: 200px) {
+    order: 2;
   }
 `;
 
@@ -60,50 +125,52 @@ export const StyledBrand = styled.span`
   }
 `;
 
-export const StyledName = styled.h3`
+export const StyledTitle = styled.h3`
   color: ${({ theme }) => theme.colors.text.primary};
   font-size: ${({ theme }) => theme.typography.fontSize.base};
   font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
   margin: 0;
 
   @container card (max-width: 200px) {
-    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
   }
 `;
 
-export const StyledChooseImageButton = styled.button<{
-  $isNoImage?: boolean;
-  $isAuthenticated: boolean;
-}>`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: ${({ theme, $isNoImage }) =>
-    $isNoImage ? theme.colors.error[100] : theme.colors.primary[100]};
-  color: ${({ theme, $isNoImage }) =>
-    $isNoImage ? theme.colors.error[700] : theme.colors.primary[700]};
-  border: none;
-  padding: ${({ theme }) => `${theme.spacing[2]} ${theme.spacing[4]}`};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-  cursor: ${({ $isAuthenticated }) => ($isAuthenticated ? 'pointer' : 'default')};
-  opacity: ${({ $isAuthenticated }) => ($isAuthenticated ? 1 : 0.5)};
-  transition: all ${({ theme }) => theme.transitions.base};
+export const StyledTagsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing[1]};
 
-  &:hover {
-    background: ${({ theme, $isNoImage, $isAuthenticated }) =>
-      $isAuthenticated
-        ? $isNoImage
-          ? theme.colors.error[200]
-          : theme.colors.primary[200]
-        : $isNoImage
-        ? theme.colors.error[100]
-        : theme.colors.primary[100]};
+  @container card (max-width: 200px) {
+    gap: ${({ theme }) => theme.spacing[1]};
   }
 `;
 
-export const StyledClickableArea = styled.div<{ $isAuthenticated: boolean }>`
-  cursor: ${({ $isAuthenticated }) => ($isAuthenticated ? 'pointer' : 'default')};
+export const StyledTag = styled.span<{ $type: string }>`
+  padding: ${({ theme }) => `${theme.spacing[1]} ${theme.spacing[2]}`};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  background: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) => theme.colors.gray[700]};
+  display: inline-block;
+
+  @container card (max-width: 200px) {
+    padding: ${({ theme }) => `${theme.spacing[1]} ${theme.spacing[2]}`};
+    font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  }
+`;
+
+export const StyledColorChip = styled.div<{ $color: string }>`
+  width: 24px;
+  height: 24px;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  ${({ $color }) => {
+    const colorMapping = getColorMapping($color);
+    return `background: ${colorMapping.background};`;
+  }}
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+`;
+
+export const StyledClickableArea = styled.div<{ $isAuthenticated?: boolean }>`
+  cursor: ${({ $isAuthenticated }) => $isAuthenticated ? 'pointer' : 'default'};
 `;

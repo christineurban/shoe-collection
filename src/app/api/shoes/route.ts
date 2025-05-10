@@ -47,58 +47,51 @@ export async function GET(request: Request) {
       ];
     }
 
-    // Add brand filter if provided
+    // Add filters using the name fields directly
     if (brands.length > 0) {
-      where.brand_id = { in: brands };
+      where.brand = { name: { in: brands } };
     }
 
-    // Add color filter if provided
     if (colors.length > 0) {
-      where.color_id = { in: colors };
+      where.color = { name: { in: colors } };
     }
 
-    // Add dress style filter if provided
     if (dressStyles.length > 0) {
-      where.dress_style_id = { in: dressStyles };
+      where.dress_style = { name: { in: dressStyles } };
     }
 
-    // Add shoe type filter if provided
     if (shoeTypes.length > 0) {
-      where.shoe_type_id = { in: shoeTypes };
+      where.shoe_type = { name: { in: shoeTypes } };
     }
 
-    // Add heel type filter if provided
     if (heelTypes.length > 0) {
-      where.heel_type_id = { in: heelTypes };
+      where.heel_type = { name: { in: heelTypes } };
     }
 
-    // Add location filter if provided
     if (locations.length > 0) {
-      where.location_id = { in: locations };
+      where.location = { name: { in: locations } };
     }
 
-    // Get all shoes that match the filters
-    const shoes = await prisma.shoes.findMany({
-      where,
-      include: {
-        brand: true,
-        color: true,
-        dress_style: true,
-        shoe_type: true,
-        heel_type: true,
-        location: true
-      },
-      orderBy: {
-        created_at: 'desc'
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-
-    // Get total count for pagination
-    const total = await prisma.shoes.count({
-      where,
-    });
+    // Get all shoes that match the filters and total count in a single query
+    const [shoes, total] = await Promise.all([
+      prisma.shoes.findMany({
+        where,
+        include: {
+          brand: true,
+          color: true,
+          dress_style: true,
+          shoe_type: true,
+          heel_type: true,
+          location: true
+        },
+        orderBy: {
+          created_at: 'desc'
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.shoes.count({ where })
+    ]);
 
     const totalPages = Math.ceil(total / limit);
 

@@ -10,8 +10,12 @@ import {
   StyledImageContainer,
   StyledImage,
   StyledContent,
-  StyledName,
+  StyledMetadata,
+  StyledBrandNameContainer,
   StyledBrand,
+  StyledTitle,
+  StyledTag,
+  StyledTagsContainer,
   StyledChooseImageButton,
   StyledClickableArea
 } from './index.styled';
@@ -21,10 +25,6 @@ interface ShoeCardProps {
   brand: string;
   name: string;
   imageUrl: string | null;
-  color?: string;
-  dressStyle?: string;
-  shoeType?: string;
-  heelType?: string;
   location?: string;
   onChooseImage?: (id: string) => void;
 }
@@ -34,10 +34,6 @@ export const ShoeCard: FC<ShoeCardProps> = ({
   brand,
   name,
   imageUrl,
-  color = '',
-  dressStyle = '',
-  shoeType = '',
-  heelType = '',
   location = '',
   onChooseImage
 }) => {
@@ -131,15 +127,23 @@ export const ShoeCard: FC<ShoeCardProps> = ({
             );
           })()}
         </StyledClickableArea>
-        <StyledContent onClick={handleContentClick}>
-          <StyledBrand>{brand}</StyledBrand>
-          <StyledName>{name}</StyledName>
-          {color && <div>Color: {color}</div>}
-          {dressStyle && <div>Style: {dressStyle}</div>}
-          {shoeType && <div>Type: {shoeType}</div>}
-          {heelType && <div>Heel: {heelType}</div>}
-          {location && <div>Location: {location}</div>}
-        </StyledContent>
+
+        <StyledClickableArea
+          as={StyledContent}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleContentClick();
+          }}
+          $isAuthenticated={isAuthenticated}
+        >
+          <StyledMetadata>
+            <StyledBrandNameContainer>
+              <StyledBrand>{brand}</StyledBrand>
+              <StyledTitle>{name}</StyledTitle>
+            </StyledBrandNameContainer>
+            {location && <StyledTag $type="location">{location}</StyledTag>}
+          </StyledMetadata>
+        </StyledClickableArea>
       </StyledCard>
     </>
   );

@@ -53,16 +53,6 @@ export const StyledEmptyState = styled.div`
   }
 `;
 
-export const StyledToggleContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  @media (min-width: 768px) {
-    display: none;
-  }
-`;
-
 export const StyledViewToggle = styled.button<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
@@ -86,5 +76,15 @@ export const StyledViewToggle = styled.button<{ $isActive: boolean }>`
   &:hover {
     background: ${({ theme }) => theme.colors.primary[500]};
     color: white;
+  }
+`;
+
+export const StyledToggleContainer = styled.div`
+  display: none;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    display: flex;
   }
 `;
