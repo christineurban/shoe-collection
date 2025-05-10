@@ -1,150 +1,138 @@
 import styled from 'styled-components';
 
 export const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[4]};
-  padding: ${({ theme }) => theme.spacing[4]};
-  background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  border: 1px solid ${({ theme }) => theme.colors.border.medium};
+  width: 100%;
 `;
 
 export const StyledImageContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 300px;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  aspect-ratio: 1;
+  background: ${({ theme }) => theme.colors.background.muted};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    margin: 0;
+    color: ${({ theme }) => theme.colors.text.secondary};
+    font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  }
 `;
 
-export const StyledImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-export const StyledContent = styled.div`
+export const StyledImageActions = styled.div`
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[4]};
+  gap: 0.5rem;
+
+  button {
+    width: 100%;
+  }
 `;
 
-export const StyledName = styled.h2`
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.xl};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.bold};
-  margin: 0;
-`;
-
-export const StyledBrand = styled.h3`
+export const StyledDisabledMessage = styled.p`
   color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.lg};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
+  text-align: center;
+  padding: 1rem;
+  background-color: ${({ theme }) => theme.colors.background.secondary};
+  border-radius: 4px;
   margin: 0;
 `;
 
 export const StyledDetails = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${({ theme }) => theme.spacing[4]};
-`;
+  grid-template-columns: 350px 1fr;
+  gap: 4rem;
+  align-items: flex-start;
 
-export const StyledDetailItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[1]};
-`;
-
-export const StyledDetailLabel = styled.span`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-`;
-
-export const StyledDetailValue = styled.span`
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-`;
-
-export const StyledNotes = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[2]};
-  padding: ${({ theme }) => theme.spacing[4]};
-  background: ${({ theme }) => theme.colors.gray[50]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-`;
-
-export const StyledNotesLabel = styled.span`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-`;
-
-export const StyledNotesContent = styled.p`
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  margin: 0;
-  white-space: pre-wrap;
-`;
-
-export const StyledChooseImageButton = styled.button`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: ${({ theme }) => theme.spacing[2]};
-  width: 100%;
-  height: 100%;
-  background: ${({ theme }) => theme.colors.gray[100]};
-  border: 2px dashed ${({ theme }) => theme.colors.border.medium};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.base};
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.gray[200]};
-    border-color: ${({ theme }) => theme.colors.primary[500]};
-    color: ${({ theme }) => theme.colors.primary[500]};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 `;
 
-export const StyledChooseImageIcon = styled.span`
-  font-size: ${({ theme }) => theme.typography.fontSize.xl};
-`;
+export const StyledDetailsContent = styled.div`
+  background: ${({ theme }) => theme.colors.background.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  padding: 2rem;
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  border: 1px solid ${({ theme }) => theme.colors.border.medium};
 
-export const StyledChooseImageText = styled.span`
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-`;
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
 
-export const StyledLoadingSpinner = styled.div`
-  width: 24px;
-  height: 24px;
-  border: 2px solid ${({ theme }) => theme.colors.primary[100]};
-  border-top-color: ${({ theme }) => theme.colors.primary[500]};
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  h2 {
+    font-size: ${({ theme }) => theme.typography.fontSize.xl};
+    color: ${({ theme }) => theme.colors.text.primary};
+    margin: 0 0 2rem 0;
+    font-weight: ${({ theme }) => theme.typography.fontWeights.semibold};
+    padding-bottom: 1rem;
+    border-bottom: 2px solid ${({ theme }) => theme.colors.border.dark};
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
+    @media (max-width: 768px) {
+      font-size: ${({ theme }) => theme.typography.fontSize.lg};
+      margin: 0 0 1.5rem 0;
     }
   }
-`;
 
-export const StyledLoadingText = styled.span`
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  p {
+    margin: 0;
+    padding: 1rem 0;
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    line-height: 1.6;
+    color: ${({ theme }) => theme.colors.text.secondary};
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.border.medium};
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.75rem 0;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+
+    strong {
+      color: ${({ theme }) => theme.colors.text.primary};
+      margin-right: 1rem;
+      min-width: 140px;
+      font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
+
+      @media (max-width: 768px) {
+        min-width: auto;
+        margin-right: 0;
+      }
+    }
+
+    a {
+      color: ${({ theme }) => theme.colors.primary[500]};
+      text-decoration: none;
+      transition: color ${({ theme }) => theme.transitions.base};
+      padding: 0.25rem 0.75rem;
+      border-radius: ${({ theme }) => theme.borderRadius.md};
+      background: ${({ theme }) => theme.colors.primary[50]};
+      font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
+      word-break: break-all;
+
+      &:hover {
+        color: ${({ theme }) => theme.colors.primary[600]};
+        background: ${({ theme }) => theme.colors.primary[100]};
+      }
+    }
+  }
 `;
