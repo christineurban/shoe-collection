@@ -116,7 +116,7 @@ export const ShoeGrid = ({
         ) : (
           <StyledEmptyState>
             <h2>No Shoes Found</h2>
-            <p>Try adjusting your filters to find what you're looking for.</p>
+            <p>Try adjusting your filters to find what you&apos;re looking for.</p>
           </StyledEmptyState>
         )}
       </StyledGrid>

@@ -19,6 +19,7 @@ interface MultiSelectProps {
   renderOption?: (option: string) => React.ReactNode;
   renderSelectedPreview?: (values: string[]) => React.ReactNode;
   disableSearch?: boolean;
+  'data-error'?: boolean;
 }
 
 export const MultiSelect = ({
@@ -29,6 +30,7 @@ export const MultiSelect = ({
   renderOption,
   renderSelectedPreview,
   disableSearch = false,
+  'data-error': hasError,
 }: MultiSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -137,6 +139,7 @@ export const MultiSelect = ({
         type="button"
         onClick={handleButtonClick}
         $isOpen={isOpen}
+        data-error={hasError}
       >
         {values.length > 0 ? (
           renderSelectedPreview ? renderSelectedPreview(values) : renderDefaultSelectedPreview()

@@ -53,7 +53,7 @@ export function Nav() {
   return (
     <StyledNav>
       <StyledContainer>
-        <StyledLogo href="/">Christine's Shoe Collection 👡</StyledLogo>
+        <StyledLogo href="/">Christine&apos;s Shoe Collection 👡</StyledLogo>
         <StyledHamburger
           onClick={toggleMenu}
           onBlur={handleBlur}

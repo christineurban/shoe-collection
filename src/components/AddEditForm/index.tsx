@@ -90,6 +90,19 @@ function AddEditFormContent({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
+  const scrollToFirstError = () => {
+    setTimeout(() => {
+      const firstErrorElement = document.querySelector('[data-error="true"]');
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+    }, 100);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -106,6 +119,7 @@ function AddEditFormContent({
     setFormErrors(errors);
     setIsLoading(false);
     if (Object.keys(errors).length > 0) {
+      scrollToFirstError();
       return;
     }
 
@@ -334,6 +348,7 @@ function AddEditFormContent({
                   }
                 }}
                 isBrand={true}
+                data-error={!!formErrors.brand}
               />
               {formErrors.brand && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.brand}</span>}
             </StyledFormGroup>
@@ -343,6 +358,7 @@ function AddEditFormContent({
                 values={formData.colors}
                 options={colors}
                 onChange={(newColors) => setFormData({ ...formData, colors: newColors })}
+                data-error={!!formErrors.colors}
               />
               {formErrors.colors && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.colors}</span>}
             </StyledFormGroup>
@@ -359,6 +375,7 @@ function AddEditFormContent({
                 options={dressStyles}
                 placeholder="Select dress style"
                 onChange={(value) => handleSelectChange('dressStyle', value)}
+                data-error={!!formErrors.dressStyle}
               />
               {formErrors.dressStyle && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.dressStyle}</span>}
             </StyledFormGroup>
@@ -369,6 +386,7 @@ function AddEditFormContent({
                 options={shoeTypes}
                 placeholder="Select shoe type"
                 onChange={(value) => handleSelectChange('shoeType', value)}
+                data-error={!!formErrors.shoeType}
               />
               {formErrors.shoeType && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.shoeType}</span>}
             </StyledFormGroup>
@@ -382,6 +400,7 @@ function AddEditFormContent({
                 options={heelTypes}
                 placeholder="Select heel type"
                 onChange={(value) => handleSelectChange('heelType', value)}
+                data-error={!!formErrors.heelType}
               />
               {formErrors.heelType && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.heelType}</span>}
             </StyledFormGroup>
@@ -392,6 +411,7 @@ function AddEditFormContent({
                 options={locations}
                 placeholder="Select location"
                 onChange={(value) => handleSelectChange('location', value)}
+                data-error={!!formErrors.location}
               />
               {formErrors.location && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.location}</span>}
             </StyledFormGroup>

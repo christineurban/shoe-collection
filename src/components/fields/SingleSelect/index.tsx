@@ -20,9 +20,10 @@ interface SingleSelectProps {
   disableSearch?: boolean;
   isBrand?: boolean;
   isColor?: boolean;
+  'data-error'?: boolean;
 }
 
-export const SingleSelect = ({ value, options, placeholder = 'Select...', onChange, onOptionsChange, disableSearch = false, isBrand = false, isColor = false }: SingleSelectProps) => {
+export const SingleSelect = ({ value, options, placeholder = 'Select...', onChange, onOptionsChange, disableSearch = false, isBrand = false, isColor = false, 'data-error': hasError }: SingleSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -123,6 +124,7 @@ export const SingleSelect = ({ value, options, placeholder = 'Select...', onChan
           type="button"
           onClick={handleButtonClick}
           $isOpen={isOpen}
+          data-error={hasError}
         >
           {value || placeholder}
         </StyledButton>
@@ -159,7 +161,7 @@ export const SingleSelect = ({ value, options, placeholder = 'Select...', onChan
             type="button"
             onClick={handleCreateNew}
           >
-            Create new {isBrand ? 'brand' : 'color'}: "{searchTerm.trim()}"
+            Create new {isBrand ? 'brand' : 'color'}: &ldquo;{searchTerm.trim()}&rdquo;
           </StyledCreateNew>
         )}
         {filteredOptions.length === 0 && !searchTerm.trim() && (
