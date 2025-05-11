@@ -7,8 +7,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 import { Shoe } from '@/types/shoe';
 import {
-  StyledLink,
-  StyledButtonGroup,
+  StyledLink
 } from './page.styled';
 
 export default function SelectImagePage({ params }: { params: { id: string } }) {
