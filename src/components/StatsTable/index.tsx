@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, ChangeEvent } from 'react';
+import { useState, useMemo } from 'react';
 import { StatItem } from '@/types/stats';
 import { StyledTable, StyledTableCell, StyledTableHeader, StyledTableRow, StyledTableControls, StyledSortButton } from './index.styled';
 import { Input } from '@/components/fields/Input';

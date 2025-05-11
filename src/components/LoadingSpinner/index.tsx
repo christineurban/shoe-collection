@@ -1,5 +1,4 @@
 import { StyledLoadingOverlay, StyledSpinner, StyledSpinnerContainer, StyledLoadingText } from './index.styled';
-import { motion } from 'framer-motion';
 
 interface LoadingSpinnerProps {
   text?: string;

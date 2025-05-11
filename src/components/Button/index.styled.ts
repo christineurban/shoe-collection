@@ -2,7 +2,6 @@
 
 import styled, { css } from 'styled-components';
 import { formStyles } from '@/theme/form';
-import { Theme } from '@/theme/types';
 
 interface StyledButtonProps {
   $variant?: 'danger' | 'secondary' | 'tertiary';

@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
 import { uploadImageToSupabase } from '@/lib/utils/image';
 
 const prisma = new PrismaClient();

@@ -1,7 +1,6 @@
 'use client';
 
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
 export const StyledForm = styled.form`
   width: 100%;

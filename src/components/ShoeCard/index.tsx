@@ -2,7 +2,6 @@
 
 import { FC, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import {
@@ -15,7 +14,6 @@ import {
   StyledBrand,
   StyledTitle,
   StyledTag,
-  StyledTagsContainer,
   StyledChooseImageButton,
   StyledClickableArea
 } from './index.styled';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, FormEvent, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import {
@@ -9,7 +9,6 @@ import {
   StyledSortControls,
   StyledSortButton,
   StyledAddForm,
-  StyledMessage,
   StyledViewControls,
   StyledViewButton,
   StyledInputContainer,
@@ -18,24 +17,17 @@ import {
   StyledNote,
   StyledAddButtonContainer,
   StyledScrollIndicator,
-  StyledDashboard,
-  StyledAttributeSection
+  StyledDashboard
 } from './page.styled';
-import { BsGrid, BsTable, BsTrash, BsChevronDown } from 'react-icons/bs';
-import { Table } from '@/components/Table';
-import { Tabs } from '@/components/Tabs';
+import { BsGrid, BsTable, BsChevronDown } from 'react-icons/bs';
 import { Input } from '@/components/fields/Input';
 import { Button } from '@/components/Button';
 import { Tile } from '@/components/Tile';
 import { Modal } from '@/components/Modal';
 import { SuccessMessage } from '@/components/SuccessMessage';
-import { StyledNameCell, StyledPercentageHeader } from '@/components/Table/index.styled';
-import { Tooltip } from 'react-tooltip';
 import { Stats } from '@/types/stats';
 import { Attribute } from '@/types/attribute';
 import { AttributeTable } from '@/components/AttributeTable';
-import { AttributeCard } from '@/components/AttributeCard';
-import { AddAttributeForm } from '@/components/AddAttributeForm';
 
 type SortOrder = 'name-asc' | 'name-desc' | 'count-asc' | 'count-desc';
 type ViewMode = 'card' | 'table';

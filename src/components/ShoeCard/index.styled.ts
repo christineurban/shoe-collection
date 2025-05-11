@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { getColorMapping, getTextColor } from '@/utils/colors';
+import { getColorMapping } from '@/utils/colors';
 import Image from 'next/image';
 
 export const StyledCard = styled.div<{ $isAuthenticated?: boolean }>`

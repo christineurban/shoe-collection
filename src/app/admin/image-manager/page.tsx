@@ -11,7 +11,6 @@ import {
   StyledDeleteButton,
   StyledSaveButton,
   StyledHeaderContainer,
-  StyledErrorMessage,
 } from './page.styled';
 
 interface Shoe {

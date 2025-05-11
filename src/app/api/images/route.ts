@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { FileObject } from '@supabase/storage-js';
 import { supabaseAdmin } from '@/lib/supabase';
 
 const prisma = new PrismaClient();

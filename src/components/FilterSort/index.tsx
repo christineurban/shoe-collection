@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getColorMapping, getTextColor } from '@/utils/colors';
 import { SingleSelect } from '@/components/fields/SingleSelect';
 import { MultiSelect } from '@/components/fields/MultiSelect';
 import { Button } from '@/components/Button';
@@ -17,10 +16,7 @@ import {
   StyledFilterGroup,
   StyledFilterHeader,
   StyledLabel,
-  StyledColorPreview,
-  StyledColorOption,
   StyledClearButton,
-  StyledOption,
   StyledCountDisplay,
   StyledHeader,
   StyledToggleButton,
@@ -32,7 +28,6 @@ import {
   StyledDrawerCloseButton,
   StyledFilterCountBadge,
 } from './index.styled';
-import { StyledTag } from '@/components/fields/MultiSelect/index.styled';
 
 interface Option {
   value: string;

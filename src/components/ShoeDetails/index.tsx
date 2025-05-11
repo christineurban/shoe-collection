@@ -1,8 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
@@ -12,7 +10,6 @@ import {
   StyledContainer,
   StyledDetails,
   StyledImageContainer,
-  StyledImageActions,
   StyledDetailsContent,
   StyledDisabledMessage
 } from './index.styled';

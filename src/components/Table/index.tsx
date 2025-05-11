@@ -5,8 +5,7 @@ import {
   StyledTable,
   StyledTableCell,
   StyledTableHeader,
-  StyledTableRow,
-  StyledTableControls
+  StyledTableRow
 } from './index.styled';
 
 interface Column<T> {

@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { ShoeDetails } from '@/components/ShoeDetails';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 import { getShoeById } from '@/lib/api/shoe';

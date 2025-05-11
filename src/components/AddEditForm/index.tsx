@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '../Button';
 import { SingleSelect } from '../fields/SingleSelect';
 import { MultiSelect } from '../fields/MultiSelect';
-import { Input } from '../fields/Input';
 import { SuccessMessage } from '@/components/SuccessMessage';
 import { FaCamera } from 'react-icons/fa';
 import {
