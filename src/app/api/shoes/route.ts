@@ -26,15 +26,12 @@ export async function GET(request: Request) {
       if (hasImage === 'true') {
         where.AND = [{
           NOT: {
-            OR: [
-              { image_url: null },
-              { image_url: 'n/a' }
-            ]
+            image_url: null
           }
         }];
       } else {
         where.AND = [{
-          image_url: null // Only include shoes with no image, exclude 'n/a'
+          image_url: null
         }];
       }
     }
@@ -133,8 +130,7 @@ export async function GET(request: Request) {
         dressStyle: shoe.dress_style.name,
         shoeType: shoe.shoe_type.name,
         heelType: shoe.heel_type.name,
-        location: shoe.location.name,
-        noImageAvailable: shoe.image_url === 'n/a'
+        location: shoe.location.name
       })),
       total,
       page,

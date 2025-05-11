@@ -77,32 +77,6 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    // If marking as no image available (imageUrl === 'n/a')
-    if (imageUrl === 'n/a') {
-      // If there was an existing image, delete it from storage
-      if (currentShoe.image_url && currentShoe.image_url !== 'n/a') {
-        await deleteImageFromSupabase(currentShoe.image_url);
-      }
-
-      // Update database to mark as no image available
-      const updatedShoe = await prisma.shoes.update({
-        where: { id },
-        data: {
-          image_url: 'n/a',
-          updated_at: new Date()
-        },
-        include: {
-          brand: true
-        }
-      });
-
-      return NextResponse.json({
-        success: true,
-        data: updatedShoe,
-        message: 'Marked as no image available'
-      });
-    }
-
     // Regular image update flow
     if (!imageUrl) {
       return NextResponse.json(
@@ -143,9 +117,7 @@ export async function POST(request: Request) {
       console.log('Supabase upload successful, URL:', supabaseUrl);
 
       // Delete old image if it exists and is different from new one
-      if (currentShoe.image_url &&
-        currentShoe.image_url !== 'n/a' &&
-        currentShoe.image_url !== supabaseUrl) {
+      if (currentShoe.image_url && currentShoe.image_url !== supabaseUrl) {
         const oldFileName = getFilenameFromUrl(currentShoe.image_url);
         if (oldFileName) {
           await deleteImageFromSupabase(currentShoe.image_url);

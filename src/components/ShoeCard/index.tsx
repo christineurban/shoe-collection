@@ -71,22 +71,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
           $isAuthenticated={isAuthenticated}
         >
           {(() => {
-            // Case 1: Marked as no image available
-            if (imageUrl === 'n/a') {
-              return (
-                <StyledChooseImageButton
-                  type="button"
-                  aria-label="View details for shoe"
-                  $isNoImage
-                  $isAuthenticated={isAuthenticated}
-                >
-                  ❌ Marked as no image
-                </StyledChooseImageButton>
-              );
-            }
-
-            // Case 2: Has an actual image
-            if (imageUrl && imageUrl !== 'n/a') {
+            if (imageUrl) {
               return (
                 <StyledImage
                   src={imageUrl}
@@ -97,7 +82,6 @@ export const ShoeCard: FC<ShoeCardProps> = ({
               );
             }
 
-            // Case 3: No image (null or undefined)
             return (
               <StyledChooseImageButton
                 type="button"

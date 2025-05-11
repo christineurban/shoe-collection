@@ -45,15 +45,13 @@ function ShoeDetailsContent({ shoe, title }: ShoeDetailsProps) {
       <StyledDetails>
         <div>
           <StyledImageContainer>
-            {shoe.imageUrl && shoe.imageUrl !== 'n/a' ? (
+            {shoe.imageUrl ? (
               <Image
                 src={shoe.imageUrl}
                 alt={`${shoe.brand} ${shoe.heelType} ${shoe.shoeType}`}
                 fill
                 priority
               />
-            ) : shoe.imageUrl === 'n/a' ? (
-              <p>❌ Marked as no image</p>
             ) : (
               <p>No image</p>
             )}

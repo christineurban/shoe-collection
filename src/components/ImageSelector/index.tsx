@@ -147,49 +147,6 @@ export const ImageSelector = ({
     }
   };
 
-  const handleMarkNoImage = async () => {
-    if (bulkMode && onImageSelected) {
-      onImageSelected(shoe.id, 'n/a');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-
-      const response = await fetch('/api/update-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: shoe.id,
-          imageUrl: 'n/a'
-        }),
-      });
-
-      if (response.ok) {
-        setSuccessMessage('Marked as no image available!');
-        setIsSuccess(true);
-        if (onImageSaved) {
-          setTimeout(() => {
-            onImageSaved();
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            setIsSuccess(false);
-          }, 1500);
-        }
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to mark as no image available');
-      }
-    } catch (error) {
-      console.error('Error marking as no image available:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
@@ -223,13 +180,6 @@ export const ImageSelector = ({
               </div>
               <StyledActionsContainer>
                 <StyledButtonGroup>
-                  <Button
-                    onClick={handleMarkNoImage}
-                    disabled={bulkMode ? false : isSaving}
-                    $variant="tertiary"
-                  >
-                    Mark as No Image Available
-                  </Button>
                   {!bulkMode && (
                     <Button
                       onClick={handleSaveImage}
@@ -245,7 +195,7 @@ export const ImageSelector = ({
 
           {!isCollapsed && (
             <>
-              {shoe.imageUrl && shoe.imageUrl !== 'n/a' && (
+              {shoe.imageUrl && (
                 <StyledCurrentImageContainer>
                   <h3>Current Image</h3>
                   <StyledCurrentImage
@@ -257,7 +207,7 @@ export const ImageSelector = ({
 
               <ImagePasteZone onImagePasted={handlePastedImage} />
 
-              {selectedImage && selectedImage !== 'n/a' && (
+              {selectedImage && (
                 <StyledImagePreviewContainer>
                   <h3>Preview Image</h3>
                   <StyledImage

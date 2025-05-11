@@ -39,16 +39,13 @@ export const StyledImageContainer = styled.div`
   overflow: hidden;
 `;
 
-export const StyledChooseImageButton = styled.button<{ $isNoImage?: boolean; $isAuthenticated?: boolean }>`
+export const StyledChooseImageButton = styled.button<{ $isAuthenticated?: boolean }>`
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${({ theme, $isNoImage }) =>
-    $isNoImage
-      ? theme.colors.gray[200]
-      : theme.colors.background.muted};
+  background-color: ${({ theme }) => theme.colors.background.muted};
   color: ${({ theme }) => theme.colors.text.secondary};
   border: none;
   cursor: ${({ $isAuthenticated }) => $isAuthenticated ? 'pointer' : 'default'};
@@ -56,11 +53,9 @@ export const StyledChooseImageButton = styled.button<{ $isNoImage?: boolean; $is
   font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
   transition: ${({ theme }) => theme.transitions.base};
 
-  ${({ $isAuthenticated, theme, $isNoImage }) => $isAuthenticated && `
+  ${({ $isAuthenticated, theme }) => $isAuthenticated && `
     &:hover {
-      background-color: ${$isNoImage
-        ? theme.colors.gray[300]
-        : theme.colors.gray[200]};
+      background-color: ${theme.colors.gray[200]};
       color: ${theme.colors.gray[700]};
     }
   `}
