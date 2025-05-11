@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AddEditForm } from '@/components/AddEditForm';
-import type { Shoe, ShoeWithRelations } from '@/types/shoe';
+import type { Shoe } from '@/types/shoe';
 import { PageHeader } from '@/components/PageHeader';
 import { StyledContainer } from '@/app/shoe/add/page.styled';
 
@@ -45,18 +45,22 @@ export default function EditShoePage({ params }: { params: { id: string } }) {
           optionsResponse.json()
         ]);
 
-        // Convert ShoeWithRelations to Shoe
+        if (!shoeData || !shoeData.brand || !shoeData.heelType || !shoeData.shoeType) {
+          throw new Error('Invalid shoe data');
+        }
+
+        // Convert API response to Shoe type
         const convertedShoe: Shoe = {
           id: shoeData.id,
-          name: `${shoeData.brand.name} ${shoeData.heel_type.name} ${shoeData.shoe_type.name}`,
-          brand: shoeData.brand.name,
-          imageUrl: shoeData.image_url,
-          colors: shoeData.colors.map((c: { color: { name: string } }) => c.color.name),
-          dressStyle: shoeData.dress_style.name,
-          shoeType: shoeData.shoe_type.name,
-          heelType: shoeData.heel_type.name,
-          location: shoeData.location.name,
-          notes: shoeData.notes
+          brand: shoeData.brand,
+          name: `${shoeData.brand} ${shoeData.heelType} ${shoeData.shoeType}`,
+          imageUrl: shoeData.imageUrl,
+          colors: shoeData.colors || [],
+          dressStyle: shoeData.dressStyle,
+          shoeType: shoeData.shoeType,
+          heelType: shoeData.heelType,
+          location: shoeData.location,
+          notes: shoeData.notes || ''
         };
 
         setShoe(convertedShoe);
