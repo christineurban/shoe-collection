@@ -26,7 +26,6 @@ interface ShoeCardProps {
   name: string;
   imageUrl: string | null;
   location?: string;
-  onChooseImage?: (id: string) => void;
 }
 
 export const ShoeCard: FC<ShoeCardProps> = ({
@@ -34,30 +33,16 @@ export const ShoeCard: FC<ShoeCardProps> = ({
   brand,
   name,
   imageUrl,
-  location = '',
-  onChooseImage
+  location = ''
 }) => {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleContentClick = () => {
+  const handleClick = () => {
     if (isAuthenticated) {
       setIsLoading(true);
       router.push(`/shoe/${id}`);
-    }
-  };
-
-  const handleImageAreaClick = () => {
-    if (!isAuthenticated) return;
-
-    // Go to details page if we have any image (including 'n/a')
-    if (imageUrl !== null) {
-      setIsLoading(true);
-      router.push(`/shoe/${id}`);
-    } else {
-      // Only go to image selection if there's no image at all
-      onChooseImage?.(id);
     }
   };
 
@@ -66,7 +51,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
 
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleContentClick();
+      handleClick();
     }
   };
 
@@ -82,10 +67,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
       >
         <StyledClickableArea
           as={StyledImageContainer}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleImageAreaClick();
-          }}
+          onClick={handleClick}
           $isAuthenticated={isAuthenticated}
         >
           {(() => {
@@ -119,10 +101,10 @@ export const ShoeCard: FC<ShoeCardProps> = ({
             return (
               <StyledChooseImageButton
                 type="button"
-                aria-label="Choose image for shoe"
+                aria-label="View details for shoe"
                 $isAuthenticated={isAuthenticated}
               >
-                Choose Image
+                No Image
               </StyledChooseImageButton>
             );
           })()}
@@ -130,10 +112,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
 
         <StyledClickableArea
           as={StyledContent}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleContentClick();
-          }}
+          onClick={handleClick}
           $isAuthenticated={isAuthenticated}
         >
           <StyledMetadata>

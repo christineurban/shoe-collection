@@ -145,8 +145,11 @@ export const StyledImagePreview = styled.div`
   }
 `;
 
-export const StyledImageCaptureButton = styled.button`
-  background: ${({ theme }) => theme.colors.primary[500]};
+export const StyledImageCaptureButton = styled.button<{ $variant?: 'danger' }>`
+  background: ${({ theme, $variant }) =>
+    $variant === 'danger'
+      ? theme.colors.error[500]
+      : theme.colors.primary[500]};
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -164,7 +167,10 @@ export const StyledImageCaptureButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.primary[600]};
+    background: ${({ theme, $variant }) =>
+      $variant === 'danger'
+        ? theme.colors.error[600]
+        : theme.colors.primary[600]};
   }
 
   &:active {

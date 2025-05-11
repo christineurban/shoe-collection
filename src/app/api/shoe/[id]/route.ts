@@ -6,6 +6,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log('Fetching shoe with ID:', params.id);
     const shoe = await prisma.shoes.findUnique({
       where: { id: params.id },
       include: {
@@ -22,7 +23,10 @@ export async function GET(
       }
     });
 
+    console.log('Found shoe:', shoe);
+
     if (!shoe) {
+      console.log('Shoe not found in database');
       return NextResponse.json(
         { error: 'Shoe not found' },
         { status: 404 }
@@ -58,19 +62,32 @@ export async function PUT(
     const data = await request.json();
 
     // Get all the required IDs
-    const [brand, color, dressStyle, shoeType, heelType, location] = await Promise.all([
+    const [brand, dressStyle, shoeType, heelType, location] = await Promise.all([
       prisma.brands.findUnique({ where: { name: data.brand } }),
-      prisma.colors.findUnique({ where: { name: data.color } }),
       prisma.dress_styles.findUnique({ where: { name: data.dressStyle } }),
       prisma.shoe_types.findUnique({ where: { name: data.shoeType } }),
       prisma.heel_types.findUnique({ where: { name: data.heelType } }),
       prisma.locations.findUnique({ where: { name: data.location } })
     ]);
 
-    if (!brand || !color || !dressStyle || !shoeType || !heelType || !location) {
+    if (!brand || !dressStyle || !shoeType || !heelType || !location) {
       return NextResponse.json(
         { error: 'One or more required attributes not found' },
         { status: 404 }
+      );
+    }
+
+    // Get color IDs for all selected colors
+    const colorPromises = data.colors.map((colorName: string) =>
+      prisma.colors.findUnique({ where: { name: colorName } })
+    );
+    const colorResults = await Promise.all(colorPromises);
+    const colors = colorResults.filter((color): color is NonNullable<typeof color> => color !== null);
+
+    if (colors.length === 0) {
+      return NextResponse.json(
+        { error: 'At least one color must be selected' },
+        { status: 400 }
       );
     }
 
@@ -87,10 +104,10 @@ export async function PUT(
         updated_at: new Date(),
         colors: {
           deleteMany: {},
-          create: [{
+          create: colors.map(color => ({
             color_id: color.id,
             updated_at: new Date()
-          }]
+          }))
         }
       },
       include: {

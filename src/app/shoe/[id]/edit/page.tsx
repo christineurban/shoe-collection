@@ -45,7 +45,17 @@ export default function EditShoePage({ params }: { params: { id: string } }) {
           optionsResponse.json()
         ]);
 
-        if (!shoeData || !shoeData.brand || !shoeData.heelType || !shoeData.shoeType) {
+        console.log('Received shoe data:', shoeData);
+
+        if (!shoeData || !shoeData.brand || !shoeData.heelType || !shoeData.shoeType || !shoeData.dressStyle || !shoeData.location) {
+          console.error('Missing required fields:', {
+            hasData: !!shoeData,
+            brand: shoeData?.brand,
+            heelType: shoeData?.heelType,
+            shoeType: shoeData?.shoeType,
+            dressStyle: shoeData?.dressStyle,
+            location: shoeData?.location
+          });
           throw new Error('Invalid shoe data');
         }
 
@@ -54,8 +64,8 @@ export default function EditShoePage({ params }: { params: { id: string } }) {
           id: shoeData.id,
           brand: shoeData.brand,
           name: `${shoeData.brand} ${shoeData.heelType} ${shoeData.shoeType}`,
-          imageUrl: shoeData.imageUrl,
-          colors: shoeData.colors || [],
+          imageUrl: shoeData.imageUrl || null,
+          colors: shoeData.colors,
           dressStyle: shoeData.dressStyle,
           shoeType: shoeData.shoeType,
           heelType: shoeData.heelType,

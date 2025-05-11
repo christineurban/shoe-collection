@@ -7,6 +7,16 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
+    // Validate all required fields
+    const requiredFields = ['brand', 'colors', 'dressStyle', 'shoeType', 'heelType', 'location'];
+    const missingFields = requiredFields.filter(field => !data[field] || (field === 'colors' && data[field].length === 0));
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
     // Get or create brand
     let brand = await prisma.brands.findUnique({ where: { name: data.brand } });
     if (!brand) {
@@ -20,21 +30,74 @@ export async function POST(request: Request) {
       console.log('Created new brand:', brand.name);
     }
 
-    // Get all the required IDs
+    // Get or create required attributes
     const [dressStyle, shoeType, heelType, location] = await Promise.all([
-      prisma.dress_styles.findUnique({ where: { name: data.dressStyle } }),
-      prisma.shoe_types.findUnique({ where: { name: data.shoeType } }),
-      prisma.heel_types.findUnique({ where: { name: data.heelType } }),
-      prisma.locations.findUnique({ where: { name: data.location } })
+      prisma.dress_styles.findUnique({ where: { name: data.dressStyle } }).then(style => {
+        if (!style) {
+          return prisma.dress_styles.create({
+            data: {
+              name: data.dressStyle,
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          });
+        }
+        return style;
+      }),
+      prisma.shoe_types.findUnique({ where: { name: data.shoeType } }).then(type => {
+        if (!type) {
+          return prisma.shoe_types.create({
+            data: {
+              name: data.shoeType,
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          });
+        }
+        return type;
+      }),
+      prisma.heel_types.findUnique({ where: { name: data.heelType } }).then(type => {
+        if (!type) {
+          return prisma.heel_types.create({
+            data: {
+              name: data.heelType,
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          });
+        }
+        return type;
+      }),
+      prisma.locations.findUnique({ where: { name: data.location } }).then(loc => {
+        if (!loc) {
+          return prisma.locations.create({
+            data: {
+              name: data.location,
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          });
+        }
+        return loc;
+      })
     ]);
 
-    // Get all color IDs
+    // Get or create colors
     const colorRecords = await Promise.all(
-      data.colors.map((colorName: string) =>
-        prisma.colors.findUnique({ where: { name: colorName } })
-      )
+      data.colors.map(async (colorName: string) => {
+        let color = await prisma.colors.findUnique({ where: { name: colorName } });
+        if (!color) {
+          color = await prisma.colors.create({
+            data: {
+              name: colorName,
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          });
+        }
+        return color;
+      })
     );
-
 
     if (!dressStyle || !shoeType || !heelType || !location) {
       return NextResponse.json(

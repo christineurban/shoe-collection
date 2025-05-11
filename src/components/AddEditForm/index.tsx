@@ -89,10 +89,26 @@ function AddEditFormContent({
   const [successMessage, setSuccessMessage] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.imageUrl || null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    // Validate all required fields
+    const errors: { [key: string]: string } = {};
+    if (!formData.brand) errors.brand = 'Brand is required.';
+    if (!formData.colors || formData.colors.length === 0) errors.colors = 'At least one color is required.';
+    if (!formData.dressStyle) errors.dressStyle = 'Dress style is required.';
+    if (!formData.shoeType) errors.shoeType = 'Shoe type is required.';
+    if (!formData.heelType) errors.heelType = 'Heel type is required.';
+    if (!formData.location) errors.location = 'Location is required.';
+
+    setFormErrors(errors);
+    setIsLoading(false);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
 
     try {
       // If there's a new image, upload it first
@@ -191,10 +207,26 @@ function AddEditFormContent({
 
   const handleSelectChange = (field: keyof AddEditFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation error if field has a value
+    if (value) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   const handleMultiSelectChange = (name: string, values: string[]) => {
     setFormData(prev => ({ ...prev, [name]: values }));
+    // Clear validation error if field has values
+    if (values.length > 0) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleImageCapture = () => {
@@ -226,6 +258,12 @@ function AddEditFormContent({
     // Create a temporary preview URL
     const preview = URL.createObjectURL(file);
     setPreviewUrl(preview);
+  };
+
+  const handleRemoveImage = () => {
+    setPreviewUrl(null);
+    setImageFile(null);
+    setFormData(prev => ({ ...prev, imageUrl: '' }));
   };
 
   return (
@@ -261,6 +299,16 @@ function AddEditFormContent({
                 <FaCamera />
                 Take Photo
               </StyledImageCaptureButton>
+              {isEditing && previewUrl && (
+                <StyledImageCaptureButton
+                  type="button"
+                  onClick={handleRemoveImage}
+                  disabled={isLoading}
+                  $variant="danger"
+                >
+                  Remove Image
+                </StyledImageCaptureButton>
+              )}
             </StyledButtonGroup>
             <StyledImageInput
               ref={fileInputRef}
@@ -288,6 +336,7 @@ function AddEditFormContent({
                 }}
                 isBrand={true}
               />
+              {formErrors.brand && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.brand}</span>}
             </StyledFormGroup>
             <StyledFormGroup>
               <label>Colors *</label>
@@ -296,6 +345,7 @@ function AddEditFormContent({
                 options={colors}
                 onChange={(newColors) => setFormData({ ...formData, colors: newColors })}
               />
+              {formErrors.colors && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.colors}</span>}
             </StyledFormGroup>
           </StyledFormRow>
         </StyledFormSection>
@@ -311,6 +361,7 @@ function AddEditFormContent({
                 placeholder="Select dress style"
                 onChange={(value) => handleSelectChange('dressStyle', value)}
               />
+              {formErrors.dressStyle && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.dressStyle}</span>}
             </StyledFormGroup>
             <StyledFormGroup>
               <label>Shoe Type *</label>
@@ -320,6 +371,7 @@ function AddEditFormContent({
                 placeholder="Select shoe type"
                 onChange={(value) => handleSelectChange('shoeType', value)}
               />
+              {formErrors.shoeType && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.shoeType}</span>}
             </StyledFormGroup>
           </StyledFormRow>
 
@@ -332,6 +384,7 @@ function AddEditFormContent({
                 placeholder="Select heel type"
                 onChange={(value) => handleSelectChange('heelType', value)}
               />
+              {formErrors.heelType && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.heelType}</span>}
             </StyledFormGroup>
             <StyledFormGroup>
               <label>Location *</label>
@@ -341,6 +394,7 @@ function AddEditFormContent({
                 placeholder="Select location"
                 onChange={(value) => handleSelectChange('location', value)}
               />
+              {formErrors.location && <span style={{ color: 'red', fontSize: '0.9em' }}>{formErrors.location}</span>}
             </StyledFormGroup>
           </StyledFormRow>
 

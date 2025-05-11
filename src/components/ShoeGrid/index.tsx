@@ -67,10 +67,6 @@ export const ShoeGrid = ({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const { isAuthenticated } = useAuth();
 
-  const handleChooseImage = (id: string) => {
-    router.push(`/shoe/${id}/select-image`);
-  };
-
   return (
     <>
       <FilterSort
@@ -115,7 +111,6 @@ export const ShoeGrid = ({
               name={shoe.name}
               imageUrl={shoe.imageUrl}
               location={shoe.location}
-              onChooseImage={isAuthenticated ? handleChooseImage : undefined}
             />
           ))
         ) : (
