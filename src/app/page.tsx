@@ -89,26 +89,24 @@ function HomeContent() {
   useEffect(() => {
     const fetchShoes = async () => {
       try {
-        // Build the query string from currentFilters
         const params = new URLSearchParams();
-        if (currentFilters.search) params.set('search', currentFilters.search);
-        if (currentFilters.hasImage) params.set('hasImage', currentFilters.hasImage);
-        if (currentFilters.brand.length > 0) {
-          currentFilters.brand.forEach(brand => params.append('brand', brand.value));
-        }
-        if (currentFilters.dressStyle.length > 0) {
-          currentFilters.dressStyle.forEach(style => params.append('dressStyle', style.value));
-        }
-        if (currentFilters.shoeType.length > 0) {
-          currentFilters.shoeType.forEach(type => params.append('shoeType', type.value));
-        }
-        if (currentFilters.heelType.length > 0) {
-          currentFilters.heelType.forEach(type => params.append('heelType', type.value));
-        }
-        if (currentFilters.location.length > 0) {
-          currentFilters.location.forEach(location => params.append('location', location.value));
-        }
-        params.set('page', currentFilters.page);
+        const search = searchParams.get('search');
+        const hasImage = searchParams.get('hasImage');
+        const brands = searchParams.getAll('brand');
+        const dressStyles = searchParams.getAll('dressStyle');
+        const shoeTypes = searchParams.getAll('shoeType');
+        const heelTypes = searchParams.getAll('heelType');
+        const locations = searchParams.getAll('location');
+        const page = searchParams.get('page') || '1';
+
+        if (search) params.set('search', search);
+        if (hasImage) params.set('hasImage', hasImage);
+        brands.forEach(brand => params.append('brand', brand));
+        dressStyles.forEach(style => params.append('dressStyle', style));
+        shoeTypes.forEach(type => params.append('shoeType', type));
+        heelTypes.forEach(type => params.append('heelType', type));
+        locations.forEach(location => params.append('location', location));
+        params.set('page', page);
         params.set('limit', '45');
 
         const response = await fetch(`/api/shoes?${params.toString()}`);
