@@ -10,8 +10,6 @@ import { PageHeader } from '@/components/PageHeader';
 import { Shoe } from '@/types/shoe';
 import styled from 'styled-components';
 
-
-
 const StyledSaveButton = styled.button`
   background: ${({ theme }) => theme.colors.primary[500]};
   color: white;
@@ -48,20 +46,6 @@ const StyledLoadingContainer = styled.div`
   justify-content: center;
   min-height: 400px;
   gap: 1rem;
-`;
-
-const StyledLoadingSpinner = styled.div`
-  width: 40px;
-  height: 40px;
-  border: 4px solid ${({ theme }) => theme.colors.gray[200]};
-  border-top: 4px solid ${({ theme }) => theme.colors.primary[500]};
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
 `;
 
 interface PageProps {
