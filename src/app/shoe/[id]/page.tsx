@@ -2,6 +2,7 @@ import { ShoeDetails } from '@/components/ShoeDetails';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 import { getShoeById } from '@/lib/api/shoe';
 import { Shoe } from '@/types/shoe';
+import { PageHeader } from '@/components/PageHeader';
 
 interface PageProps {
   params: {
@@ -35,9 +36,10 @@ export default async function ShoePage({ params }: PageProps) {
     );
   } catch (error) {
     return (
-      <div>
-        {error instanceof Error ? error.message : 'An error occurred'}
-      </div>
+      <PageHeader
+        title="Error"
+        description={error instanceof Error ? error.message : 'An error occurred'}
+      />
     );
   }
 }

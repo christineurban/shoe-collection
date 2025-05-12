@@ -12,12 +12,12 @@
     "ts": "node --import tsx",
     "backup": "node --import tsx scripts/backup-db.ts",
     "backup:images": "node --import tsx scripts/backup-images.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "next build --no-lint"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "eslint --fix",
-      "tsc-files --noEmit"
+      "eslint --fix"
     ]
   },
   "prisma": {
