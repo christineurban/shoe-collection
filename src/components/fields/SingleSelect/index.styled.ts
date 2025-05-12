@@ -84,25 +84,14 @@ export const StyledDropdown = styled.div<{ $isOpen: boolean }>`
   z-index: 1000;
   display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 767px) {
+    max-height: 60vh;
+  }
 `;
 
 export const StyledNoMatches = styled.div`
   padding: 0.75rem 1rem;
   color: #666;
-`;
-
-export const StyledCreateNew = styled.button`
-  width: 100%;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.primary[500]};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-  transition: all ${({ theme }) => theme.transitions.base};
-  background: none;
-  border: none;
-  text-align: left;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primary[50]};
-  }
 `;

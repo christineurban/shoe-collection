@@ -10,18 +10,17 @@ import {
   StyledImage,
   StyledContent,
   StyledMetadata,
-  StyledBrandNameContainer,
   StyledBrand,
-  StyledTitle,
   StyledTag,
   StyledChooseImageButton,
-  StyledClickableArea
+  StyledClickableArea,
+  StyledTagsContainer,
+  StyledBrandRow
 } from './index.styled';
 
 interface ShoeCardProps {
   id: string;
   brand: string;
-  name: string;
   imageUrl: string | null;
   location?: string;
   dressStyle: string;
@@ -30,7 +29,6 @@ interface ShoeCardProps {
 export const ShoeCard: FC<ShoeCardProps> = ({
   id,
   brand,
-  name,
   imageUrl,
   location = '',
   dressStyle
@@ -62,7 +60,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
         onKeyDown={handleKeyDown}
         tabIndex={isAuthenticated ? 0 : -1}
         role={isAuthenticated ? "button" : "article"}
-        aria-label={isAuthenticated ? `View details for ${brand} ${name}` : `${brand} ${name}`}
+        aria-label={isAuthenticated ? `View details for ${brand}` : brand}
         $isAuthenticated={isAuthenticated}
       >
         <StyledClickableArea
@@ -75,7 +73,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
               return (
                 <StyledImage
                   src={imageUrl}
-                  alt={`${brand} ${name}`}
+                  alt={brand}
                   width={200}
                   height={200}
                 />
@@ -99,15 +97,16 @@ export const ShoeCard: FC<ShoeCardProps> = ({
           onClick={handleClick}
           $isAuthenticated={isAuthenticated}
         >
-          <StyledMetadata>
-            <StyledBrandNameContainer>
-              <StyledBrand>{brand}</StyledBrand>
-              <StyledTitle>{name}</StyledTitle>
-            </StyledBrandNameContainer>
+          <StyledBrandRow>
+            <StyledBrand>{brand}</StyledBrand>
             {location && <StyledTag $type="location">{location}</StyledTag>}
-            {dressStyle && (
-              <StyledTag $type="dressStyle" aria-label={`Dress style: ${dressStyle.toLowerCase() === 'either' ? 'Dressy/Casual' : dressStyle}`}>{dressStyle.toLowerCase() === 'either' ? 'Dressy/Casual' : dressStyle}</StyledTag>
-            )}
+          </StyledBrandRow>
+          <StyledMetadata>
+            <StyledTagsContainer>
+              {dressStyle && (
+                <StyledTag $type="dressStyle" aria-label={`Dress style: ${dressStyle.toLowerCase() === 'either' ? 'Dressy/Casual' : dressStyle}`}>{dressStyle.toLowerCase() === 'either' ? 'Dressy/Casual' : dressStyle}</StyledTag>
+              )}
+            </StyledTagsContainer>
           </StyledMetadata>
         </StyledClickableArea>
       </StyledCard>

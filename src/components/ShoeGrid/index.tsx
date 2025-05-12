@@ -22,7 +22,6 @@ interface Option {
 interface Shoe {
   id: string;
   brand: string;
-  name: string;
   imageUrl: string | null;
   color: string;
   dressStyle: string;
@@ -108,7 +107,6 @@ export const ShoeGrid = ({
               key={shoe.id}
               id={shoe.id}
               brand={shoe.brand}
-              name={shoe.name}
               imageUrl={shoe.imageUrl}
               location={shoe.location}
               dressStyle={shoe.dressStyle}

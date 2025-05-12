@@ -93,6 +93,12 @@ export const StyledMetadata = styled.div`
   justify-content: space-between;
   gap: ${({ theme }) => theme.spacing[2]};
 
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: ${({ theme }) => theme.spacing[1]};
+  }
+
   @container card (max-width: 200px) {
     flex-direction: column;
     align-items: stretch;
@@ -115,19 +121,12 @@ export const StyledBrand = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
 
+  @media (max-width: 600px) {
+    margin-bottom: ${({ theme }) => theme.spacing[1]};
+  }
+
   @container card (max-width: 200px) {
     font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  }
-`;
-
-export const StyledTitle = styled.h3`
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
-  margin: 0;
-
-  @container card (max-width: 200px) {
-    font-size: ${({ theme }) => theme.typography.fontSize.base};
   }
 `;
 
@@ -135,6 +134,10 @@ export const StyledTagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing[1]};
+
+  @media (max-width: 600px) {
+    margin-top: ${({ theme }) => theme.spacing[1]};
+  }
 
   @container card (max-width: 200px) {
     gap: ${({ theme }) => theme.spacing[1]};
@@ -168,4 +171,19 @@ export const StyledColorChip = styled.div<{ $color: string }>`
 
 export const StyledClickableArea = styled.div<{ $isAuthenticated?: boolean }>`
   cursor: ${({ $isAuthenticated }) => $isAuthenticated ? 'pointer' : 'default'};
+`;
+
+export const StyledBrandRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: ${({ theme }) => theme.spacing[1]};
+  }
 `;
