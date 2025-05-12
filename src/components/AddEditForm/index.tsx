@@ -117,8 +117,8 @@ function AddEditFormContent({
     if (!formData.location) errors.location = 'Location is required.';
 
     setFormErrors(errors);
-    setIsLoading(false);
     if (Object.keys(errors).length > 0) {
+      setIsLoading(false);
       scrollToFirstError();
       return;
     }
@@ -279,6 +279,15 @@ function AddEditFormContent({
     setFormData(prev => ({ ...prev, imageUrl: '' }));
   };
 
+  if (isSuccess) {
+    return (
+      <SuccessMessage
+        message={successMessage}
+        onClose={() => {}}
+      />
+    );
+  }
+
   return (
     <>
       <StyledForm onSubmit={handleSubmit}>
@@ -432,8 +441,9 @@ function AddEditFormContent({
           <Button
             type="submit"
             disabled={isLoading}
+            $isLoading={isLoading}
           >
-            {isLoading ? 'Saving...' : isEditing ? 'Update Shoe' : 'Add Shoe'}
+            {isEditing ? 'Update Shoe' : 'Add Shoe'}
           </Button>
         </StyledButtonGroup>
       </StyledForm>
@@ -451,11 +461,6 @@ function AddEditFormContent({
           </Button>
         </StyledDangerZone>
       )}
-
-      <SuccessMessage
-        message={isSuccess ? successMessage : null}
-        onClose={() => setIsSuccess(false)}
-      />
     </>
   );
 }

@@ -1,12 +1,13 @@
 'use client';
 
 import { ButtonHTMLAttributes } from 'react';
-import { StyledButton } from './index.styled';
+import { StyledButton, StyledButtonSpinner } from './index.styled';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   $variant?: 'danger' | 'secondary' | 'tertiary';
   $fullWidth?: boolean;
   $size?: 'small' | 'default';
+  $isLoading?: boolean;
 }
 
 export const Button = ({
@@ -14,6 +15,7 @@ export const Button = ({
   $variant,
   $fullWidth,
   $size = 'default',
+  $isLoading = false,
   ...props
 }: ButtonProps) => {
   return (
@@ -21,9 +23,11 @@ export const Button = ({
       $variant={$variant}
       $fullWidth={$fullWidth}
       $size={$size}
+      disabled={props.disabled || $isLoading}
+      aria-busy={$isLoading}
       {...props}
     >
-      {children}
+      {$isLoading ? <StyledButtonSpinner aria-label="Loading" /> : children}
     </StyledButton>
   );
 };

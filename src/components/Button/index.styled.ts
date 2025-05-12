@@ -77,3 +77,18 @@ export const StyledButton = styled.button<StyledButtonProps>`
     }
   `}
 `;
+
+export const StyledButtonSpinner = styled.div`
+  width: 1em;
+  height: 1em;
+  border: 2px solid ${({ theme }) => theme.colors.primary[100]};
+  border-top: 2px solid ${({ theme }) => theme.colors.primary[500]};
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
