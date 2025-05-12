@@ -90,7 +90,7 @@ export const StyledContent = styled.div`
 export const StyledMetadata = styled.div`
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: ${({ theme }) => theme.spacing[2]};
 
   @media (max-width: 600px) {
@@ -134,13 +134,16 @@ export const StyledTagsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing[1]};
+  justify-content: flex-end;
 
   @media (max-width: 600px) {
     margin-top: ${({ theme }) => theme.spacing[1]};
+    justify-content: flex-start;
   }
 
   @container card (max-width: 200px) {
     gap: ${({ theme }) => theme.spacing[1]};
+    justify-content: flex-start;
   }
 `;
 

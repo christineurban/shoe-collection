@@ -110,6 +110,8 @@ export const ShoeGrid = ({
               imageUrl={shoe.imageUrl}
               location={shoe.location}
               dressStyle={shoe.dressStyle}
+              heelType={shoe.heelType}
+              shoeType={shoe.shoeType}
             />
           ))
         ) : (

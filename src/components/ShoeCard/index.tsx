@@ -23,6 +23,8 @@ interface ShoeCardProps {
   imageUrl: string | null;
   location?: string;
   dressStyle: string;
+  heelType: string;
+  shoeType: string;
 }
 
 export const ShoeCard: FC<ShoeCardProps> = ({
@@ -30,7 +32,9 @@ export const ShoeCard: FC<ShoeCardProps> = ({
   brand,
   imageUrl,
   location = '',
-  dressStyle
+  dressStyle,
+  heelType,
+  shoeType
 }) => {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -50,12 +54,14 @@ export const ShoeCard: FC<ShoeCardProps> = ({
     }
   };
 
+  const title = `${brand} ${heelType} ${shoeType}`;
+
   return (
     <StyledCard
       onKeyDown={handleKeyDown}
       tabIndex={isAuthenticated ? 0 : -1}
       role={isAuthenticated ? "button" : "article"}
-      aria-label={isAuthenticated ? `View details for ${brand}` : brand}
+      aria-label={isAuthenticated ? `View details for ${title}` : title}
       $isAuthenticated={isAuthenticated}
     >
       <StyledClickableArea
@@ -68,7 +74,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
             return (
               <StyledImage
                 src={imageUrl}
-                alt={brand}
+                alt={title}
                 width={200}
                 height={200}
               />
@@ -93,7 +99,7 @@ export const ShoeCard: FC<ShoeCardProps> = ({
         $isAuthenticated={isAuthenticated}
       >
         <StyledBrandRow>
-          <StyledBrand>{brand}</StyledBrand>
+          <StyledBrand>{title}</StyledBrand>
           {location && <StyledTag $type="location">{location}</StyledTag>}
         </StyledBrandRow>
         <StyledMetadata>
