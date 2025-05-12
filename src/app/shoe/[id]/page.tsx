@@ -1,7 +1,6 @@
 'use client';
 
 import { ShoeDetails } from '@/components/ShoeDetails';
-import { getShoeById } from '@/lib/api/shoe';
 import { Shoe } from '@/types/shoe';
 import { PageHeader } from '@/components/PageHeader';
 import { useEffect, useState } from 'react';
@@ -20,20 +19,12 @@ export default function ShoePage({ params }: PageProps) {
   useEffect(() => {
     const fetchShoe = async () => {
       try {
-        const data = await getShoeById(params.id);
-        const shoeData: Shoe = {
-          id: data.id,
-          brand: data.brand.name,
-          name: data.brand.name,
-          imageUrl: data.image_url,
-          colors: data.colors.map(c => c.color.name),
-          dressStyle: data.dress_style.name,
-          shoeType: data.shoe_type.name,
-          heelType: data.heel_type.name,
-          location: data.location.name,
-          notes: data.notes,
-        };
-        setShoe(shoeData);
+        const response = await fetch(`/api/shoe/${params.id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch shoe details');
+        }
+        const data = await response.json();
+        setShoe(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
