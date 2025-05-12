@@ -61,8 +61,32 @@ export async function GET(request: Request) {
       };
     }
 
+    // Updated dressStyle filter logic for 'either' handling
     if (dressStyles.length > 0) {
-      where.dress_style = { name: { in: dressStyles } };
+      // Normalize filter values
+      const normalizedDressStyles = dressStyles.map(s => s.toLowerCase().trim());
+      let dressStyleFilter: string[] = [];
+      const hasDressy = normalizedDressStyles.includes('dressy');
+      const hasCasual = normalizedDressStyles.includes('casual');
+      const hasEither = normalizedDressStyles.includes('either');
+
+      if (hasDressy && hasCasual) {
+        dressStyleFilter = ['dressy', 'casual', 'either'];
+      } else if (hasDressy) {
+        dressStyleFilter = ['dressy', 'either'];
+      } else if (hasCasual) {
+        dressStyleFilter = ['casual', 'either'];
+      } else if (hasEither) {
+        dressStyleFilter = ['either'];
+      }
+      if (dressStyleFilter.length > 0) {
+        where.dress_style = {
+          name: {
+            in: dressStyleFilter,
+            mode: 'insensitive'
+          }
+        };
+      }
     }
 
     if (shoeTypes.length > 0) {
