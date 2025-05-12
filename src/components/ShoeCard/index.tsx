@@ -24,6 +24,7 @@ interface ShoeCardProps {
   name: string;
   imageUrl: string | null;
   location?: string;
+  dressStyle: string;
 }
 
 export const ShoeCard: FC<ShoeCardProps> = ({
@@ -31,7 +32,8 @@ export const ShoeCard: FC<ShoeCardProps> = ({
   brand,
   name,
   imageUrl,
-  location = ''
+  location = '',
+  dressStyle
 }) => {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -103,6 +105,9 @@ export const ShoeCard: FC<ShoeCardProps> = ({
               <StyledTitle>{name}</StyledTitle>
             </StyledBrandNameContainer>
             {location && <StyledTag $type="location">{location}</StyledTag>}
+            {dressStyle && (
+              <StyledTag $type="dressStyle" aria-label={`Dress style: ${dressStyle.toLowerCase() === 'either' ? 'Dressy/Casual' : dressStyle}`}>{dressStyle.toLowerCase() === 'either' ? 'Dressy/Casual' : dressStyle}</StyledTag>
+            )}
           </StyledMetadata>
         </StyledClickableArea>
       </StyledCard>

@@ -20,7 +20,7 @@ export function Nav() {
   const { isAuthenticated, logout } = useAuth();
 
   const publicRoutes = [
-    { path: '/', label: 'Search' },
+    { path: '/', label: 'View All' },
   ];
 
   const protectedRoutes = [
