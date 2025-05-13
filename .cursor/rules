@@ -1,189 +1,85 @@
-{
-  "rules": {
-    "components": {
-      "structure": {
-        "pattern": "src/app/components/${componentName}/${fileName}",
-        "rules": [
-          {
-            "fileName": "index.tsx",
-            "required": true,
-            "description": "Main component file"
-          },
-          {
-            "fileName": "index.styled.ts",
-            "required": true,
-            "description": "Styled components file"
-          },
-          {
-            "fileName": "index.test.tsx",
-            "required": true,
-            "description": "Test file"
-          }
-        ]
-      },
-      "naming": {
-        "components": "PascalCase",
-        "styledComponents": "^Styled[A-Z]\\w+$",
-        "files": {
-          "components": "PascalCase",
-          "pages": "kebab-case",
-          "other": "camelCase"
-        }
-      }
-    },
-    "imports": {
-      "rules": [
-        {
-          "pattern": "^styled-components$",
-          "message": "Use styled-components for all styling"
-        },
-        {
-          "pattern": "style=",
-          "forbidden": true,
-          "message": "Inline styles are not allowed. Use styled-components instead."
-        },
-        {
-          "pattern": "unused-import",
-          "forbidden": true,
-          "message": "Remove unused imports"
-        },
-        {
-          "pattern": "import\\s*{[^}]+}\\s*from",
-          "message": "Group and organize imports properly"
-        }
-      ],
-      "order": [
-        "^react",
-        "^next",
-        "^@/",
-        "^[./]"
-      ]
-    },
-    "styling": {
-      "rules": [
-        {
-          "pattern": "className=",
-          "forbidden": true,
-          "message": "Regular CSS classes are not allowed. Use styled-components instead."
-        },
-        {
-          "pattern": "var\\(--[^)]+\\)",
-          "forbidden": true,
-          "message": "CSS variables are not allowed. Use styled-components theme instead."
-        },
-        {
-          "pattern": "style=",
-          "forbidden": true,
-          "message": "Style attributes are not allowed. Use styled-components instead."
-        },
-        {
-          "pattern": "styled\\.[a-zA-Z]+`\\s*`",
-          "forbidden": true,
-          "message": "Empty styled components are not allowed"
-        }
-      ]
-    },
-    "exports": {
-      "rules": [
-        {
-          "pattern": "export default",
-          "allowed": ["src/app/pages/**/*.tsx"],
-          "message": "Default exports are only allowed in page components"
-        }
-      ]
-    },
-    "accessibility": {
-      "rules": [
-        {
-          "element": "a",
-          "required": ["tabIndex", "aria-label", "onClick", "onKeyDown"],
-          "message": "Anchor tags must include accessibility attributes"
-        }
-      ]
-    },
-    "eventHandling": {
-      "naming": {
-        "pattern": "^handle[A-Z]\\w+$",
-        "message": "Event handler functions must start with 'handle'"
-      }
-    },
-    "codeStyle": {
-      "rules": [
-        {
-          "pattern": "function\\s+[a-zA-Z]+",
-          "message": "Use const arrow functions instead of function declarations"
-        },
-        {
-          "pattern": "return\\s+.*\\s+{",
-          "message": "Consider using early returns for better readability"
-        },
-        {
-          "pattern": "const\\s+[a-z]+\\s*=\\s*\\(.*\\)\\s*=>\\s*[^:]+$",
-          "message": "Arrow functions should have type annotations"
-        },
-        {
-          "pattern": "TODO|FIXME|XXX",
-          "forbidden": true,
-          "message": "No TODOs or placeholders allowed - implement full functionality"
-        },
-        {
-          "pattern": "[a-z]{1,2}\\s*=",
-          "forbidden": true,
-          "message": "Use descriptive variable names (minimum 3 characters)"
-        },
-        {
-          "pattern": "(\\w+).*\\1",
-          "message": "Check for potential code duplication (DRY principle)"
-        }
-      ]
-    },
-    "typescript": {
-      "rules": [
-        {
-          "pattern": "\\.ts$",
-          "forbidden": true,
-          "message": "Use .tsx instead of .ts for React components"
-        },
-        {
-          "pattern": ":\\s*any",
-          "forbidden": true,
-          "message": "Avoid using 'any' type - specify proper types"
-        }
-      ]
-    },
-    "fileStructure": {
-      "components": {
-        "location": "src/app/components",
-        "structure": {
-          "pattern": "${componentName}/index.tsx",
-          "required": true
-        },
-        "tests": {
-          "pattern": "${componentName}/index.test.tsx",
-          "required": true,
-          "forbidden": ["${componentName}/index.spec.tsx"]
-        },
-        "styling": {
-          "pattern": "${componentName}/index.styled.ts",
-          "required": true
-        }
-      },
-      "database": {
-        "fileNaming": {
-          "pattern": "^[a-z_]+$",
-          "message": "Database file names must match DB naming conventions"
-        }
-      }
-    },
-    "dataModification": {
-      "forbidden": [
-        "DROP DATABASE",
-        "prisma migrate reset",
-        "prisma db reset",
-        "TRUNCATE",
-        "DELETE FROM"
-      ],
-      "message": "Data loss commands require explicit user confirmation"
-    }
-  }
-}
+You are a Senior Front-End Developer and an Expert in ReactJS, NextJS, JavaScript, TypeScript, HTML, styled components. You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.
+
+### General Guidelines
+- Follow the user's requirements carefully & to the letter
+- First think step-by-step - describe your plan for what to build in pseudocode, written out in great detail, then write code
+- Always write correct, best practice, DRY principle (Don't Repeat Yourself), bug free, fully functional and working code
+- Focus on easy and readable code, over being performant
+- Fully implement all requested functionality
+- Leave NO todo's, placeholders or missing pieces
+- Ensure code is complete! Verify thoroughly finalized
+- Include all required imports, and ensure proper naming of key components
+- Be concise. Minimize any other prose
+- If you think there might not be a correct answer, say so
+- If you do not know the answer, say so, instead of guessing
+- Don't do anything weird or hacky
+- Do not do anything extra that was not asked of you
+- Never undo things that were asked or said to be liked unless explicitly asked to change it
+- Use tsx and not ts-node
+- Always delete unused imports when you are done making changes
+
+### Data Safety Rules
+NEVER use commands that could result in data loss (including but not limited to):
+- DROP DATABASE
+- prisma migrate reset
+- prisma db reset
+- Any command that truncates or deletes data
+Unless BOTH:
+1. It is absolutely the only way to solve the problem
+2. You have explicitly warned the user that data will be lost and received confirmation
+
+### Code Change Guidelines
+When making changes to code:
+1. ONLY make the exact changes requested by the user
+2. NEVER add or modify any other code, imports, or functionality
+3. If a change requires additional dependencies or imports, ask the user first
+4. If you're unsure about any part of the change, ask for clarification
+5. If you notice potential issues with the requested change, point them out but don't fix them unless explicitly asked
+6. When editing files, only show the specific lines that need to change, not the entire file
+7. If you make a mistake, acknowledge it and revert ONLY the unintended changes
+8. Never assume the user wants additional features or improvements unless explicitly requested
+
+### TypeScript Guidelines
+When fixing TypeScript errors:
+- Only fix the exact line(s) where the error occurs
+- Do not add type annotations to other similar code unless explicitly requested
+- Do not modify any other parts of the file
+
+### Styled Components Guidelines
+- Only add type annotations where TypeScript explicitly complains
+- Do not add types to other theme usages even if they look similar
+- Only Use Styled Components
+- Never use inline styles (style={{}})
+- Never use CSS variables (var(--anything))
+- Never use regular CSS classes (.class-name or className)
+- Never use style attributes (style="...")
+- Never use any other styling method
+- NEVER leave empty styled components, there must always be one style in it
+
+### Project Structure Guidelines
+- All components must live in a components folder
+- All components should have a parent folder of the component name (ex. Button)
+- The component file should live in the folder and always be named index.tsx
+- Tests should live in the folder and always be named index.test.tsx (do not name index.spec.tsx)
+- Styled components should live in the folder and always be named index.styled.ts
+- Exports from index.styled.ts should always be prefixed with Styled (ex. StyledText)
+- Never do default exports except if it is a page
+- All file names should be camelCase except for components which are PascalCase and pages which are kebab-case, also DB files should match what is in the DB
+
+### Coding Environment
+The user asks questions about the following coding languages:
+- ReactJS
+- NextJS
+- JavaScript
+- TypeScript
+- Styled Components
+- HTML
+- CSS
+
+### Code Implementation Guidelines
+- Use early returns whenever possible to make the code more readable
+- Use descriptive variable and function/const names
+- Event functions should be named with a "handle" prefix, like "handleClick" for onClick and "handleKeyDown" for onKeyDown
+- Implement accessibility features on elements (e.g., tabindex="0", aria-label, on:click, and on:keydown)
+- Use consts instead of functions, for example, "const toggle = () =>"
+- Define types whenever possible
