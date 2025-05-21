@@ -23,6 +23,7 @@ import {
 } from './index.styled';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 import type { Shoe } from '@/types/shoe';
+import Image from 'next/image';
 
 interface AddEditFormData {
   id?: string;
@@ -284,7 +285,14 @@ function AddEditFormContent({
           <StyledImageSection>
             <StyledImagePreview>
               {previewUrl ? (
-                <img src={previewUrl} alt="Shoe preview" />
+                <Image
+                  src={previewUrl}
+                  alt="Shoe preview"
+                  width={300}
+                  height={300}
+                  style={{ objectFit: 'cover' }}
+                  unoptimized // Since this is a blob URL
+                />
               ) : (
                 <StyledImagePlaceholder>
                   <FaCamera />
@@ -338,10 +346,10 @@ function AddEditFormContent({
                 value={formData.brand}
                 options={brands}
                 placeholder="Select brand"
-                onChange={(value) => handleSelectChange('brand', value)}
-                onOptionsChange={(newBrands) => {
-                  if (onBrandsChange) {
-                    onBrandsChange(newBrands);
+                onChange={(value) => {
+                  handleSelectChange('brand', value);
+                  if (onBrandsChange && !brands.includes(value)) {
+                    onBrandsChange([...brands, value]);
                   }
                 }}
                 isBrand={true}

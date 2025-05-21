@@ -125,7 +125,7 @@ function fetchUrl(url: string, retryCount = 0): Promise<string> {
       });
 
       req.end();
-    } catch (error) {
+    } catch {
       logger.error(`Invalid URL: ${url}`);
       reject(new Error('Invalid URL'));
     }
@@ -163,7 +163,7 @@ function normalizeUrl(url: string | null | undefined, baseUrl: string): string |
     cleanUrl.hash = '';
 
     return cleanUrl.toString();
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -268,10 +268,10 @@ export async function GET(request: Request) {
         uniqueImagesFound: uniqueImageArray.length
       }
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({
       error: 'Failed to fetch images',
-      details: error instanceof Error ? error.message : String(error)
+      details: 'An unexpected error occurred'
     }, { status: 500 });
   }
 }

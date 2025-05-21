@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { SingleSelect } from '@/components/fields/SingleSelect';
 import { MultiSelect } from '@/components/fields/MultiSelect';
 import { Button } from '@/components/Button';
@@ -55,26 +55,8 @@ interface FilterSortProps {
 }
 
 export const FilterSort = (props: FilterSortProps) => {
-  return (
-    <SuspenseBoundary>
-      <FilterSortContent {...props} />
-    </SuspenseBoundary>
-  );
-};
-
-function FilterSortContent({
-  brands,
-  dressStyles,
-  shoeTypes,
-  heelTypes,
-  locations,
-  currentFilters,
-  totalShoes,
-  displayedShoes,
-}: FilterSortProps): JSX.Element {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [filters, setFilters] = useState<FilterSortProps['currentFilters']>(currentFilters);
+  const [filters, setFilters] = useState<FilterSortProps['currentFilters']>(props.currentFilters);
   const [isFiltersVisible, setIsFiltersVisible] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -260,7 +242,7 @@ function FilterSortContent({
           )}
         </StyledFilterHeader>
         <MultiSelect
-          options={brands}
+          options={props.brands}
           values={filters.brand.map(b => b.value)}
           onChange={(values) => handleMultiChange('brand')(values.map(v => ({ value: v, label: v })))}
           placeholder="Select brands..."
@@ -277,7 +259,7 @@ function FilterSortContent({
           )}
         </StyledFilterHeader>
         <MultiSelect
-          options={dressStyles}
+          options={props.dressStyles}
           values={filters.dressStyle.map(s => s.value)}
           onChange={(values) => handleMultiChange('dressStyle')(values.map(v => ({ value: v, label: v })))}
           placeholder="Select dress styles..."
@@ -294,7 +276,7 @@ function FilterSortContent({
           )}
         </StyledFilterHeader>
         <MultiSelect
-          options={shoeTypes}
+          options={props.shoeTypes}
           values={filters.shoeType.map(t => t.value)}
           onChange={(values) => handleMultiChange('shoeType')(values.map(v => ({ value: v, label: v })))}
           placeholder="Select shoe types..."
@@ -311,7 +293,7 @@ function FilterSortContent({
           )}
         </StyledFilterHeader>
         <MultiSelect
-          options={heelTypes}
+          options={props.heelTypes}
           values={filters.heelType.map(t => t.value)}
           onChange={(values) => handleMultiChange('heelType')(values.map(v => ({ value: v, label: v })))}
           placeholder="Select heel types..."
@@ -328,7 +310,7 @@ function FilterSortContent({
           )}
         </StyledFilterHeader>
         <MultiSelect
-          options={locations}
+          options={props.locations}
           values={filters.location.map(l => l.value)}
           onChange={(values) => handleMultiChange('location')(values.map(v => ({ value: v, label: v })))}
           placeholder="Select locations..."
@@ -378,46 +360,59 @@ function FilterSortContent({
   );
 
   return (
-    <StyledFiltersContainer>
-      <StyledHeader>
-        <StyledCountDisplay>
-          Showing {displayedShoes} of {totalShoes} shoes
-        </StyledCountDisplay>
-        {!isMobile && (
-          <StyledToggleButton
-            onClick={() => setIsFiltersVisible(!isFiltersVisible)}
-            aria-expanded={isFiltersVisible}
-            aria-controls="filters-container"
-            $isExpanded={isFiltersVisible}
-          >
-            {isFiltersVisible ? 'Hide Filters' : 'Show Filters'}
-          </StyledToggleButton>
-        )}
-      </StyledHeader>
+    <SuspenseBoundary>
+      <StyledFiltersContainer>
+        <StyledHeader>
+          <StyledCountDisplay>
+            Showing {props.displayedShoes} of {props.totalShoes} shoes
+          </StyledCountDisplay>
+          {!isMobile && (
+            <StyledToggleButton
+              onClick={() => setIsFiltersVisible(!isFiltersVisible)}
+              aria-expanded={isFiltersVisible}
+              aria-controls="filters-container"
+              $isExpanded={isFiltersVisible}
+            >
+              {isFiltersVisible ? 'Hide Filters' : 'Show Filters'}
+            </StyledToggleButton>
+          )}
+        </StyledHeader>
 
-      {isMobile ? (
-        <>
-          <StyledMobileButton
-            onClick={handleDrawerOpen}
-            aria-label={`Filter & Sort${activeFilterCount > 0 ? `, ${activeFilterCount} filters selected` : ''}`}
-          >
-            <FiFilter />
-            Filter & Sort
-            {activeFilterCount > 0 && !isDrawerOpen && (
-              <StyledFilterCountBadge>{activeFilterCount}</StyledFilterCountBadge>
-            )}
-          </StyledMobileButton>
-          <StyledDrawerBackdrop
-            $isOpen={isDrawerOpen}
-            onClick={handleDrawerClose}
-          />
-          <StyledDrawer $isOpen={isDrawerOpen}>
-            <StyledDrawerHeader>
-              <StyledDrawerTitle>Filter & Sort</StyledDrawerTitle>
-              <StyledDrawerCloseButton onClick={handleDrawerClose} aria-label="Close filter and sort drawer">
-                <MdClose />
-              </StyledDrawerCloseButton>
-            </StyledDrawerHeader>
+        {isMobile ? (
+          <>
+            <StyledMobileButton
+              onClick={handleDrawerOpen}
+              aria-label={`Filter & Sort${activeFilterCount > 0 ? `, ${activeFilterCount} filters selected` : ''}`}
+            >
+              <FiFilter />
+              Filter & Sort
+              {activeFilterCount > 0 && !isDrawerOpen && (
+                <StyledFilterCountBadge>{activeFilterCount}</StyledFilterCountBadge>
+              )}
+            </StyledMobileButton>
+            <StyledDrawerBackdrop
+              $isOpen={isDrawerOpen}
+              onClick={handleDrawerClose}
+            />
+            <StyledDrawer $isOpen={isDrawerOpen}>
+              <StyledDrawerHeader>
+                <StyledDrawerTitle>Filter & Sort</StyledDrawerTitle>
+                <StyledDrawerCloseButton onClick={handleDrawerClose} aria-label="Close filter and sort drawer">
+                  <MdClose />
+                </StyledDrawerCloseButton>
+              </StyledDrawerHeader>
+              {renderFilterContent()}
+              {hasActiveFilters() && (
+                <StyledClearAllContainer>
+                  <Button onClick={clearAllFilters} $variant="danger" $fullWidth>
+                    Clear All Filters
+                  </Button>
+                </StyledClearAllContainer>
+              )}
+            </StyledDrawer>
+          </>
+        ) : (
+          <StyledContainer id="filters-container" $isVisible={isFiltersVisible}>
             {renderFilterContent()}
             {hasActiveFilters() && (
               <StyledClearAllContainer>
@@ -426,20 +421,9 @@ function FilterSortContent({
                 </Button>
               </StyledClearAllContainer>
             )}
-          </StyledDrawer>
-        </>
-      ) : (
-        <StyledContainer id="filters-container" $isVisible={isFiltersVisible}>
-          {renderFilterContent()}
-          {hasActiveFilters() && (
-            <StyledClearAllContainer>
-              <Button onClick={clearAllFilters} $variant="danger" $fullWidth>
-                Clear All Filters
-              </Button>
-            </StyledClearAllContainer>
-          )}
-        </StyledContainer>
-      )}
-    </StyledFiltersContainer>
+          </StyledContainer>
+        )}
+      </StyledFiltersContainer>
+    </SuspenseBoundary>
   );
 }

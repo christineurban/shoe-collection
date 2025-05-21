@@ -39,7 +39,6 @@ interface ImageSelectorProps {
   bulkMode?: boolean;
   onImageSelected?: (id: string, imageUrl: string | null) => void;
   selectedImage?: string | null;
-  returnTo?: string;
 }
 
 export const ImageSelector = ({
@@ -47,15 +46,14 @@ export const ImageSelector = ({
   onImageSaved,
   bulkMode = false,
   onImageSelected,
-  selectedImage: externalSelectedImage,
-  returnTo
+  selectedImage: externalSelectedImage
 }: ImageSelectorProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(externalSelectedImage || null);
   const [images, setImages] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed] = useState(false);
 
   const handleImageSelect = (imageUrl: string) => {
     if (bulkMode && onImageSelected) {

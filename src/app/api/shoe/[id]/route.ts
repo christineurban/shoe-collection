@@ -23,8 +23,6 @@ export async function GET(
       }
     });
 
-    console.log('Found shoe:', shoe);
-
     if (!shoe) {
       console.log('Shoe not found in database');
       return NextResponse.json(

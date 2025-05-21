@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import styled from 'styled-components';
@@ -77,7 +77,7 @@ const StyledError = styled.p`
   text-align: center;
 `;
 
-export default function LoginPage() {
+function LoginContent() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -142,5 +142,13 @@ export default function LoginPage() {
         <StyledButton type="submit">Login</StyledButton>
       </StyledForm>
     </StyledContainer>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

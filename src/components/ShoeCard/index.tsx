@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import {
   StyledCard,
@@ -37,7 +37,6 @@ export const ShoeCard: FC<ShoeCardProps> = ({
   shoeType
 }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isAuthenticated } = useAuth();
 
   const handleClick = () => {

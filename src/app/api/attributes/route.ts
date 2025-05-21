@@ -119,7 +119,6 @@ export async function POST(request: Request) {
       );
     }
 
-    let result;
     switch (type) {
       case 'brand':
         await prisma.brands.create({
@@ -282,25 +281,24 @@ export async function DELETE(request: Request) {
       );
     }
 
-    let result;
     switch (type) {
       case 'brand':
-        result = await prisma.brands.delete({ where: { id } });
+        await prisma.brands.delete({ where: { id } });
         break;
       case 'color':
-        result = await prisma.colors.delete({ where: { id } });
+        await prisma.colors.delete({ where: { id } });
         break;
       case 'dressStyle':
-        result = await prisma.dress_styles.delete({ where: { id } });
+        await prisma.dress_styles.delete({ where: { id } });
         break;
       case 'shoeType':
-        result = await prisma.shoe_types.delete({ where: { id } });
+        await prisma.shoe_types.delete({ where: { id } });
         break;
       case 'heelType':
-        result = await prisma.heel_types.delete({ where: { id } });
+        await prisma.heel_types.delete({ where: { id } });
         break;
       case 'location':
-        result = await prisma.locations.delete({ where: { id } });
+        await prisma.locations.delete({ where: { id } });
         break;
     }
 
