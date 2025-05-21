@@ -39,7 +39,6 @@ export async function GET(request: Request) {
     // Add search filter if provided
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
         { brand: { name: { contains: search, mode: 'insensitive' } } }
       ];
     }

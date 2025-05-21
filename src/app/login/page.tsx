@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import styled from 'styled-components';
 
@@ -81,8 +81,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -91,7 +93,7 @@ export default function LoginPage() {
         const data = await response.json();
 
         if (data.isAuthenticated) {
-          router.push('/');
+          router.push(returnTo || '/');
         } else {
           setIsLoading(false);
         }
@@ -102,7 +104,7 @@ export default function LoginPage() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, returnTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,11 +113,11 @@ export default function LoginPage() {
     try {
       const success = await login(password);
       if (success) {
-        router.push('/');
+        router.push(returnTo || '/');
       } else {
         setError('Incorrect password');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     }
   };

@@ -61,7 +61,7 @@ export async function uploadImageToSupabase(imageUrl: string, shoe: { brand: str
     const fileName = createUrlSafeFilename(shoe.brand, shoe.heel_type.name, shoe.shoe_type.name, shoe.id);
 
     // Upload the image to Supabase Storage
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin
       .storage
       .from('shoe-images')
       .upload(fileName, imageBlob, {

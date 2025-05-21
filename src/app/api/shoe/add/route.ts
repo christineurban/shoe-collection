@@ -161,7 +161,7 @@ export async function POST(request: Request) {
       location: newShoe.location.name,
       notes: newShoe.notes
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create shoe' },
       { status: 500 }

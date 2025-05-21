@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { FilterSort } from '@/components/FilterSort';
 import { ShoeCard } from '@/components/ShoeCard';
-import { useRouter } from 'next/navigation';
 import {
   StyledGrid,
   StyledEmptyState,
@@ -12,7 +11,6 @@ import {
 } from './index.styled';
 import { BsGrid } from 'react-icons/bs';
 import { MdOutlineViewAgenda } from 'react-icons/md';
-import { useAuth } from '@/lib/auth/AuthContext';
 
 interface Option {
   value: string;
@@ -62,9 +60,7 @@ export const ShoeGrid = ({
   currentFilters,
   totalShoes,
 }: ShoeGridProps) => {
-  const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const { isAuthenticated } = useAuth();
 
   return (
     <>

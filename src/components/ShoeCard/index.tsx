@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import {
   StyledCard,
@@ -37,17 +37,18 @@ export const ShoeCard: FC<ShoeCardProps> = ({
   shoeType
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useAuth();
 
   const handleClick = () => {
     if (isAuthenticated) {
       router.push(`/shoe/${id}`);
+    } else {
+      router.push(`/login?returnTo=/shoe/${id}`);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isAuthenticated) return;
-
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleClick();

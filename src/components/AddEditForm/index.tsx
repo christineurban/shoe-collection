@@ -230,18 +230,6 @@ function AddEditFormContent({
     }
   };
 
-  const handleMultiSelectChange = (name: string, values: string[]) => {
-    setFormData(prev => ({ ...prev, [name]: values }));
-    // Clear validation error if field has values
-    if (values.length > 0) {
-      setFormErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
   const handleImageCapture = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();

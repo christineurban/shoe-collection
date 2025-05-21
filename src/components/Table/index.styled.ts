@@ -2,11 +2,6 @@
 
 import styled from 'styled-components';
 
-interface SortButtonProps {
-  active?: boolean;
-  direction?: 'asc' | 'desc';
-}
-
 interface TableHeaderProps {
   $active?: boolean;
   $direction?: 'asc' | 'desc';

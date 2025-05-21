@@ -7,11 +7,6 @@ import { ShoeGrid } from '@/components/ShoeGrid';
 import { Pagination } from '@/components/Pagination';
 import { SuspenseBoundary } from '@/components/SuspenseBoundary';
 
-interface Option {
-  value: string;
-  label: string;
-}
-
 interface Shoe {
   id: string;
   brand: string;

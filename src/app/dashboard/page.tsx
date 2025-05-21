@@ -205,10 +205,6 @@ export default function Dashboard() {
     handleAdd(newAttributeName, type);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewAttributeName(e.target.value);
-  };
-
   const sortAttributes = (attributes: Attribute[] = []): Attribute[] => {
     return [...attributes].sort((a, b) => {
       switch (sortOrder) {

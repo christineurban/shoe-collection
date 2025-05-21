@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     // Update all records where image_url contains 'googleusercontent'
     const result = await prisma.shoes.updateMany({

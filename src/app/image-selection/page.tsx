@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth/AuthContext';
 import { ImageSelector } from '@/components/ImageSelector';
 import { EmptyState } from '@/components/EmptyState';
 import { Pagination } from '@/components/Pagination';
@@ -39,15 +38,6 @@ const StyledPaginationContainer = styled.div`
   gap: 1rem;
 `;
 
-const StyledLoadingContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  gap: 1rem;
-`;
-
 interface PageProps {
   searchParams: {
     page?: string;
@@ -56,7 +46,6 @@ interface PageProps {
 
 export default function ImageSelectionPage({ searchParams }: PageProps) {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
   const [shoes, setShoes] = useState<Shoe[]>([]);
   const [selectedImages, setSelectedImages] = useState<Record<string, string | null>>({});
   const [isLoading, setIsLoading] = useState(true);

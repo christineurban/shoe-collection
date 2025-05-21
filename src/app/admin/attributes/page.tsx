@@ -8,8 +8,8 @@ import { StyledContainer } from './page.styled';
 
 export default function AttributesPage() {
   const [activeTab, setActiveTab] = useState('brands');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading] = useState(false);
+  const [error] = useState<string | null>(null);
 
   const tabs = [
     {

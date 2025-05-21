@@ -145,7 +145,7 @@ function normalizeUrl(url: string | null | undefined, baseUrl: string): string |
       try {
         const base = new URL(baseUrl);
         url = new URL(url, `${base.protocol}//${base.host}`).toString();
-      } catch (e) {
+      } catch {
         return null;
       }
     }
@@ -154,7 +154,7 @@ function normalizeUrl(url: string | null | undefined, baseUrl: string): string |
     let cleanUrl: URL;
     try {
       cleanUrl = new URL(url);
-    } catch (e) {
+    } catch {
       return null;
     }
 
@@ -168,53 +168,10 @@ function normalizeUrl(url: string | null | undefined, baseUrl: string): string |
   }
 }
 
-const isLikelyProductImage = (imgElement: Element): boolean => {
-  const src = imgElement.attribs?.['src'] || '';
-  const dataSrc = imgElement.attribs?.['data-src'] || '';
-  const rawUrl = (src || dataSrc).toLowerCase();
-
-  // Strip query params and hash
-  const url = rawUrl.split('?')[0].split('#')[0];
-
-  // Skip SVGs
-  if (url.endsWith('.svg')) {
-    return false;
-  }
-
-  // Skip small images
-  const width = parseInt(imgElement.attribs?.['width'] || '0');
-  const height = parseInt(imgElement.attribs?.['height'] || '0');
-  if ((width > 0 && width < 200) || (height > 0 && height < 200)) {
-    return false;
-  }
-
-  return true;
-}
-
 function extractSrcsetUrls(srcset: string): string[] {
   return srcset.split(',')
     .map(part => part.trim().split(/\s+/)[0])
     .filter(Boolean);
-}
-
-// Helper function to find images in JSON-LD data
-function findImagesInJsonLd(obj: any, uniqueImages: Set<string>, baseUrl: string): void {
-  if (!obj) return;
-
-  if (typeof obj === 'string' && obj.match(/\.(jpg|jpeg|png|webp)/i)) {
-    const normalizedUrl = normalizeUrl(obj, baseUrl);
-    if (normalizedUrl) {
-      uniqueImages.add(normalizedUrl);
-    }
-  }
-
-  if (Array.isArray(obj)) {
-    obj.forEach(item => findImagesInJsonLd(item, uniqueImages, baseUrl));
-  }
-
-  if (typeof obj === 'object') {
-    Object.values(obj).forEach(value => findImagesInJsonLd(value, uniqueImages, baseUrl));
-  }
 }
 
 function isString(value: unknown): value is string {

@@ -54,17 +54,6 @@ interface FilterSortProps {
   displayedShoes: number;
 }
 
-interface FilterState {
-  brand: Option[];
-  dressStyle: Option[];
-  shoeType: Option[];
-  heelType: Option[];
-  location: Option[];
-  search: string;
-  sort: string;
-  hasImage: string;
-}
-
 export const FilterSort = (props: FilterSortProps) => {
   return (
     <SuspenseBoundary>
@@ -89,6 +78,7 @@ function FilterSortContent({
   const [isFiltersVisible, setIsFiltersVisible] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -102,18 +92,6 @@ function FilterSortContent({
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
-
-  const ratings = [
-    'A_PLUS', 'A', 'A_MINUS',
-    'B_PLUS', 'B', 'B_MINUS',
-    'C_PLUS', 'C', 'C_MINUS',
-    'D_PLUS', 'D', 'D_MINUS',
-    'F'
-  ];
-
-  const formatRatingForDisplay = (rating: string): string => {
-    return rating.replace('_PLUS', '+').replace('_MINUS', '-');
-  };
 
   const updateUrl = (newFilters: typeof filters) => {
     const params = new URLSearchParams();
@@ -146,16 +124,19 @@ function FilterSortContent({
       [key]: value
     };
     setFilters(newFilters);
-    updateUrl(newFilters);
-  };
 
-  const handleBrandChange = (value: string) => {
-    const newFilters = {
-      ...filters,
-      brand: value ? [{ value, label: value }] : []
-    };
-    setFilters(newFilters);
-    updateUrl(newFilters);
+    // If this is a search input, debounce the URL update
+    if (key === 'search') {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      const timeout = setTimeout(() => {
+        updateUrl(newFilters);
+      }, 500);
+      setSearchTimeout(timeout);
+    } else {
+      updateUrl(newFilters);
+    }
   };
 
   const handleMultiChange = (key: keyof typeof filters) => (values: Option[]) => {

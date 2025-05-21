@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     let result;
     switch (type) {
       case 'brand':
-        result = await prisma.brands.create({
+        await prisma.brands.create({
           data: {
             name,
             updated_at: new Date()
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
         });
         break;
       case 'color':
-        result = await prisma.colors.create({
+        await prisma.colors.create({
           data: {
             name,
             updated_at: new Date()
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
         });
         break;
       case 'dressStyle':
-        result = await prisma.dress_styles.create({
+        await prisma.dress_styles.create({
           data: {
             name,
             updated_at: new Date()
@@ -146,7 +146,7 @@ export async function POST(request: Request) {
         });
         break;
       case 'shoeType':
-        result = await prisma.shoe_types.create({
+        await prisma.shoe_types.create({
           data: {
             name,
             updated_at: new Date()
@@ -154,7 +154,7 @@ export async function POST(request: Request) {
         });
         break;
       case 'heelType':
-        result = await prisma.heel_types.create({
+        await prisma.heel_types.create({
           data: {
             name,
             updated_at: new Date()
@@ -162,7 +162,7 @@ export async function POST(request: Request) {
         });
         break;
       case 'location':
-        result = await prisma.locations.create({
+        await prisma.locations.create({
           data: {
             name,
             updated_at: new Date()

@@ -66,8 +66,8 @@ export const StyledLogo = styled(Link)`
 `;
 
 export const StyledLink = styled(Link)<{ $isActive: boolean }>`
-  color: ${({ theme, $isActive }) =>
-    $isActive ? theme.colors.text.inverse : `${theme.colors.text.inverse}80`};
+  color: ${({ $isActive }) =>
+    $isActive ? 'white' : 'rgba(255, 255, 255, 0.5)'};
   text-decoration: none;
   font-weight: ${({ theme }) => theme.typography.fontWeights.medium};
   padding: 0.5rem 1rem;

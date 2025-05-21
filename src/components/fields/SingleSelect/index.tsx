@@ -9,21 +9,19 @@ import {
   StyledCreateNew,
 } from './index.styled';
 import { StyledDropdown } from '../index.styled';
-import type { CSSProperties } from 'react';
 
 interface SingleSelectProps {
   value: string;
   options: string[];
   placeholder?: string;
   onChange: (value: string) => void;
-  onOptionsChange?: (newOptions: string[]) => void;
   disableSearch?: boolean;
   isBrand?: boolean;
   isColor?: boolean;
   'data-error'?: boolean;
 }
 
-export const SingleSelect = ({ value, options, placeholder = 'Select...', onChange, onOptionsChange, disableSearch = false, isBrand = false, isColor = false, 'data-error': hasError }: SingleSelectProps) => {
+export const SingleSelect = ({ value, options, placeholder = 'Select...', onChange, disableSearch = false, isBrand = false, isColor = false, 'data-error': hasError }: SingleSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -105,15 +103,6 @@ export const SingleSelect = ({ value, options, placeholder = 'Select...', onChan
       setIsOpen(false);
       setSearchTerm('');
     }
-  };
-
-  const inputStyles: CSSProperties = {
-    width: '100%',
-    height: '40px',
-    padding: '0.5rem 1rem',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    fontSize: '1rem',
   };
 
   return (

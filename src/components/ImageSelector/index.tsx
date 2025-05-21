@@ -52,9 +52,7 @@ export const ImageSelector = ({
 }: ImageSelectorProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(externalSelectedImage || null);
   const [images, setImages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isRemoving, setIsRemoving] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -67,43 +65,6 @@ export const ImageSelector = ({
       if (onImageSelected) {
         onImageSelected(shoe.id, imageUrl);
       }
-    }
-  };
-
-  const handleRemoveImage = async () => {
-    try {
-      setIsRemoving(true);
-
-      const response = await fetch('/api/remove-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: shoe.id
-        }),
-      });
-
-      if (response.ok) {
-        setSuccessMessage('Image removed successfully!');
-        setIsSuccess(true);
-        if (onImageSaved) {
-          setTimeout(() => {
-            onImageSaved();
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            setIsSuccess(false);
-          }, 1500);
-        }
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to remove image');
-      }
-    } catch (error) {
-      console.error('Error removing image:', error);
-    } finally {
-      setIsRemoving(false);
     }
   };
 
@@ -145,10 +106,6 @@ export const ImageSelector = ({
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
   };
 
   const handlePastedImage = (imageUrl: string) => {

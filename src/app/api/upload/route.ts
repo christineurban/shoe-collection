@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const filename = `${timestamp}-${image.name}`;
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('shoe-images')
       .upload(filename, fileBuffer, {
         contentType: image.type,
