@@ -28,12 +28,14 @@ import { SuccessMessage } from '@/components/SuccessMessage';
 import { Stats } from '@/types/stats';
 import { Attribute } from '@/types/attribute';
 import { AttributeTable } from '@/components/AttributeTable';
+import { useAuth } from '@/lib/auth/AuthContext';
 
 type SortOrder = 'name-asc' | 'name-desc' | 'count-asc' | 'count-desc';
 type ViewMode = 'card' | 'table';
 
 export default function Dashboard() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState<Stats>({
     totalShoes: 0,
     totalBrands: 0,
@@ -259,8 +261,9 @@ export default function Dashboard() {
   };
 
   const handleStatClick = (type: 'brands' | 'colors' | 'dressStyles' | 'shoeTypes' | 'heelTypes' | 'locations') => {
-    if (selectedAttribute === type) return;
-
+    if (!isAuthenticated) {
+      return; // Do nothing if not authenticated
+    }
     setSelectedAttribute(type);
     if (attributeListRef.current) {
       attributeListRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -316,7 +319,7 @@ export default function Dashboard() {
     <StyledDashboard>
       <PageHeader
         title="Dashboard"
-        description="Click on a tile to view and manage details"
+        description={isAuthenticated ? "Click on a tile to view and manage details" : "View collection statistics"}
       />
 
       <SuccessMessage
@@ -382,7 +385,7 @@ export default function Dashboard() {
         />
       </StyledStatsGrid>
 
-      {selectedAttribute && (
+      {selectedAttribute && isAuthenticated && (
         <>
           <StyledScrollIndicator>
             <BsChevronDown />

@@ -8,6 +8,7 @@ export function middleware(request: NextRequest) {
   // Public routes that don't require authentication
   const publicRoutes = [
     '/',
+    '/dashboard',
     '/api/shoes',
     '/api/brands',
     '/api/colors',

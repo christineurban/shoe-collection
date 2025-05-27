@@ -21,10 +21,10 @@ export function Nav() {
 
   const publicRoutes = [
     { path: '/', label: 'View All' },
+    { path: '/dashboard', label: 'Dashboard' },
   ];
 
   const protectedRoutes = [
-    { path: '/dashboard', label: 'Dashboard' },
     { path: '/shoe/add', label: 'Add New Shoe' },
   ];
 
