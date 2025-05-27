@@ -266,7 +266,14 @@ export default function Dashboard() {
     }
     setSelectedAttribute(type);
     if (attributeListRef.current) {
-      attributeListRef.current.scrollIntoView({ behavior: 'smooth' });
+      const navHeight = 78; // Height of the nav bar
+      const elementPosition = attributeListRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 

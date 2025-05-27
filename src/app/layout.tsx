@@ -6,6 +6,7 @@ import { ThemeProvider } from '../theme';
 import { Nav } from '@/components/Nav';
 import { MainContainer } from '@/components/MainContainer';
 import { AuthProvider } from '@/lib/auth/AuthContext';
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 const onest = Onest({
   subsets: ['latin'],
@@ -29,6 +30,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <ThemeProvider>
             <AuthProvider>
+            <ScrollToTop />
               <Nav />
               <MainContainer>
                 {children}
