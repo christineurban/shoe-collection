@@ -12,7 +12,7 @@ interface Shoe {
   brand: string;
   name: string;
   imageUrl: string | null;
-  color: string;
+  colors: string[];
   dressStyle: string;
   shoeType: string;
   heelType: string;
@@ -39,6 +39,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [shoes, setShoes] = useState<Shoe[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
   const [dressStyles, setDressStyles] = useState<string[]>([]);
   const [shoeTypes, setShoeTypes] = useState<string[]>([]);
   const [heelTypes, setHeelTypes] = useState<string[]>([]);
@@ -52,6 +53,7 @@ function HomeContent() {
   // Get current filters from URL
   const currentFilters = {
     brand: searchParams.getAll('brand').map(value => ({ value, label: value })),
+    colors: searchParams.getAll('colors').map(value => ({ value, label: value })),
     dressStyle: searchParams.getAll('dressStyle').map(value => ({ value, label: value })),
     shoeType: searchParams.getAll('shoeType').map(value => ({ value, label: value })),
     heelType: searchParams.getAll('heelType').map(value => ({ value, label: value })),
@@ -69,6 +71,7 @@ function HomeContent() {
         if (!response.ok) throw new Error('Failed to fetch options');
         const data = await response.json();
         setBrands(data.brands);
+        setColors(data.colors);
         setDressStyles(data.dressStyles);
         setShoeTypes(data.shoeTypes);
         setHeelTypes(data.heelTypes);
@@ -88,6 +91,7 @@ function HomeContent() {
         const search = searchParams.get('search');
         const hasImage = searchParams.get('hasImage');
         const brands = searchParams.getAll('brand');
+        const colors = searchParams.getAll('colors');
         const dressStyles = searchParams.getAll('dressStyle');
         const shoeTypes = searchParams.getAll('shoeType');
         const heelTypes = searchParams.getAll('heelType');
@@ -97,6 +101,7 @@ function HomeContent() {
         if (search) params.set('search', search);
         if (hasImage) params.set('hasImage', hasImage);
         brands.forEach(brand => params.append('brand', brand));
+        colors.forEach(color => params.append('colors', color));
         dressStyles.forEach(style => params.append('dressStyle', style));
         shoeTypes.forEach(type => params.append('shoeType', type));
         heelTypes.forEach(type => params.append('heelType', type));
@@ -156,6 +161,7 @@ function HomeContent() {
       <ShoeGrid
         shoes={shoes}
         brands={brands}
+        colors={colors}
         dressStyles={dressStyles}
         shoeTypes={shoeTypes}
         heelTypes={heelTypes}

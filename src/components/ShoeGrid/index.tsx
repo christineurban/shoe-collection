@@ -21,7 +21,7 @@ interface Shoe {
   id: string;
   brand: string;
   imageUrl: string | null;
-  color: string;
+  colors: string[];
   dressStyle: string;
   shoeType: string;
   heelType: string;
@@ -31,12 +31,14 @@ interface Shoe {
 interface ShoeGridProps {
   shoes: Shoe[];
   brands: string[];
+  colors: string[];
   dressStyles: string[];
   shoeTypes: string[];
   heelTypes: string[];
   locations: string[];
   currentFilters: {
     brand: Option[];
+    colors: Option[];
     dressStyle: Option[];
     shoeType: Option[];
     heelType: Option[];
@@ -53,6 +55,7 @@ type ViewMode = 'grid' | 'list';
 export const ShoeGrid = ({
   shoes,
   brands,
+  colors,
   dressStyles,
   shoeTypes,
   heelTypes,
@@ -66,6 +69,7 @@ export const ShoeGrid = ({
     <>
       <FilterSort
         brands={brands}
+        colors={colors}
         dressStyles={dressStyles}
         shoeTypes={shoeTypes}
         heelTypes={heelTypes}
@@ -104,6 +108,7 @@ export const ShoeGrid = ({
               id={shoe.id}
               brand={shoe.brand}
               imageUrl={shoe.imageUrl}
+              colors={shoe.colors}
               location={shoe.location}
               dressStyle={shoe.dressStyle}
               heelType={shoe.heelType}

@@ -54,7 +54,9 @@ export const StyledClearAllContainer = styled.div`
 
   @media (max-width: 767px) {
     margin-top: 0.5rem;
+    margin-bottom: 1rem;
     padding-top: 1rem;
+    padding-bottom: 1rem;
     border-top: 1px solid ${({ theme }) => theme.colors.gray[200]};
   }
 
@@ -69,8 +71,8 @@ export const StyledClearAllContainer = styled.div`
   }
 
   @media (min-width: 1200px) {
-    grid-column: 3;
-    grid-row: 3;
+    grid-column: 1 / -1;
+    grid-row: auto;
     align-self: flex-end;
   }
 `;

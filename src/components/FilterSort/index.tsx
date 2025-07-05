@@ -36,12 +36,14 @@ interface Option {
 
 interface FilterSortProps {
   brands: string[];
+  colors: string[];
   dressStyles: string[];
   shoeTypes: string[];
   heelTypes: string[];
   locations: string[];
   currentFilters: {
     brand: Option[];
+    colors: Option[];
     dressStyle: Option[];
     shoeType: Option[];
     heelType: Option[];
@@ -142,6 +144,7 @@ export const FilterSort = (props: FilterSortProps) => {
   const clearAllFilters = () => {
     const newFilters = {
       brand: [],
+      colors: [],
       dressStyle: [],
       shoeType: [],
       heelType: [],
@@ -175,7 +178,7 @@ export const FilterSort = (props: FilterSortProps) => {
 
   const hasActiveFilters = () => {
     // Check array filters
-    const hasArrayFilters = ['brand', 'dressStyle', 'shoeType', 'heelType', 'location'].some(
+    const hasArrayFilters = ['brand', 'colors', 'dressStyle', 'shoeType', 'heelType', 'location'].some(
       key => filters[key as keyof typeof filters].length > 0
     );
 
@@ -203,6 +206,7 @@ export const FilterSort = (props: FilterSortProps) => {
     let count = 0;
     if (filters.search) count++;
     if (filters.brand.length > 0) count++;
+    if (filters.colors.length > 0) count++;
     if (filters.dressStyle.length > 0) count++;
     if (filters.shoeType.length > 0) count++;
     if (filters.heelType.length > 0) count++;
@@ -246,6 +250,23 @@ export const FilterSort = (props: FilterSortProps) => {
           values={filters.brand.map(b => b.value)}
           onChange={(values) => handleMultiChange('brand')(values.map(v => ({ value: v, label: v })))}
           placeholder="Select brands..."
+        />
+      </StyledFilterGroup>
+
+      <StyledFilterGroup>
+        <StyledFilterHeader>
+          <StyledLabel>Color</StyledLabel>
+          {filters.colors.length > 0 && (
+            <StyledClearButton onClick={() => clearFilter('colors')}>
+              Clear
+            </StyledClearButton>
+          )}
+        </StyledFilterHeader>
+        <MultiSelect
+          options={props.colors}
+          values={filters.colors.map(c => c.value)}
+          onChange={(values) => handleMultiChange('colors')(values.map(v => ({ value: v, label: v })))}
+          placeholder="Select colors..."
         />
       </StyledFilterGroup>
 
@@ -401,7 +422,6 @@ export const FilterSort = (props: FilterSortProps) => {
                   <MdClose />
                 </StyledDrawerCloseButton>
               </StyledDrawerHeader>
-              {renderFilterContent()}
               {hasActiveFilters() && (
                 <StyledClearAllContainer>
                   <Button onClick={clearAllFilters} $variant="danger" $fullWidth>
@@ -409,6 +429,7 @@ export const FilterSort = (props: FilterSortProps) => {
                   </Button>
                 </StyledClearAllContainer>
               )}
+              {renderFilterContent()}
             </StyledDrawer>
           </>
         ) : (
