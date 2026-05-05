@@ -131,10 +131,20 @@ export async function GET(request: Request) {
       return 3;
     };
 
+    const isUnknownBrand = (shoe: typeof allShoes[number]) =>
+      shoe.brand.name.toLowerCase() === 'unknown';
+
     const sortedShoes = allShoes.sort((a, b) => {
+      const aIsUnknown = isUnknownBrand(a);
+      const bIsUnknown = isUnknownBrand(b);
+      if (aIsUnknown !== bIsUnknown) {
+        return aIsUnknown ? 1 : -1;
+      }
+
       const aPriority = getPriority(a);
       const bPriority = getPriority(b);
       if (aPriority !== bPriority) return aPriority - bPriority;
+
       // fallback: newest first
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
