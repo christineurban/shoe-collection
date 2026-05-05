@@ -32,32 +32,34 @@ export default function AddShoePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const response = await fetch('/api/options');
+  const fetchOptions = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/options', { cache: 'no-store' });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch options');
-        }
-
-        const data = await response.json();
-
-        setOptions({
-          brands: data.brands,
-          colors: data.colors,
-          dressStyles: data.dressStyles,
-          shoeTypes: data.shoeTypes,
-          heelTypes: data.heelTypes,
-          locations: data.locations
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error('Failed to fetch options');
       }
-    };
 
+      const data = await response.json();
+
+      setOptions({
+        brands: data.brands,
+        colors: data.colors,
+        dressStyles: data.dressStyles,
+        shoeTypes: data.shoeTypes,
+        heelTypes: data.heelTypes,
+        locations: data.locations
+      });
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchOptions();
   }, []);
 

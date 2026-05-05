@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const [brands, colors, dressStyles, shoeTypes, heelTypes, locations] = await Promise.all([
@@ -31,6 +33,12 @@ export async function GET() {
       shoeTypes: shoeTypes.filter(s => s.name !== 'Unknown').map(s => s.name),
       heelTypes: heelTypes.filter(h => h.name !== 'Unknown').map(h => h.name),
       locations: locations.filter(l => l.name !== 'Unknown').map(l => l.name)
+    }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     });
   } catch (error) {
     console.error('Error fetching options:', error);

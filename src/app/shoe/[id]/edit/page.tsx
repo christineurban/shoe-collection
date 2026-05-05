@@ -33,7 +33,7 @@ export default function EditShoePage({ params }: { params: { id: string } }) {
       try {
         const [shoeResponse, optionsResponse] = await Promise.all([
           fetch(`/api/shoe/${params.id}`),
-          fetch('/api/options')
+          fetch('/api/options', { cache: 'no-store' })
         ]);
 
         if (!shoeResponse.ok || !optionsResponse.ok) {

@@ -67,7 +67,7 @@ function HomeContent() {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const response = await fetch('/api/options');
+        const response = await fetch('/api/options', { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to fetch options');
         const data = await response.json();
         setBrands(data.brands);
