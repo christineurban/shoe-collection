@@ -100,8 +100,8 @@ export async function GET(request: Request) {
       where.location = { name: { in: locations } };
     }
 
-    // Get all shoes that match the filters and total count in a single query
-    const [allShoes, total] = await Promise.all([
+    // Default ordering: most recently added shoes first
+    const [paginatedShoes, total] = await Promise.all([
       prisma.shoes.findMany({
         where,
         include: {
@@ -116,41 +116,12 @@ export async function GET(request: Request) {
           heel_type: true,
           location: true
         },
-        // Remove orderBy for custom JS sorting
+        orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
+        skip: (page - 1) * limit,
+        take: limit
       }),
       prisma.shoes.count({ where })
     ]);
-
-    // Custom sort: heeled boots first, then just heels, then just boots, then others, then by created_at desc
-    const getPriority = (shoe: typeof allShoes[number]) => {
-      const isHeel = shoe.heel_type.name.toLowerCase() === 'heel';
-      const isBoot = shoe.shoe_type.name.toLowerCase() === 'boot';
-      if (isHeel && isBoot) return 0; // highest priority
-      if (isHeel) return 1;
-      if (isBoot) return 2;
-      return 3;
-    };
-
-    const isUnknownBrand = (shoe: typeof allShoes[number]) =>
-      shoe.brand.name.toLowerCase() === 'unknown';
-
-    const sortedShoes = allShoes.sort((a, b) => {
-      const aIsUnknown = isUnknownBrand(a);
-      const bIsUnknown = isUnknownBrand(b);
-      if (aIsUnknown !== bIsUnknown) {
-        return aIsUnknown ? 1 : -1;
-      }
-
-      const aPriority = getPriority(a);
-      const bPriority = getPriority(b);
-      if (aPriority !== bPriority) return aPriority - bPriority;
-
-      // fallback: newest first
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-
-    // Paginate after sorting
-    const paginatedShoes = sortedShoes.slice((page - 1) * limit, page * limit);
 
     const totalPages = Math.ceil(total / limit);
 
